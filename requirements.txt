@@ -1,0 +1,9 @@
+numpy
+plotly
+torch==1.8.1
+pytorch3d
+tensorflow
+matplotlib
+seaborn
+jupyter
+
