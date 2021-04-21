@@ -19,6 +19,7 @@
     - [`4.3. Libraries`](#43-libraries)
 - [`Contributors`](#contributors)
 
+--- 
 
 ## 1. Repository Structure
 - [`data`](/data): Contains some sample data
