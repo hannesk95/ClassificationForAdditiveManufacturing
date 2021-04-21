@@ -69,7 +69,7 @@
 - Is all data used in the end?
 
 
-### 2.5. Data Quality/Verification
+### 3.5. Data Quality/Verification
 
 - Does the Data match the requirements (from problem description)?
 
@@ -77,16 +77,16 @@
 
 ## 4. Requirements
 
-### Data
+### 4.1 Data
 - Thingi10K
 - ABC Dataset
 
-### Infrastructure
+### 4.2 Infrastructure
 - LRZ AI System
 - Docker 
 - Enroot
 
-### Libraries
+### 4.3 Libraries
 - PyTorch
 - Numpy
 - Matplotlib
