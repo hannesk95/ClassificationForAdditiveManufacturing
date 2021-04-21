@@ -4,16 +4,12 @@ RUN apt-get update
 RUN apt-get -y install python3
 RUN apt-get -y install python3-pip
 
-RUN pip3 install numpy
-RUN pip3 install plotly
-RUN pip3 install torch==1.8.1
-RUN pip3 install pytorch3d
+RUN pip3 install -r requirements.txt
 
 RUN pip3 install torch-scatter -f https://pytorch-geometric.com/whl/torch-${1.8.1}+${11.2.2}.html
 RUN pip3 install torch-sparse -f https://pytorch-geometric.com/whl/torch-${1.8.1}+${11.2.2}.html
 RUN pip3 install torch-cluster -f https://pytorch-geometric.com/whl/torch-${1.8.1}+${11.2.2}.html
 RUN pip3 install torch-spline-conv -f https://pytorch-geometric.com/whl/torch-${1.8.1}+${11.2.2}.html
-RUN pip3 install torch-geometric
 
 # Maybe add kaolin repo to our git and copy it from there to the image
 RUN apt-get -y install git
