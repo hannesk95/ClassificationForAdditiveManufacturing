@@ -19,8 +19,8 @@
 
 |                                     |                                  |
 | ----------------------------------- | -------------------------------- |
-| Bouziane, Nouhayla                  | nouhayla.bouziane931@gmail.com   |
-| Ebid, Ahmend                        | ge75roz@mytum.de                 |
+| Bouziane, Nouhayla                  | nouhayla.bouziane@tum.de         |
+| Ebid, Ahmed                         | ahmed.ebid@tum.de                |
 | Srinivas, Aditya                    | aditya.srinivas@tum.de           |
 | Bok, Felix                          | felix.bok@tum.de                 |
 | Kiechle, Johannes                   | johannes.kiechle@tum.de          |
