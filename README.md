@@ -1,4 +1,4 @@
-# Geometrical Deep Learning on 3D Models: Classification for Additive Manufacturing
+# Geometrical Deep Learning on 3D Models: <br> Classification for Additive Manufacturing
 ### TUM Data Innovation Lab in cooperation with VW Data:Lab | Summer 2021
 
 ---
