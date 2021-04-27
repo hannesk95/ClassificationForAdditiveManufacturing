@@ -13,7 +13,7 @@ class DataNormalizer():
 
     def align(self, stl_path, target_path=None):
         """
-        Creates a 3D interactive JavaScript plot of a given stl 3D model
+        align 3D models
         :param stl_path: Source path to the stl model
         :param target_path: path of the resulting stl file.
         :return: stl file containing the model aligned
