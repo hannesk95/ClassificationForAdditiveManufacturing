@@ -1,4 +1,5 @@
 # FROM nvidia/cuda:11.2.2-devel-ubuntu20.04
+# FROM pymesh/pymesh
 FROM ubuntu:latest
 
 LABEL description="This container incorporates the entire environment in order to deploy it on LRZ AI System"
@@ -10,7 +11,7 @@ RUN apt update \
 
 # Install predefined python packages
 COPY requirements.txt /tmp/requirements.txt
-RUN pip3 install -r /tmp/requirements.txt
+#RUN pip3 install -r /tmp/requirements.txt
 
 # Install GIT
 RUN apt -y install git
