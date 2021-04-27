@@ -11,3 +11,5 @@ In addition, parameters can be used in order to specify the output directory whe
 ```cmd
 python3 fetch_data.py -o <output_dir>
 ```
+
+**General comment:** Do not store data in any repository sturcture neither upload any data to the repository.
