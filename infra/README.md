@@ -4,7 +4,7 @@ Currently, there are several files inside this `infra` directory. The following 
 
 |File|Purpose|
 |----|-------|
-|`Dockerfile`|The main file which incorporates all commands in order to define the structure and software stack of the docker container.|
+|[`Dockerfile`](./Dockerfile)|The main file which incorporates all commands in order to define the structure and software stack of the docker container.|
 |`entrypoint.sh`|This file is part of the docker container itself. It gets invoked every time the container gets started.|
 |`requirements.txt`|This file gets copied into the docker container. It serves the purpose of being the python library database.|
 |`docker_build.sh`|Run this script in order to create a local docker image out of the Dockerfile.|
