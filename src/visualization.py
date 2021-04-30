@@ -1,8 +1,8 @@
 import numpy as np
-import re
 import os.path
 from stl import mesh
 import plotly.graph_objects as go
+from src.data_generation.utils import extract_file_name
 
 
 def get_layout(title):
@@ -46,8 +46,7 @@ class Visualizer:
             raise TypeError(f'No file found at {stl_path}. Provide a valid path ')
 
         if target_name is None:
-            target_name = stl_path.split('/')[-1]
-            target_name = re.sub('.stl$', '', target_name)
+            target_name = extract_file_name(stl_path)
 
         my_mesh = mesh.Mesh.from_file(stl_path)
 
