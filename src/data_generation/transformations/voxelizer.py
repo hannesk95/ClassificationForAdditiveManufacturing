@@ -13,10 +13,10 @@ class Voxelizer:
         :input_mesh_file_path : Provide the input path to the .stl file or .obj file
         :return : N x N x N SDF values
         """
-        self.mesh = trimesh.load(self.input_mesh_file_path)
+        self.mesh = trimesh.load(self.input_mesh_file_path)  # TODO: Find common stl datatyp
 
-        self.voxels = mesh_to_voxels(self.mesh, 64, sign_method='depth', pad=False)
+        self.voxels = mesh_to_voxels(self.mesh, 64, sign_method='depth', pad=False)  # TODO: Add the parameters to init
 
         vertices, faces, normals, _ = measure.marching_cubes(self.voxels, level=0)
         mesh = trimesh.Trimesh(vertices=vertices, faces=faces, vertex_normals=normals)
-        mesh.show()
+        mesh.show()  # TODO: Return model

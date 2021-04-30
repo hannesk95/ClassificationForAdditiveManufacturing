@@ -5,7 +5,7 @@ class Normalizer:
     def __init__(self, model):
         self.model = model
 
-    def __call__(self, stl_path, target_path=None):
+    def __call__(self, stl_path, target_path=None): # TODO: Add the parameters to init
         """
         Align 3D models using pymeshlab
         :param stl_path: Source path to the stl model
@@ -15,7 +15,7 @@ class Normalizer:
 
         ms = pymeshlab.MeshSet()
         # load mesh
-        ms.load_new_mesh(stl_path)
+        ms.load_new_mesh(stl_path)  # TODO: Find common stl datatyp
         # apply filter to align the model to principal component
         ms.transform_align_to_principal_axis()
         ms.save_current_mesh(target_path)
