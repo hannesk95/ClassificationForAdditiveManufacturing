@@ -10,7 +10,8 @@ class DataConverter():
     def voxelize(self):
         """
         The function converts an input triangular mesh into a voxelized array.
-        input_mesh_file_path : Provide the input path to the .stl file or .obj file
+        :input_mesh_file_path : Provide the input path to the .stl file or .obj file
+        :return : N x N x N SDF values
         """
         self.mesh = trimesh.load(self.input_mesh_file_path)
 

@@ -32,13 +32,14 @@ class Visualizer:
 
         self.colorscale = [[0, '#e5dee5'], [1, '#e5dee5']]
 
-    def plot_mesh(self, stl_path, target_name=None):
+    def plot_mesh(self, stl_path, target_name=None, save=True):
         """
         Creates a 3D interactive JavaScript plot of a given stl 3D model
 
         :param stl_path: Source path to the stl model to plot
         :param target_name: name of the resulting html file. If not provided the name of the given file in stl_path will be
         used
+        :param save: boolean: Deciding wheter the output model should be saved or not
         :return: Html file containing the plot
         """
         if not os.path.isfile(stl_path):
@@ -77,14 +78,18 @@ class Visualizer:
         layout = get_layout(title)
         fig = go.Figure(data=[mesh3D], layout=layout)
 
-        target_path = os.path.join(self.target_dir, target_name + '.html')
-        fig.write_html(target_path)
+        if save:
+            target_path = os.path.join(self.target_dir, target_name + '.html')
+            fig.write_html(target_path)
+        else:
+            fig.show()
 
-    def plot_voxel(self, model, target_name):
+    def plot_voxel(self, model, target_name, save=True):
         """
         Creates a 3D interactive JavaScript plot of a given 3D voxel model
         :param model: three dimensional numpy.ndarray containing a binary voxel representation
         :param target_name: string containing the name of the output file
+        :param save: boolean: Deciding wheter the output model should be saved or not
         :return: Html file containing the plot
         """
         mesh3d_list = []
@@ -113,5 +118,8 @@ class Visualizer:
         layout = get_layout(title)
         fig = go.Figure(data=mesh3d_list, layout=layout)
 
-        target_path = os.path.join(self.target_dir, target_name + '.html')
-        fig.write_html(target_path)
+        if save:
+            target_path = os.path.join(self.target_dir, target_name + '.html')
+            fig.write_html(target_path)
+        else:
+            fig.show()
