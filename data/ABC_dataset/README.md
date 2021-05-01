@@ -20,5 +20,21 @@ In the follwing, it will be explained how to select a data chunk out of the 100 
 
 **General comment:** Do not store data in any repository sturcture neither upload any data to the repository.
 
+---
+
+## Python Packages
+The following provides a listing which python libraries are needed in order to run the python script:
+
+```cmd
+tqdm
+$ pip3 install tqdm
+
+argparse
+$ pip3 install pytest-shutil
+
+pyunpack
+$ pip3 install pyunpack
+```
+
 
 
