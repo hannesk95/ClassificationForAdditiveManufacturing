@@ -4,6 +4,7 @@ from tqdm import tqdm
 from shutil import copyfile, rmtree
 from pyunpack import Archive
 
+
 def start_download():
     """
     This function creates a directory, if it does not exist already, in order to store the
@@ -22,6 +23,8 @@ def unzip_directory():
     """
     This function takes the 7z archive and extracts it.
     """
+
+    os.chdir("../")
     zip_name = os.listdir("./stl_files")
     zip_path = "./stl_files" + "/" + zip_name[0]
 
