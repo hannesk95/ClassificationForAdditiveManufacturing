@@ -4,9 +4,6 @@ import open3d as o3d
 from stl import mesh
 import pymeshlab
 
-
-#####align the model using pymeshlab
-
 class DataNormalizer():
     def __init__(self,arg):
         self.arg = arg
@@ -26,7 +23,7 @@ class DataNormalizer():
         ms.transform_align_to_principal_axis()
         ms.save_current_mesh(target_path)
 
-    def align_mesh_with_origin(self, mesh):
+    def center_mesh_around_origin(self, mesh):
         """
         Translates the mesh to the origin in-place
 
@@ -51,6 +48,7 @@ class DataNormalizer():
         reference: https://physics.stackexchange.com/questions/426273/how-to-find-the-axis-with-minimum-moment-of-inertia
 
         :param mesh: O3D mesh object
+        :return: axis of the minimum MOI (a numpy (3,) array)
         """
         ##### 1. constructing two arrays: points (mesh vertices) and points squared #####
         points = np.asarray(mesh.vertices)

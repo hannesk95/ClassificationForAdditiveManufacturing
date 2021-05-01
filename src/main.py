@@ -9,7 +9,7 @@ def main():
     mesh = mesh_reader.mesh
 
     data_normalizer = DataNormalizer("data_normalizer")
-    data_normalizer.align_mesh_with_origin(mesh)
+    data_normalizer.center_mesh_around_origin(mesh)
     scale_factor = 1 / np.max(mesh.get_max_bound() - mesh.get_min_bound())
     data_normalizer.scale(mesh, scale_factor)
     min_MOI_axis = data_normalizer.min_MOI_axis(mesh)
