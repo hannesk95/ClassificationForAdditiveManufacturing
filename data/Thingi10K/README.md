@@ -13,3 +13,16 @@ $ python3 fetch_Thingi10K.py -o <output_dir>
 ```
 
 **General comment:** Do not store data in any repository sturcture neither upload any data to the repository.
+
+---
+
+## Python Packages
+The following provides a listing which python libraries are needed in order to run the python script:
+
+```cmd
+tqdm
+$ pip3 install tqdm
+
+argparse
+$ pip3 install argparse
+```
