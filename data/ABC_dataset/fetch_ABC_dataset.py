@@ -39,7 +39,7 @@ def flatten_directory():
     """
 
     cwd = os.getcwd()
-    dataset_path = cwd + "\\" + "stl_files"
+    dataset_path = os.path.join(cwd, 'stl_files')
 
     os.chdir(dataset_path)
     folders = os.listdir()
@@ -48,14 +48,16 @@ def flatten_directory():
 
         if folders[i].endswith("7z"):
             continue
+        if folders[i] == '.DS_Store':
+            continue
 
-        os.chdir(dataset_path + "\\" + folders[i])
+        os.chdir(os.path.join(dataset_path, folders[i]))
         filename = os.listdir()
-        src = dataset_path + "\\" + folders[i] + "\\" + filename[0]
-        dst = dataset_path + "\\" + filename[0]
+        src = os.path.join(dataset_path, folders[i], filename[0])
+        dst = os.path.join(dataset_path, filename[0])
         copyfile(src, dst)
         os.chdir(dataset_path)
-        rmtree(dataset_path + "\\" + folders[i], ignore_errors=True)
+        rmtree(os.path.join(dataset_path, folders[i]), ignore_errors=True)
 
 
 if __name__ == "__main__":
