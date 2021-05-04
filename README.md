@@ -47,9 +47,11 @@
 
 ## 1. Repository Structure
 - [`data`](/data): Contains some sample data
+- [`dev_notebooks`](/dev_notebooks): Contains all Jupyter notebook files which are used for rapid prototyping
 - [`doc`](/doc): Contains diverse documentation files
 - [`infra`](/infra): Contains all files which are used in order to create the environment for training deep learning models on the LRZ AI System
 - [`src`](/src): Contains all python source files of the project
+- [`tests`](/tests): Contains all test files in order to perform unit testing
 
 ---
 
