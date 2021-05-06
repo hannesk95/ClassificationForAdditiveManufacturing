@@ -2,7 +2,6 @@ import os
 import logging
 import numpy as np
 import open3d as o3d
-
 from src.data_generation.utils import extract_file_name
 
 
@@ -10,7 +9,7 @@ class Model:
     """
     Model class, for handling mesh and voxel models
 
-    :param path: path to the .obj/.stl file to be read
+    :param model: Input model which was read by BatchDataProcessor.
     """
     def __init__(self, path):
         self.path = path
@@ -18,6 +17,10 @@ class Model:
         self.label = 1
         self.model_name = extract_file_name(path)
         self.voxel_rep = None
+
+    #def get_model_properties(self, mesh):
+        #mesh.compute_vertex_normals()
+        #return mesh, np.asarray(mesh.vertices), mesh.triangle_normals, np.asarray(mesh.triangles)
 
     def load_model(self):
         mesh = o3d.io.read_triangle_mesh(self.path)
