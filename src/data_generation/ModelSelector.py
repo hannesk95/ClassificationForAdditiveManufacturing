@@ -9,19 +9,22 @@ class ModelSelector:
     """Class for pre-selecting 3D models according to filesize and compactness"""
 
     def __init__(self, input_path: str = None, max_filesize: float = None,
-                 min_compactness: float = 0.0):
+                 min_compactness: float = 0.0, num_files: int = 0):
         """
         Constructor method in order to initialize the object.
         @param input_path: Input path to the directory where dataset files are stored.
         @param max_filesize: Maximum filesize of a 3D model in order to be selected (in MegaByte).
         @param min_compactness: Minimum compactness of a 3D model in order to be selected. Range between [0, 1].
+        @param num_files: Number of files to be returned.
         """
 
         self.input_path = input_path
         self.max_filesize = max_filesize
         self.min_compactness = min_compactness
+        self.num_files = num_files
         self.check_compactness = True
         self.preselection = {}
+
 
         if input_path is None:
             raise ValueError("[ERROR]: Path to the dataset containing the files has to be given!")
@@ -32,6 +35,9 @@ class ModelSelector:
         if min_compactness == 0.0:
             logging.info("Compactness was not specified, continuing without checking compactness!")
             self.check_compactness = False
+
+        if num_files == 0:
+            logging.info("Number of files was not specified, return all files which fulfill requirements!")
 
     def _get_filesize(self, input_path: str, max_filesize: float) -> dict:
 
@@ -47,6 +53,9 @@ class ModelSelector:
 
             if max_filesize >= size_in_MByte:
                 files[filepath] = size_in_MByte
+
+        # Sort dictionary by value in ascending order
+        dict(sorted(files.items(), key=lambda item: item[1]))
 
         return files
 
@@ -95,6 +104,9 @@ class ModelSelector:
         if self.check_compactness:
             self.preselection = self._load_model(self.preselection.copy(), self.min_compactness)
 
-        return list(self.preselection.keys())
+        if self.num_files != 0:
+            return list(self.preselection.keys())[:self.num_files]
+        else:
+            return list(self.preselection.keys())
 
 
