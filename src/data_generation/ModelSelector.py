@@ -12,8 +12,8 @@ class ModelSelector:
         """
         Constructor method in order to initialize the object.
         @param input_path: Input path to the directory where dataset files are stored.
-        @param max_filesize: Maximum filesize of a 3D model in order to be selected.
-        @param min_compactness: Minimum compactness of a 3D model in order to be selected.
+        @param max_filesize: Maximum filesize of a 3D model in order to be selected (in MegaByte).
+        @param min_compactness: Minimum compactness of a 3D model in order to be selected. Range between [0, 1].
         """
 
         self.input_path = input_path
@@ -28,7 +28,7 @@ class ModelSelector:
         if max_filesize is None:
             raise ValueError("[ERROR]: Please specify maximum filesize!")
 
-        if min_compactness == 0.0:
+        if min_compactness == 0.0 or min_compactness is None:
             print("[INFO]: Compactness was not specified, continuing without checking compactness!")
             self.check_compactness = False
 
