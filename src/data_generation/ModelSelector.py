@@ -104,7 +104,7 @@ class ModelSelector:
         if self.check_compactness:
             self.preselection = self._load_model(self.preselection.copy(), self.min_compactness)
 
-        if self.num_files != 0:
+        if self.num_files != 0 and self.num_files < len(list(self.preselection.keys())):
             return list(self.preselection.keys())[:self.num_files]
         else:
             return list(self.preselection.keys())
