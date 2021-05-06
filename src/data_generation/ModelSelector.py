@@ -92,14 +92,13 @@ class ModelSelector:
 
         return compactness
 
-    def __call__(self) -> list:
+    def select_models(self) -> list:
         """
-        Call method which returns a list of preselected files according to maximum filesize
+        method which returns a list of preselected files according to maximum filesize
         and minimum compactness (if specified).
         @return: list of selected files according to filesize and compactness
         """
-
-        self.preselection = self._get_filesize(self.input_path, self.max_filesize)  # TODO Get max file number
+        self.preselection = self._get_filesize(self.input_path, self.max_filesize)
 
         if self.check_compactness:
             self.preselection = self._load_model(self.preselection.copy(), self.min_compactness)
@@ -108,5 +107,3 @@ class ModelSelector:
             return list(self.preselection.keys())[:self.num_files]
         else:
             return list(self.preselection.keys())
-
-
