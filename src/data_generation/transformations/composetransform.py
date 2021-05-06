@@ -1,6 +1,6 @@
 class ComposeTransformer:
     """Transform class that combines multiple other transforms into one"""
-    def __init__(self, transforms):
+    def __init__(self, transforms: list) -> object:
         """
         :param transforms: transforms to be combined
         """
@@ -8,5 +8,5 @@ class ComposeTransformer:
 
     def __call__(self, model):
         for transform in self.transforms:
-            model = transform(model)
+            transform(model)
         return model

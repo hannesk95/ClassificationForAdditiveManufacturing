@@ -2,6 +2,7 @@ import os
 import open3d as o3d
 from tqdm import tqdm
 import numpy as np
+import logging
 
 
 class ModelSelector:
@@ -28,8 +29,8 @@ class ModelSelector:
         if max_filesize is None:
             raise ValueError("[ERROR]: Please specify maximum filesize!")
 
-        if min_compactness == 0.0 or min_compactness is None:
-            print("[INFO]: Compactness was not specified, continuing without checking compactness!")
+        if min_compactness == 0.0:
+            logging.info("Compactness was not specified, continuing without checking compactness!")
             self.check_compactness = False
 
     def _get_filesize(self, input_path: str, max_filesize: float) -> dict:
@@ -89,7 +90,7 @@ class ModelSelector:
         @return: list of selected files according to filesize and compactness
         """
 
-        self.preselection = self._get_filesize(self.input_path, self.max_filesize)
+        self.preselection = self._get_filesize(self.input_path, self.max_filesize)  # TODO Get max file number
 
         if self.check_compactness:
             self.preselection = self._load_model(self.preselection.copy(), self.min_compactness)
