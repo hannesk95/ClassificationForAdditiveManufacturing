@@ -22,7 +22,7 @@ def main():
     for model in loader():
         pass
 
-        # 3. Aligne model
+        # 3. Align model
 
         # 4. Normalize model
 
