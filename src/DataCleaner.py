@@ -5,6 +5,7 @@ import pymeshlab
 from MeshReader import MeshReader
 from MeshSaver import MeshSaver
 
+# reference: https://support.shapeways.com/hc/en-us/articles/360007107674-Tips-for-successful-modeling
 
 class DataCleaner():
     def __init__(self,arg):
