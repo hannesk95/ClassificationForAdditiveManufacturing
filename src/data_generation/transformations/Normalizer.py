@@ -9,6 +9,9 @@ class Normalizer:
         self.mesh = mesh  # TODO: Find common stl datatyp
 
     def __call__(self): 
+        pass
+
+    def __call__v1(self): 
         self.center_mesh_around_origin(self.mesh)
         scale_factor = 1 / np.max(self.mesh.get_max_bound() - self.mesh.get_min_bound())
         self.scale(self.mesh, scale_factor)

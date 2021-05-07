@@ -8,6 +8,9 @@ class Aligner:
         self.mesh = mesh
 
     def __call__(self): 
+        pass
+
+    def __call__v1(self): 
         min_MOI_axis = self.min_MOI_axis(self.mesh)
         coordinate_axis =  np.array([0., 0., 1.])
         rotation_matrix = self.align_vectors(self.mesh, min_MOI_axis, coordinate_axis)
