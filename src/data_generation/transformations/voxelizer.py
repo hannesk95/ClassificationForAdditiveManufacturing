@@ -44,7 +44,7 @@ class DataConverter():
                 for k in range(dims[2]):
                     if (abs(float(sdf[i][j][k])) > 0.05):
                         binay_voxels[i][j][k] = 0
-
+        np.savez_compressed("occupancy_grid.npz",voxels=binay_voxels) #To load use np.load("<Path to the file occupancy_grid.npz>")['voxels']
         fig = plt.figure()
         ax = fig.gca(projection='3d')
         ax.voxels(binay_voxels)
