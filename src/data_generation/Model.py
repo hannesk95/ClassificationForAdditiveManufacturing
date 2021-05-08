@@ -13,7 +13,7 @@ class Model:
     """
     def __init__(self, path):
         self.path = path
-        self.mesh, self.vertices, self.normals, self.faces = self.load_model(path)
+        self.mesh, self.vertices, self.normals, self.faces = self.load_model()
         self.label = 1
         self.model_name = extract_file_name(path)
         self.voxel_rep = None
@@ -61,6 +61,9 @@ class Model:
         self.vertices = vertices
         self.normals = normals
         self.faces = faces
+
+    def set_voxel_rep(self, voxel_rep):
+        self.voxel_rep = voxel_rep
 
     def visualize(self, geometries):
         """
