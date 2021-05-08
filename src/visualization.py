@@ -2,6 +2,7 @@ import numpy as np
 import os.path
 from stl import mesh
 import plotly.graph_objects as go
+from scipy.ndimage import convolve
 from src.data_generation.utils import extract_file_name
 
 
@@ -16,6 +17,23 @@ def get_layout(title):
                        scene_yaxis_visible=False,
                        scene_zaxis_visible=False)
     return layout
+
+
+def convert_to_hull(model):
+    """
+    Converts a filled voxel model into a hull of voxels, i.e. removes the voxels inside the model
+    :param model: binary np.ndarray of dim 3
+    :return: binary np.ndarray of dim 3: Hull of the model
+    """
+    model_shape = model.shape
+    frame_shape = tuple(dim + 6 for dim in model_shape)
+    frame = np.zeros(frame_shape)
+    frame[3:frame_shape[0] - 3, 3:frame_shape[1] - 3, 3:frame_shape[2] - 3] = model
+    kernel = np.ones((3, 3, 3))
+    model_out = convolve(model, kernel, mode='constant')
+    model_out = np.array(model_out == 27, np.int32)
+
+    return np.array((model_out + model) == 1, np.int32)
 
 
 class Visualizer:
@@ -83,42 +101,50 @@ class Visualizer:
         else:
             fig.show()
 
-    def plot_voxel(self, model, target_name, save=True):
+    def plot_voxel(self, model, target_name, save=True, format='html'):
         """
         Creates a 3D interactive JavaScript plot of a given 3D voxel model
         :param model: three dimensional numpy.ndarray containing a binary voxel representation
         :param target_name: string containing the name of the output file
         :param save: boolean: Deciding wheter the output model should be saved or not
+        :param format: "html", "png", "jpeg": file format of the output file
         :return: Html file containing the plot
         """
         mesh3d_list = []
-        for idz, _ in enumerate(model):
-            for idy, _ in enumerate(model[idz]):
-                for idx, item in enumerate(model[idz][idy]):
-                    if int(item) == 1:
-                        x_position = idx
-                        mesh3d = go.Mesh3d(
-                            # 8 vertices of a cube
-                            x=[idx, idx, idx + 1, idx + 1, idx, idx, idx + 1, idx + 1],
-                            y=[idy, idy + 1, idy + 1, idy, idy, idy + 1, idy + 1, idy],
-                            z=[idz, idz, idz, idz, idz + 1, idz + 1, idz + 1, idz + 1],
-
-                            i=[7, 0, 0, 0, 4, 4, 6, 6, 4, 0, 3, 2],
-                            j=[3, 4, 1, 2, 5, 6, 5, 2, 0, 1, 6, 3],
-                            k=[0, 7, 2, 3, 6, 7, 1, 1, 5, 5, 7, 6],
-                            flatshading=True,
-                            colorscale=self.colorscale,
-                            color='#FFFFFF',
-                            showscale=False
-                        )
-                        mesh3d_list.append(mesh3d)
+        model = convert_to_hull(model)
+        voxel_list = np.transpose(np.nonzero(model))
+        for voxel in voxel_list:
+            idx = voxel[0]
+            idy = voxel[1]
+            idz = voxel[2]
+            mesh3d = go.Mesh3d(
+                # 8 vertices of a cube
+                x=[idx, idx, idx + 1, idx + 1, idx, idx, idx + 1, idx + 1],
+                y=[idy, idy + 1, idy + 1, idy, idy, idy + 1, idy + 1, idy],
+                z=[idz, idz, idz, idz, idz + 1, idz + 1, idz + 1, idz + 1],
+                i=[7, 0, 0, 0, 4, 4, 6, 6, 4, 0, 3, 2],
+                j=[3, 4, 1, 2, 5, 6, 5, 2, 0, 1, 6, 3],
+                k=[0, 7, 2, 3, 6, 7, 1, 1, 5, 5, 7, 6],
+                flatshading=True,
+                colorscale=self.colorscale,
+                color='#FFFFFF',
+                showscale=False
+            )
+            mesh3d_list.append(mesh3d)
 
         title = f"STL Model {target_name}"
         layout = get_layout(title)
         fig = go.Figure(data=mesh3d_list, layout=layout)
 
         if save:
-            target_path = os.path.join(self.target_dir, target_name + '.html')
-            fig.write_html(target_path)
+            if format == 'html':
+                target_path = os.path.join(self.target_dir, target_name + '.html')
+                fig.write_html(target_path)
+            elif format == 'png':
+                target_path = os.path.join(self.target_dir, target_name + '.png')
+                fig.write_image(target_path)
+            elif format == 'jpeg':
+                target_path = os.path.join(self.target_dir, target_name + '.jpeg')
+                fig.write_image(target_path)
         else:
             fig.show()
