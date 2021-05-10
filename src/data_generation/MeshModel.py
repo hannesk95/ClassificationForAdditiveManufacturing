@@ -1,33 +1,28 @@
 import os
 import logging
 import numpy as np
+import matplotlib.pyplot as plt
 import open3d as o3d
 from src.data_generation.utils import extract_file_name
 
 
-class Model:
+class MeshModel:
     """
-    Model class, for handling mesh and voxel models
+    Model class, for handling mesh models
 
-    :param model: Input model which was read by BatchDataProcessor.
+    :param path: Path to the stl file
     """
     def __init__(self, path):
         self.path = path
-        self.mesh, self.vertices, self.normals, self.faces = self.load_model()
-        self.label = 1
+        self.mesh, self.vertices, self.normals, self.faces = self._load_model()
         self.model_name = extract_file_name(path)
-        self.voxel_rep = None
 
-    #def get_model_properties(self, mesh):
-        #mesh.compute_vertex_normals()
-        #return mesh, np.asarray(mesh.vertices), mesh.triangle_normals, np.asarray(mesh.triangles)
-
-    def load_model(self):
+    def _load_model(self):
         mesh = o3d.io.read_triangle_mesh(self.path)
         mesh.compute_vertex_normals()
         return mesh, np.asarray(mesh.vertices), mesh.triangle_normals, np.asarray(mesh.triangles)
 
-    def save_as_mesh(self, target_path=None):
+    def save(self, target_path=None):
         if target_path is None:
             target_path = self.path
 
@@ -42,17 +37,6 @@ class Model:
         # save the mesh to path
         o3d.io.write_triangle_mesh(target_path, mesh)
 
-    def save_as_npz(self, target_path):
-        """
-        Saves the voxelized model as compressed npz array + the label
-        :param target_path: target_path where to store the model
-        :return: -
-        """
-        if self.model_name is None:
-            logging.ERROR('Model was not voxelized. Please voxelize the model before saving it')
-        else:
-            np.savez_compressed(os.path.join(target_path, self.model_name), model=self.voxel_rep, label=self.label)
-
     def get_model_data(self):
         """Returns vertices, normals and faces"""
         return self.vertices, self.normals, self.faces
@@ -61,9 +45,6 @@ class Model:
         self.vertices = vertices
         self.normals = normals
         self.faces = faces
-
-    def set_voxel_rep(self, voxel_rep):
-        self.voxel_rep = voxel_rep
 
     def visualize(self, geometries):
         """
