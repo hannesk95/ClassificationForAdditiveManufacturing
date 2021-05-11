@@ -50,20 +50,25 @@ class DataConverter():
         ax.voxels(binay_voxels)
         plt.show() 
         
-        def sdftotsdf(self,sdf):
-            dims = [sdf.shape[0],sdf.shape[1],sdf.shape[2]]
+     def sdftotsdf(self,sdf):
+        """
+        The function takes in sdf values and converts it into TSDF values.Rasterization is then done using Marching Cubes algorithm.
+        : sdf: N x N x N array of sdf values where N is the number of voxels.
+        """
+        
+        dims = [sdf.shape[0],sdf.shape[1],sdf.shape[2]]
 
-            for i in range(dims[0]):
-                for j in range(dims[1]):
-                    for k in range(dims[2]):
-                        if(float(sdf[i][j][k]) > 1):
-                            sdf[i][j][k] = 1.0
-                        elif(float(sdf[i][j][k]) < -0.5):
-                            sdf[i][j][k] = -0.5
-            print(np.min(sdf),np.max(sdf))
-            vertices, faces, normals, _ = measure.marching_cubes(sdf, level=0)
-            mesh = trimesh.Trimesh(vertices=vertices, faces=faces, vertex_normals=normals)
-            mesh.show() 
+        for i in range(dims[0]):
+            for j in range(dims[1]):
+                for k in range(dims[2]):
+                    if(float(sdf[i][j][k]) > 1):
+                        sdf[i][j][k] = 1.0
+                    elif(float(sdf[i][j][k]) < -0.5):
+                        sdf[i][j][k] = -0.5
+        
+        vertices, faces, normals, _ = measure.marching_cubes(sdf, level=0)
+        mesh = trimesh.Trimesh(vertices=vertices, faces=faces, vertex_normals=normals)
+        mesh.show() 
         
         
 
