@@ -1,5 +1,6 @@
 import os
 import logging
+import configparser
 from src.data_generation.ModelSelector import ModelSelector
 from src.data_generation.BatchDataProcessor import BatchDataProcessor
 from src.data_generation.transformations.Normalizer import Normalizer
@@ -10,18 +11,27 @@ from src.data_generation.transformations.ComposeTransformer import ComposeTransf
 
 
 def main():
-    # Location of our dataset
-    # TODO create config and read config here
-    model_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data'))
-    # target_path =
-    # max_file_number =
-    # max_filesize =
-    # min_compactness =
-    # batch_size =
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+
+    model_path = config['filepaths']['model_path']
+    if model_path is None:
+        model_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'Sample_Data'))
+
+    target_path = config['filepaths']['target_path']
+    if target_path is None:
+        target_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'SyntheticDataset'))
+        if not os.path.exists(target_path):
+            os.makedirs(target_path)
+    
+    num_files = config['ModelSelector'].getint('num_files')
+    max_filesize = config['ModelSelector'].getfloat('max_filesize')
+    min_compactness = config['ModelSelector'].getfloat('min_compactness')
+    batch_size = config['BatchDataProcessor'].getint('batch_size')
 
     # 1. Preselect files
-    selector = ModelSelector(input_path=model_path, max_filesize=1,
-                             min_compactness=0.0, num_files=0)
+    selector = ModelSelector(input_path=model_path, max_filesize=max_filesize,
+                             min_compactness=min_compactness, num_files=num_files)
     final_models = selector.select_models()
 
     # 2. Define transformations
@@ -34,7 +44,7 @@ def main():
     composer = ComposeTransformer([normalizer, aligner, voxelizer, defector])
 
     # 4. Start processing using batch of files
-    batch_processor = BatchDataProcessor(final_models, batch_size=500, transformer=composer)
+    batch_processor = BatchDataProcessor(final_models, batch_size=batch_size, transformer=composer)
     batch_processor.process()
 
 

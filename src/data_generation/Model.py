@@ -61,3 +61,13 @@ class Model:
         self.vertices = vertices
         self.normals = normals
         self.faces = faces
+
+    def visualize(self, geometries):
+        """
+        A wrapper over Open3D's visualization function draw_geometries 
+        which takes a list of geometry objects and renders them together.
+        It views the loaded mesh and the given geometries together.
+        :param geometries: a list o3d.geometry objects
+        """
+
+        o3d.visualization.draw_geometries([self.mesh] + geometries)
