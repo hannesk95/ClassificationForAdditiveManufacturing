@@ -26,8 +26,11 @@ class VoxelModel:
         """Returns model data (3dim array + label)"""
         return self.vertices, self.normals, self.faces
 
-    def visualize(self, target_path):
+    def visualize(self, target_path=None):
         fig = plt.figure()
         ax = fig.gca(projection='3d')
         ax.voxels(self.model)
-        plt.savefig(os.path.join(target_path, self.model_name))
+        if target_path is None:
+            plt.show()
+        else:
+            plt.savefig(os.path.join(target_path, self.model_name))

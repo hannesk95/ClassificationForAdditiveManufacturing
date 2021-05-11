@@ -1,6 +1,5 @@
-import open3d as o3d
 from tqdm import tqdm
-from src.data_generation.Model import Model
+from src.data_generation.MeshModel import MeshModel
 
 
 class BatchDataProcessor:
@@ -20,7 +19,7 @@ class BatchDataProcessor:
     def _load_data_batch(self):
         for self.file in tqdm(self.filepaths[self.pointer:(self.pointer + self.batch_size)],
                               desc=f"[INFO]: Loading data batches of size {self.batch_size}!"):
-            self.data_batch.append(Model(self.file))
+            self.data_batch.append(MeshModel(self.file))
             self.pointer += self.batch_size
 
         yield self.data_batch
@@ -30,7 +29,7 @@ class BatchDataProcessor:
             for model in tqdm(batch, desc="[INFO]: Running models through the pipline"):
                 if self.transformer is not None:
                     model = self.transformer(model)
-                model.save_as_npz(self.target_path)
+                model.save(self.target_path)
 
 
 

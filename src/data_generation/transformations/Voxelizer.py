@@ -2,6 +2,7 @@ from mesh_to_sdf import mesh_to_voxels
 import numpy as np
 import trimesh
 from skimage import measure
+from src.data_generation.VoxelModel import VoxelModel
 
 
 def sdf_to_binary(sdf):
@@ -39,9 +40,9 @@ class Voxelizer:
     def __call__(self, model):
         voxels = self.mesh_to_sdf(model)
         if self.representation == 'sdf':
-            model.set_voxel_rep(voxels)
+            model = VoxelModel(voxels, np.array([1]), model.model_name)
         else:
-            model.set_voxel_rep(sdf_to_binary(voxels))
+            model = VoxelModel(voxels, np.array([1]), model.model_name)
         return model
 
     def mesh_to_sdf(self, model):
