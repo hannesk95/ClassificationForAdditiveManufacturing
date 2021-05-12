@@ -30,10 +30,3 @@ class BatchDataProcessor:
                 if self.transformer is not None:
                     model = self.transformer(model)
                 model.save(self.target_path)
-
-
-
-
-
-
-

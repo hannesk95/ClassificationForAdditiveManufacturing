@@ -20,7 +20,7 @@ class VoxelModel:
         :param target_path: target_path where to store the model
         :return: -
         """
-        np.savez_compressed(os.path.join(target_path, self.model_name), model=self.voxel_rep, label=self.label)
+        np.savez_compressed(os.path.join(target_path, self.model_name), model=self.model, label=self.label)
 
     def get_model_data(self):
         """Returns model data (3dim array + label)"""

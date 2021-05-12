@@ -55,7 +55,7 @@ class ModelSelector:
                 files[filepath] = size_in_MByte
 
         # Sort dictionary by value in ascending order
-        dict(sorted(files.items(), key=lambda item: item[1]))
+        files = dict(sorted(files.items(), key=lambda item: item[1]))
 
         return files
 
