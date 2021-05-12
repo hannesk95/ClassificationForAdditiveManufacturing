@@ -55,7 +55,7 @@ class ModelSelector:
                 files[filepath] = size_in_MByte
 
         # Sort dictionary by value in ascending order
-        dict(sorted(files.items(), key=lambda item: item[1]))
+        files = dict(sorted(files.items(), key=lambda item: item[1]))
 
         return files
 
@@ -104,6 +104,6 @@ class ModelSelector:
             self.preselection = self._load_model(self.preselection.copy(), self.min_compactness)
 
         if self.num_files != 0 and self.num_files < len(list(self.preselection.keys())):
-            return list(self.preselection.keys())[:self.num_files]
+                return list(self.preselection.keys())[:self.num_files]
         else:
             return list(self.preselection.keys())

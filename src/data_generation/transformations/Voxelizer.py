@@ -32,24 +32,6 @@ def visualise_sdf(sdf):
     mesh.show()
 
 
-def sdf_to_tsdf(sdf):
-    """
-    The function takes in sdf values and converts it into TSDF values.Rasterization is then done using Marching Cubes algorithm.
-    : sdf: N x N x N array of sdf values where N is the number of voxels.
-    """
-
-    dims = [sdf.shape[0], sdf.shape[1], sdf.shape[2]]
-
-    for i in range(dims[0]):
-        for j in range(dims[1]):
-            for k in range(dims[2]):
-                if float(sdf[i][j][k]) > 1:
-                    sdf[i][j][k] = 1.0
-                elif float(sdf[i][j][k]) < -0.5:
-                    sdf[i][j][k] = -0.5
-    return sdf
-
-
 class Voxelizer:
     def __init__(self, dimension=64, representation='occupancy'):
         self.dimension = dimension

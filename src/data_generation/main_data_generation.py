@@ -3,11 +3,7 @@ import logging
 import configparser
 from src.data_generation.ModelSelector import ModelSelector
 from src.data_generation.BatchDataProcessor import BatchDataProcessor
-from src.data_generation.transformations.Normalizer import Normalizer
-from src.data_generation.transformations.Aligner import Aligner
-from src.data_generation.transformations.Voxelizer import Voxelizer
-from src.data_generation.transformations.Defector import Defector
-from src.data_generation.transformations.ComposeTransformer import ComposeTransformer
+from src.data_generation.transformations import Normalizer, Aligner, Voxelizer, Defector, ComposeTransformer
 
 
 def main():
@@ -15,11 +11,11 @@ def main():
     config.read('config.ini')
 
     model_path = config['filepaths']['model_path']
-    if model_path is None:
+    if model_path == 'None':
         model_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'Sample_Data'))
 
     target_path = config['filepaths']['target_path']
-    if target_path is None:
+    if target_path == 'None':
         target_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'SyntheticDataset'))
         if not os.path.exists(target_path):
             os.makedirs(target_path)
@@ -35,16 +31,17 @@ def main():
     final_models = selector.select_models()
 
     # 2. Define transformations
-    normalizer = Normalizer()
-    aligner = Aligner()
+    # normalizer = Normalizer()
+    # aligner = Aligner()
     voxelizer = Voxelizer()
-    defector = Defector()
+    # defector = Defector()
 
     # 3. Compose transformations
-    composer = ComposeTransformer([normalizer, aligner, voxelizer, defector])
+    # composer = ComposeTransformer([normalizer, aligner, voxelizer, defector])
 
     # 4. Start processing using batch of files
-    batch_processor = BatchDataProcessor(final_models, batch_size=batch_size, transformer=composer)
+    batch_processor = BatchDataProcessor(final_models, batch_size=batch_size, transformer=voxelizer,
+                                         target_path=target_path)
     batch_processor.process()
 
 
