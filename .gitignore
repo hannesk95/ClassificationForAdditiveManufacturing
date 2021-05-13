@@ -134,6 +134,6 @@ dmypy.json
 # Additional
 .idea/
 .vscode/
-# data
+data
 PyMesh/
 *.ipynb
