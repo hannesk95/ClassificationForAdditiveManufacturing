@@ -15,7 +15,7 @@ def extract_file_name(path, suffix='stl'):
     return file_name
 
 
-def binvox2npz(path_voxel_model: str, label: np.array() = None) -> np.ndarray:
+def binvox2npz(path_voxel_model: str, label: np.array = None) -> np.ndarray:
 
     # TODO: Adjust label handover. For now it is included in order not to forget it later!
 

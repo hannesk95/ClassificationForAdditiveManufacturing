@@ -9,7 +9,7 @@ class VoxelModel:
 
     :param model: 3 dimensional np.ndarray containing either sdf rep of occupancy grid rep of model
     """
-    def __init__(self, model: np.array, label: np.array, model_name: str):
+    def __init__(self, model: np.ndarray, label: np.array, model_name: str):
         self.model = model
         self.label = label
         self.model_name = model_name

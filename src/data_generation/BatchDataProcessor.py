@@ -26,7 +26,7 @@ class BatchDataProcessor:
 
     def process(self):
         for batch in self._load_data_batch():
-            for model in tqdm(batch, desc="[INFO]: Running models through the pipline"):
+            for model in tqdm(batch, desc="[INFO]: Running models through the pipeline"):
                 if self.transformer is not None:
                     model = self.transformer(model)
                 model.save(self.target_path)
