@@ -60,6 +60,7 @@ class Voxelizer:
         if self.representation == 'sdf':
             model = VoxelModel(voxels, np.array([1]), model.model_name)
         else:
+            voxels = sdf_to_binary(voxels)
             model = VoxelModel(voxels, np.array([1]), model.model_name)
         return model
 
