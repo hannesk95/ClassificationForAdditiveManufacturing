@@ -1,5 +1,5 @@
 import logging
-from src.data_generation.Configurator import Configurator
+from src.data_generation.ParamConfigurator import ParamConfigurator
 from src.data_generation.ModelSelector import ModelSelector
 from src.data_generation.BatchDataProcessor import BatchDataProcessor
 from src.data_generation.transformations import Normalizer, Aligner, Voxelizer, VoxelizerGPU, Defector, ComposeTransformer
@@ -8,7 +8,7 @@ from src.data_generation.transformations import Normalizer, Aligner, Voxelizer, 
 def main():
 
     # 1. Define configuration parameters
-    config = Configurator()
+    config = ParamConfigurator()
 
     # 2. Preselect files
     selector = ModelSelector(input_path=config.model_path, max_filesize=config.max_filesize,
