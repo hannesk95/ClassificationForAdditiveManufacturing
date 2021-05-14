@@ -2,7 +2,7 @@ import os
 import configparser
 
 
-class Configurator:
+class ParamConfigurator:
 
     def __init__(self):
         config = configparser.ConfigParser()
