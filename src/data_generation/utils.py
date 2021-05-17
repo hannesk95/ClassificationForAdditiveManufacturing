@@ -25,7 +25,7 @@ def binvox2npz(path_voxel_model: str, label: np.array = None) -> np.ndarray:
     filepath = Path(path_voxel_model).with_suffix('.npz')
     np.savez_compressed(filepath, model=model, label=label)
 
-    return np.array(model.data)
+    return np.array(model.data).astype(int)
 
 
 def _read_binvox_header(fp):
