@@ -23,13 +23,16 @@ class VoxelModel:
         np.savez_compressed(os.path.join(target_path, self.model_name), model=self.model, label=self.label)
 
     def get_model_data(self):
-        """Returns model data (3dim array + label)"""
-        return self.vertices, self.normals, self.faces
+        """Returns model data (3dim array)"""
+        return self.model
 
     def visualize(self, target_path=None):
-        fig = plt.figure()
+        fig = plt.figure(figsize=(6.4*2, 4.8*2))
         ax = fig.gca(projection='3d')
         ax.voxels(self.model)
+        ax.set_xlabel('x (0)')
+        ax.set_ylabel('y (1)')
+        ax.set_zlabel('z (2)')
         if target_path is None:
             plt.show()
         else:
