@@ -10,6 +10,9 @@ RUN pip3 install --upgrade pip
 # Install GIT
 RUN apt -y install git
 
+# Install Horovod for GPU parallelization
+# RUN HOROVOD_GPU_OPERATIONS=NCCL pip3 install horovod
+
 # Install predefined python packages
 COPY requirements.txt /tmp/requirements.txt
 # RUN pip3 install -r /tmp/requirements.txt
