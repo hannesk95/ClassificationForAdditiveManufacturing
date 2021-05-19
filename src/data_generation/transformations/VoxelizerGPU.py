@@ -46,7 +46,7 @@ class VoxelizerGPU:
         """ Internal method in order to prepare the shell command to be executed in order
         to start the CUDA voxelizer. """
 
-        path_voxelizer = "./build/bin/voxelizer "
+        path_voxelizer = "/voxelizer/build/bin/voxelizer "  # Do not change this path!
         resolution = f"-r {self.dimension} "
         path_input = model_path
         path_output = os.path.join(Path(model_path).with_suffix(''), "_voxelized_", str(self.dimension))
