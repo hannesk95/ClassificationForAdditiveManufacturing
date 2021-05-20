@@ -11,7 +11,7 @@ def _convert_stl2obj(model: object) -> str:
 
     #mesh_stl = o3d.io.read_triangle_mesh(model_path)
     mesh_stl = model.mesh
-    mesh_obj_path = Path(model.path).with_suffix('.obj')
+    mesh_obj_path = str(Path(model.path).with_suffix('.obj'))
     o3d.io.write_triangle_mesh(mesh_obj_path, mesh_stl)
 
     return mesh_obj_path
@@ -32,9 +32,9 @@ class VoxelizerGPU:
 
         if model.path.endswith(".stl"):
             model_path = _convert_stl2obj(model)
-            cmd = self._get_shell_command(model_path)
+            cmd, voxel_model_path = self._get_shell_command(model_path)
             subprocess.call(cmd, shell=True)
-            binvox2npz(Path(model_path).with_suffix('.binvox'))
+            binvox2npz(str(Path(voxel_model_path).with_suffix('.binvox')))
             os.remove(model_path)
 
         else:
@@ -42,13 +42,13 @@ class VoxelizerGPU:
             subprocess.call(cmd, shell=True)
             binvox2npz(Path(model_path).with_suffix('.binvox'))
 
-    def _get_shell_command(self, model_path: str) -> str:
+    def _get_shell_command(self, model_path: str) -> list:
         """ Internal method in order to prepare the shell command to be executed in order
         to start the CUDA voxelizer. """
 
         path_voxelizer = "/voxelizer/build/bin/voxelizer "  # Do not change this path!
         resolution = f"-r {self.dimension} "
-        path_input = model_path
-        path_output = os.path.join(Path(model_path).with_suffix(''), "_voxelized_", str(self.dimension))
+        path_input = model_path + " "
+        path_output = str(Path(model_path).with_suffix('')) + "_voxelized_" + str(self.dimension)
 
-        return path_voxelizer + resolution + path_input + path_output
+        return [path_voxelizer + resolution + path_input + path_output, path_output]
