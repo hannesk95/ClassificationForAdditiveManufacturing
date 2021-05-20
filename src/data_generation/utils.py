@@ -1,6 +1,7 @@
 import re
 import numpy as np
 from pathlib import Path
+from src.data_generation.VoxelModel import VoxelModel
 
 
 def extract_file_name(path, suffix='stl'):
@@ -15,17 +16,17 @@ def extract_file_name(path, suffix='stl'):
     return file_name
 
 
-def binvox2npz(path_voxel_model: str, label: np.array = None) -> np.ndarray:
+def binvox2npz(path_voxel_model: str, label: np.ndarray = np.array([1])) -> object:
 
     # TODO: Adjust label handover. For now it is included in order not to forget it later!
 
     with open(path_voxel_model, 'rb') as file:
         model = _read_as_3d_array(file)
 
-    filepath = Path(path_voxel_model).with_suffix('.npz')
-    np.savez_compressed(filepath, model=model, label=label)
-
-    return np.array(model.data).astype(int)
+    filepath = str(Path(path_voxel_model).with_suffix(''))
+    np.savez_compressed(filepath, model=model.astype(int), label=label)
+    model = VoxelModel(model.astype(int), label, filepath)
+    return model
 
 
 def _read_binvox_header(fp):
