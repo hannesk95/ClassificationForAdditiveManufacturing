@@ -35,6 +35,10 @@ for gpu in gpus:
 
 if gpus:
     tf.config.experimental.set_visible_devices(gpus[hvd.local_rank()],'GPU')
+    print("########################################")
+    print("# USING GPU POWER TO SPEED UP TRAINING #")
+    print("# AVAILABLE GPUs: ", len(gpus), " #")
+    print("########################################")
 ###HVD-Step2.
 
 """## Getting and Exploring the Dataset

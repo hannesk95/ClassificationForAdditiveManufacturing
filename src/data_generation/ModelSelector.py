@@ -5,6 +5,47 @@ import numpy as np
 import logging
 
 
+def _get_filesize(input_path: str, max_filesize: float) -> dict:
+
+    files = {}
+    models = os.listdir(input_path)
+
+    for model in tqdm(iterable=models, desc='[INFO]: Getting size of files!'):
+        if not model.endswith('.stl'):
+            continue
+
+        filepath = os.path.join(input_path, model)
+        size_in_MByte = ((os.path.getsize(filepath)) / 1000) / 1000
+
+        if max_filesize >= size_in_MByte:
+            files[filepath] = size_in_MByte
+
+    # Sort dictionary by value in ascending order
+    files = dict(sorted(files.items(), key=lambda item: item[1]))
+
+    return files
+
+
+def _compute_compactness(mesh: object) -> float:
+    """
+    Method which calculates the compactenss of a given 3D model.
+    @param mesh: 3D mesh object which was read in by Open3D
+    @return: number which indicated compactness of mesh object
+    """
+
+    bounding_box = mesh.get_axis_aligned_bounding_box()
+    volume_bb = bounding_box.volume()
+
+    try:
+        volume_mesh = mesh.get_volume()
+        compactness = volume_bb / volume_mesh
+    except RuntimeError as err:
+        compactness = None
+        print(err)
+
+    return compactness
+
+
 class ModelSelector:
     """Class for pre-selecting 3D models according to filesize and compactness"""
 
@@ -25,7 +66,6 @@ class ModelSelector:
         self.check_compactness = True
         self.preselection = {}
 
-
         if input_path is None:
             raise ValueError("[ERROR]: Path to the dataset containing the files has to be given!")
 
@@ -39,26 +79,6 @@ class ModelSelector:
         if num_files == 0:
             logging.info("Number of files was not specified, return all files which fulfill requirements!")
 
-    def _get_filesize(self, input_path: str, max_filesize: float) -> dict:
-
-        files = {}
-        models = os.listdir(input_path)
-
-        for model in tqdm(iterable=models, desc='[INFO]: Getting size of files!'):
-            if not model.endswith('.stl'):
-                continue
-
-            filepath = os.path.join(input_path, model)
-            size_in_MByte = ((os.path.getsize(filepath)) / 1000) / 1000
-
-            if max_filesize >= size_in_MByte:
-                files[filepath] = size_in_MByte
-
-        # Sort dictionary by value in ascending order
-        dict(sorted(files.items(), key=lambda item: item[1]))
-
-        return files
-
     def _load_model(self, files: dict, min_compactness: float) -> dict:
 
         filepaths = list(files.keys())
@@ -66,31 +86,12 @@ class ModelSelector:
         for file in tqdm(iterable=filepaths, desc='[INFO]: Calculate compactness of files!'):
             mesh = o3d.io.read_triangle_mesh(file)
             mesh.scale(1 / np.max(mesh.get_max_bound() - mesh.get_min_bound()), center=mesh.get_center())
-            mesh_compactness = self._compute_compactness()
+            mesh_compactness = _compute_compactness()
 
             if mesh_compactness < min_compactness or mesh_compactness is None:
                 del files[file]
 
         return files
-
-    def _compute_compactness(self, mesh: object) -> float:
-        """
-        Method which calculates the compactenss of a given 3D model.
-        @param mesh: 3D mesh object which was read in by Open3D
-        @return: number which indicated compactness of mesh object
-        """
-
-        bounding_box = mesh.get_axis_aligned_bounding_box()
-        volume_bb = bounding_box.volume()
-
-        try:
-            volume_mesh = mesh.get_volume()
-            compactness = volume_bb / volume_mesh
-        except RuntimeError as err:
-            compactness = None
-            print(err)
-
-        return compactness
 
     def select_models(self) -> list:
         """
@@ -98,7 +99,7 @@ class ModelSelector:
         and minimum compactness (if specified).
         @return: list of selected files according to filesize and compactness
         """
-        self.preselection = self._get_filesize(self.input_path, self.max_filesize)
+        self.preselection = _get_filesize(self.input_path, self.max_filesize)
 
         if self.check_compactness:
             self.preselection = self._load_model(self.preselection.copy(), self.min_compactness)
