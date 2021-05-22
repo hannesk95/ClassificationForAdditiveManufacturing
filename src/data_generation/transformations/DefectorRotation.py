@@ -1,6 +1,7 @@
 import numpy as np
 import random
 from scipy.ndimage.interpolation import rotate
+import seaborn as sns
 
 from src.data_generation.VoxelModel import VoxelModel
 
@@ -60,10 +61,11 @@ def determine_last_unique_horizontal_elements(source, number_of_elements):
 
 
 class DefectorRotation:
-    def __init(self, radius=2, border=5, rotation=True):
+    def __init(self, radius=2, border=5, rotation=True, visualize_top_down_view=False):
         self.radius = radius
         self.border = border
         self.rotation = rotation
+        self.visualize_top_down_view = visualize_top_down_view
 
     def __call__(self, model):
         model_data = model.model
@@ -107,5 +109,12 @@ class DefectorRotation:
 
         # TODO Put model in shape as before
         # TODO Add more checks
+        # TODO Find way on how to save model with defect (first idea return list of models
+        
+        if self.visualize_top_down_view:
+            top_down_view = np.sum(model_data, axis=2)
+            sns.heatmap(top_down_view)
 
-        return VoxelModel(model_data, np.array([0]), model.model_name + f'_defect_radius{self.radius}')
+        model_with_defect = VoxelModel(model_data, np.array([0]), model.model_name + f'_defect_radius{self.radius}')
+
+        return model
