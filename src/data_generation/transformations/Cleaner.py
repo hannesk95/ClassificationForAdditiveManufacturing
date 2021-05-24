@@ -8,34 +8,45 @@ from MeshSaver import MeshSaver
 # reference: https://support.shapeways.com/hc/en-us/articles/360007107674-Tips-for-successful-modeling
 
 class DataCleaner():
-    def __init__(self,arg):
-        self.arg = arg
+    def __init__(self,mesh):
+        self.mesh = mesh
+
+    def __call__(self):
+        cleaned_vertices, cleaned_faces, cleaned_normals = self.clean(self.mesh.vertices,self.mesh.faces)
+        self.mesh.set_model_data(cleaned_vertices, cleaned_faces, cleaned_normals)
+        self.mesh_checks(self.mesh.mesh)
+        self.fix_mesh_vertices(self.mesh.mesh)
+        self.fix_mesh_edges(self.mesh.mesh)
+        self.fix_mesh_triangles(self.mesh.mesh)
+        self.mesh.set_model_data(np.asarray(self.mesh.mesh.vertices), np.asarray(self.mesh.mesh.triangle_normals),np.asarray(self.mesh.mesh.triangles))
 
     # Clean the model using pymeshlab
-    def clean(self, vertices, faces):
+    def clean(self, mesh):
         """
         Creates
-        :param vertices: numpy array containing vertices
-        :param faces: numpy array containing faces
+        :param mesh model
         :return: vertices_cleaned: numpy array containing vertices cleaned
                  faces_cleaned: numpy array containing faces cleaned
+                 normals_cleaned: numpy array containing faces cleaned
 
         """
 
         ms = pymeshlab.MeshSet()
         # load mesh using vertices and faces
-        m = pymeshlab.Mesh(vertices, faces)
+        m = pymeshlab.Mesh(mesh.vertices, mesh.faces)
         ms.add_mesh(m)
         # apply filter to clean the model
         ms.remove_isolated_folded_faces_by_edge_flip()
         ms.remove_duplicate_faces()
-        #get triangles and vertices matrices
+        #get triangles,vertices,normals matrices
         face_matrix = ms.current_mesh().face_matrix()
         vertex_matrix = ms.current_mesh().vertex_matrix()
+        normal_matrix = ms.current_mesh().face_normal_matrix()
         # construct numpy arrays
         faces_cleaned =  np.array(face_matrix)
         vertices_cleaned =  np.array(vertex_matrix)
-        return vertices_cleaned,faces_cleaned
+        normals_cleaned = np.array(normal_matrix)
+        return vertices_cleaned,faces_cleaned,normals_cleaned
 
     def mesh_checks(self, mesh):
         """
