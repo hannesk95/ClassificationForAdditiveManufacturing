@@ -4,3 +4,4 @@ from .Aligner import Aligner
 from .Defector import Defector
 from .ComposeTransformer import ComposeTransformer
 from .VoxelizerGPU import VoxelizerGPU
+from .DefectorRotation import DefectorRotation
