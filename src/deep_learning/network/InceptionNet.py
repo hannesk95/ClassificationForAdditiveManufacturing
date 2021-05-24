@@ -76,6 +76,9 @@ class conv_block(nn.Module):
     def forward(self,x):
         return self.relu(self.batchnorm(self.conv(x)))
 
+"""
+#Testing only
 if __name__ == '__main__':
     model = GoogleNet()
     summary(model,(1,64,64,64))
+"""
