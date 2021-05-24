@@ -4,22 +4,19 @@ from torch.nn.modules import padding
 from torchsummary import summary
 
 class GoogleNet(nn.Module):
-    def __init__(self,in_channels=3):
+    def __init__(self,in_channels=1):
         super(GoogleNet,self).__init__()
         self.conv1 = conv_block(in_channels=in_channels,out_channels=64,kernel_size=(5,5,5),stride=(1,1,1),padding=(2,2,2))
-        self.maxpool = nn.MaxPool3d(kernel_size=2,stride=2,padding=1)
+        self.maxpool = nn.MaxPool3d(kernel_size=2,stride=2)
         self.conv2 = conv_block(in_channels=64,out_channels=192,kernel_size=(3,3,3),stride=(1,1,1),padding=(1,1,1))
         
         #Inception block
-        self.inception3a = Inception_Block(in_channels=192,out_1x1x1=64,red_3x3x3=96,out_3x3x3=128,red_5x5x5=16,out_5x5x5=48,out_1x1x1_pool=32)
-        self.inception3b = Inception_Block(in_channels=256,out_1x1x1=128,red_3x3x3=128,out_3x3x3=192,red_5x5x5=32,out_5x5x5=96,out_1x1x1_pool=64)
-        self.inception4a = Inception_Block(in_channels=480,out_1x1x1=192,red_3x3x3=96,out_3x3x3=208,red_5x5x5=16,out_5x5x5=48,out_1x1x1_pool=64)
-        self.inception4b = Inception_Block(in_channels=512,out_1x1x1=128,red_3x3x3=128,out_3x3x3=256,red_5x5x5=24,out_5x5x5=64,out_1x1x1_pool=64)
-        self.inception4c = Inception_Block(in_channels=512,out_1x1x1=256,red_3x3x3=160,out_3x3x3=320,red_5x5x5=32,out_5x5x5=128,out_1x1x1_pool=128)
-        self.inception5 = Inception_Block(in_channels=832,out_1x1x1=384,red_3x3x3=192,out_3x3x3=384,red_5x5x5=48,out_5x5x5=128,out_1x1x1_pool=128)
+        self.inception3 = Inception_Block(in_channels=192,out_1x1x1=64,red_3x3x3=96,out_3x3x3=128,red_5x5x5=16,out_5x5x5=32,out_1x1x1_pool=32)
+        self.inception4 = Inception_Block(in_channels=256,out_1x1x1=192,red_3x3x3=96,out_3x3x3=208,red_5x5x5=16,out_5x5x5=48,out_1x1x1_pool=64)
+        self.inception5 = Inception_Block(in_channels=512,out_1x1x1=384,red_3x3x3=192,out_3x3x3=384,red_5x5x5=48,out_5x5x5=128,out_1x1x1_pool=128)
         self.inception6 = Inception_Block(in_channels=1024,out_1x1x1=384,red_3x3x3=192,out_3x3x3=384,red_5x5x5=48,out_5x5x5=128,out_1x1x1_pool=128)
         
-        self.avgpool = nn.AvgPool3d(kernel_size=4,stride=1)
+        self.avgpool = nn.AvgPool3d(kernel_size=2,stride=1)
 
         self.dropout = nn.Dropout3d(p=0.4)
 
@@ -33,17 +30,13 @@ class GoogleNet(nn.Module):
     def forward(self,x):
        x = self.conv1(x)
        x = self.maxpool(x)
-       print(x.shape)
        x = self.conv2(x)
-       
        x = self.maxpool(x)
        
-       x = self.inception3a(x)
-       x = self.inception3b(x)
+       
+       x = self.inception3(x)
        x = self.maxpool(x)
-       x = self.inception4a(x)
-       x = self.inception4b(x)
-       x = self.inception4c(x)
+       x = self.inception4(x)
        x = self.maxpool(x)
        x = self.inception5(x)
        x = self.maxpool(x)
@@ -66,9 +59,9 @@ class Inception_Block(nn.Module):
         super(Inception_Block,self).__init__()
 
         self.branch_1 = conv_block(in_channels,out_1x1x1,kernel_size=1)
-        self.branch_2 = nn.Sequential(conv_block(in_channels,red_3x3x3,kernel_size=1),conv_block(red_3x3x3,out_3x3x3,kernel_size=3,padding=1))
-        self.branch_3 = nn.Sequential(conv_block(in_channels,red_5x5x5,kernel_size=1),conv_block(red_5x5x5,out_5x5x5,kernel_size=3,padding=2))
-        self.branch_4 = nn.Sequential(nn.MaxPool3d(kernel_size=2,stride=2),conv_block(in_channels,out_1x1x1_pool,kernel_size=1))
+        self.branch_2 = nn.Sequential(conv_block(in_channels,red_3x3x3,kernel_size=1),conv_block(red_3x3x3,out_3x3x3,kernel_size=3,stride=1,padding=1))
+        self.branch_3 = nn.Sequential(conv_block(in_channels,red_5x5x5,kernel_size=1),conv_block(red_5x5x5,out_5x5x5,kernel_size=5,stride=1,padding=2))
+        self.branch_4 = nn.Sequential(nn.MaxPool3d(kernel_size=3,stride=1,padding=1),conv_block(in_channels,out_1x1x1_pool,kernel_size=1))
 
     def forward(self,x):
         return torch.cat([self.branch_1(x),self.branch_2(x),self.branch_3(x),self.branch_4(x)],1)
@@ -85,4 +78,4 @@ class conv_block(nn.Module):
 
 if __name__ == '__main__':
     model = GoogleNet()
-    summary(model,(3,128,128,128))
+    summary(model,(1,64,64,64))
