@@ -152,13 +152,8 @@ def generate_model(model_depth, **kwargs):
     
     return model
 
-"""
+
 #For test only
 if __name__ == '__main__':
     net = generate_model(50)
-
-    if torch.cuda.device_count() > 0:
-        summary(net.cuda(),(1,64,64,64))
-    else:
-        summary(net,(1,64,64,64))
-"""
+    print(summary(net,(1,64,64,64)))
