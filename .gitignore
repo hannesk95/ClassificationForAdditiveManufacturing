@@ -112,6 +112,7 @@ venv.bak/
 .di-labvenv/
 #requirements.txt
 src/data_generation/config.ini
+src/data_generation_container/config.ini
 src/volksenv.yml
 
 # Spyder project settings
