@@ -34,6 +34,9 @@ $ pip3 install pytest-shutil
 
 pyunpack
 $ pip3 install pyunpack
+
+patool
+$ pip3 install patool
 ```
 
 
