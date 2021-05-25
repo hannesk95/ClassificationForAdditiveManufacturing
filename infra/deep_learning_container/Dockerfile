@@ -30,6 +30,9 @@ RUN apt update
 RUN apt install libnccl2 libnccl-dev
 RUN HOROVOD_GPU_OPERATIONS=NCCL pip install horovod
 
+# Copy .sbatch script into container
+COPY script.sbatch script.sbatch
+
 # Define entrypoint
 COPY entrypoint.sh entrypoint.sh
 ENTRYPOINT ["bash","entrypoint.sh"]
