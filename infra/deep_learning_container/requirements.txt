@@ -1,0 +1,8 @@
+mlflow
+numpy
+wandb
+matplotlib
+seaborn
+pandas
+pillow
+torchsummary

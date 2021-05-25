@@ -1,0 +1,7 @@
+numpy
+plotly
+matplotlib
+seaborn
+numpy-stl
+tqdm
+open3d
