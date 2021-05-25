@@ -15,10 +15,6 @@ RUN apt -y install git
 # Install Cmake
 RUN apt -y install cmake
 
-# Install Nvidia NCCL for accelerating neural network training using MPI
-# RUN git clone https://github.com/NVIDIA/nccl.git
-# RUN cd nccl/src/ && make -j build
-
 # Install predefined python packages
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
