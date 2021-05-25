@@ -4,32 +4,41 @@ from stl import mesh
 import pymeshlab
 
 class Aligner:
-    def __init__(self, mesh):
+    def __init__(self, mesh,version):
         self.mesh = mesh
+        self.version = version
 
-    def __call__(self): 
-        pass
-
-    def __call__v1(self): 
-        min_MOI_axis = self.min_MOI_axis(self.mesh)
-        coordinate_axis =  np.array([0., 0., 1.])
-        rotation_matrix = self.align_vectors(self.mesh, min_MOI_axis, coordinate_axis)
-        min_MOI_axis = rotation_matrix.dot(min_MOI_axis)
-
-    def align(self, stl_path, target_path=None):
+    def __call__(self):
+        if self.version == 1 :
+            min_MOI_axis = self.min_MOI_axis(self.mesh)
+            coordinate_axis =  np.array([0., 0., 1.])
+            rotation_matrix = self.align_vectors(self.mesh, min_MOI_axis, coordinate_axis)
+            min_MOI_axis = rotation_matrix.dot(min_MOI_axis)
+        elif self.version == 2:
+            aligned_vertices, aligned_faces, aligned_normals = self.align(self.mesh.vertices, self.mesh.faces)
+            self.mesh.set_model_data(aligned_vertices, aligned_faces, aligned_normals)
+    def align(self, mesh):
         """
         align 3D models
-        :param stl_path: Source path to the stl model
-        :param target_path: path of the resulting stl file.
-        :return: stl file containing the model aligned
+        :param mesh model
+        :return: mesh vertices,faces,normals aligned
         """
 
         ms = pymeshlab.MeshSet()
-        # load mesh
-        ms.load_new_mesh(stl_path)
+        # load mesh using vertices and faces
+        m = pymeshlab.Mesh(mesh.vertices, mesh.faces)
+        ms.add_mesh(m)
         # apply filter to align the model to principal component
         ms.transform_align_to_principal_axis()
-        ms.save_current_mesh(target_path)
+        # get triangles and vertices matrices
+        face_matrix = ms.current_mesh().face_matrix()
+        vertex_matrix = ms.current_mesh().vertex_matrix()
+        normal_matrix = ms.current_mesh().face_normal_matrix()
+        # construct numpy arrays
+        faces_aligned = np.array(face_matrix)
+        vertices_aligned = np.array(vertex_matrix)
+        normals_aligned  = np.array(normal_matrix)
+        return vertices_aligned, faces_aligned, normals_aligned
 
     def min_MOI_axis(self, mesh):
         """

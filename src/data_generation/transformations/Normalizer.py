@@ -8,13 +8,11 @@ class Normalizer:
         # TODO: Add the parameters to init
         self.mesh = mesh  # TODO: Find common stl datatyp
 
-    def __call__(self): 
-        pass
-
-    def __call__v1(self): 
-        self.center_mesh_around_origin(self.mesh)
-        scale_factor = 1 / np.max(self.mesh.get_max_bound() - self.mesh.get_min_bound())
-        self.scale(self.mesh, scale_factor)
+    def __call__(self):
+        self.center_mesh_around_origin(self.mesh.mesh)
+        scale_factor = 1 / np.max(self.mesh.mesh.get_max_bound() - self.mesh.mesh.get_min_bound())
+        self.scale(self.mesh.mesh, scale_factor)
+        self.mesh.set_model_data(np.asarray(self.mesh.mesh.vertices), np.asarray(self.mesh.mesh.triangle_normals), np.asarray(self.mesh.mesh.triangles))
 
     def center_mesh_around_origin(self, mesh):
         """
