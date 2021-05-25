@@ -1,6 +1,7 @@
 import sys
-sys.path.insert(0, "TUM-DI-LAB/")   #TODO currently needed for LRZ AI System, find better solution
-sys.path.insert(1, "dataset/")      #TODO currently needed for LRZ AI System, find better solution
+sys.path.append(".")   #TODO Ugly - currently needed for LRZ AI System - find better solution
+sys.path.append("..")
+sys.path.append("../..")
 import logging
 from src.data_generation.ParamConfigurator import ParamConfigurator
 from src.data_generation.ModelSelector import ModelSelector
