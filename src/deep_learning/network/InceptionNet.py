@@ -152,6 +152,10 @@ class conv_block(nn.Module):
 """
 #Testing only
 if __name__ == '__main__':
-    model = GoogleNet()
-    summary(model,(1,64,64,64))
+    net = InceptionNet_v1()
+    
+    if torch.cuda.device_count() > 0:
+        summary(net.cuda(),(1,64,64,64))
+    else:
+        summary(net,(1,64,64,64))
 """
