@@ -8,5 +8,5 @@ class ComposeTransformer:
 
     def __call__(self, model):
         for transform in self.transforms:
-            transform(model)
+            model = transform(model)
         return model
