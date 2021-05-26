@@ -130,7 +130,6 @@ class DefectorRotation:
             model_data = np.around(rotate(model_data, 360 - z_rotation, (0, 2)))
 
         # TODO Put model in shape as before
-        # TODO Find way on how to save model with defect (first idea return list of models)
 
         if self.visualize_top_down_view:
             basis = np.zeros_like(top_down_view)
@@ -143,4 +142,4 @@ class DefectorRotation:
 
         model_with_defect = VoxelModel(model_data, np.array([0]), model.model_name + f'_defect_radius{self.radius}')
 
-        return model
+        return [model, model_with_defect]
