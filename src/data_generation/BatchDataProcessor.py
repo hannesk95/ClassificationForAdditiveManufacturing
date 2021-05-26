@@ -34,9 +34,16 @@ class BatchDataProcessor:
 
             yield data_batch
 
+    def _save_model(self, models):
+        if type(models) is list:
+            for model_instance in models:
+                model_instance.save(self.target_path)
+        else:
+            models.save(self.target_path)
+
     def process(self):
         for batch in self._load_data_batch():
             for model in tqdm(batch, desc="[INFO]: Running models through the pipeline"):
                 if self.transformer is not None:
-                    model = self.transformer(model)
-                model.save(self.target_path)
+                    models = self.transformer(model)
+                self._save_model(models)
