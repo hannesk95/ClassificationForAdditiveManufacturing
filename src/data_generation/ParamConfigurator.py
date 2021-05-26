@@ -24,4 +24,10 @@ class ParamConfigurator:
         self.min_compactness = config['ModelSelector'].getfloat('min_compactness')
         self.batch_size = config['BatchDataProcessor'].getint('batch_size')
 
+        self.voxel_dimensions = config['Voxelization'].getint('voxel_dimensions')
+        self.voxel_representation = config['Voxelization']['voxel_representation']
+
+        self.hole_radius = config['Defector'].getint('hole_radius')
+        self.border = config['Defector'].getint('border')
+
 

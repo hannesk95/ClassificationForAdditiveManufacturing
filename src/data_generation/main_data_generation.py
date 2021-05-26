@@ -5,11 +5,11 @@ import logging
 from src.data_generation.ParamConfigurator import ParamConfigurator
 from src.data_generation.ModelSelector import ModelSelector
 from src.data_generation.BatchDataProcessor import BatchDataProcessor
-from src.data_generation.transformations import Normalizer, Aligner, Voxelizer, VoxelizerGPU, Defector, ComposeTransformer
+from src.data_generation.transformations import Normalizer, Aligner, Cleaner, Voxelizer, VoxelizerGPU, DefectorRotation, \
+    ComposeTransformer
 
 
 def main():
-
     # 1. Define configuration parameters
     config = ParamConfigurator()
 
@@ -21,11 +21,12 @@ def main():
     # 3. Define transformations
     # normalizer = Normalizer()
     # aligner = Aligner()
-    voxelizer = VoxelizerGPU()
-    # defector = Defector()
+    # cleaner = Cleaner()
+    voxelizer = Voxelizer(dimension=config.voxel_dimensions, representation=config.voxel_representation)
+    defector = DefectorRotation(radius=config.hole_radius, border=config.border)
 
     # 4. Compose transformations
-    # composer = ComposeTransformer([normalizer, aligner, voxelizer, defector])
+    # composer = ComposeTransformer([normalizer, aligner, cleaner, voxelizer, defector])
 
     # 5. Start processing using batch of files
     batch_processor = BatchDataProcessor(final_models, batch_size=config.batch_size, transformer=voxelizer,
