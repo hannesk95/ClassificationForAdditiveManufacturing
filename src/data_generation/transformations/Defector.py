@@ -93,7 +93,7 @@ class Defector:
         return None
 
 
-    def find_axis_and_radius(voxels):
+    def find_axis_and_radius_greedy(voxels):
         """
         find an appropriate radius for the cylinder
         :voxels: voxel grid indices
@@ -107,3 +107,33 @@ class Defector:
             print(a, r)
             if r != None:
                 return a, r
+
+    
+    def find_axis_and_radius_exhaustive(voxels):
+        """
+        find an appropriate radius for the cylinder
+        :voxels: voxel grid indices
+        :return: pair: selected axis and radius
+        """
+        # try out the 3 possible axes
+        axis = range(3)
+        result = []
+        for a in axis:
+            r = find_radius(voxels, a)
+            print(a, r)
+            result.append(r)
+        # return axis, radius 
+        return np.argmax(result), np.max(result)
+
+    def find_axis_and_radius(voxels, version = 1):
+        """
+        find an appropriate radius for the cylinder
+        :voxels: voxel grid indices
+        :version: 1 is greedy, otherwise exhaustive
+        :return: pair: selected axis and radius
+        """
+        if version == 1:
+            return find_axis_and_radius_greedy(voxels)
+        else:
+            return find_axis_and_radius_exhaustive(voxels)
+    
