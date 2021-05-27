@@ -13,11 +13,11 @@ class DataCleaner():
     def __call__(self):
         cleaned_vertices, cleaned_faces, cleaned_normals = self.clean(self.mesh.vertices,self.mesh.faces)
         self.mesh.set_model_data(cleaned_vertices, cleaned_faces, cleaned_normals)
-        self.mesh_checks(self.mesh.mesh)
-        self.fix_mesh_vertices(self.mesh.mesh)
-        self.fix_mesh_edges(self.mesh.mesh)
-        self.fix_mesh_triangles(self.mesh.mesh)
-        self.mesh.set_model_data(np.asarray(self.mesh.mesh.vertices), np.asarray(self.mesh.mesh.triangle_normals),np.asarray(self.mesh.mesh.triangles))
+        self.mesh_checks(self.mesh)
+        self.fix_mesh_vertices(self.mesh)
+        self.fix_mesh_edges(self.mesh)
+        self.fix_mesh_triangles(self.mesh)
+        self.mesh.set_model_data(np.asarray(self.mesh.vertices), np.asarray(self.mesh.triangle_normals),np.asarray(self.mesh.triangles))
 
     # Clean the model using pymeshlab
     def clean(self, mesh):
