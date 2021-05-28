@@ -11,7 +11,7 @@ def _get_filesize(input_path: str, max_filesize: float) -> dict:
     files = {}
     models = os.listdir(input_path)
 
-    for model in tqdm(iterable=models, desc='[INFO]: Getting size of files!'):
+    for model in tqdm(iterable=models, desc='INFO - Getting size of files!'):
         if not model.endswith('.stl'):
             continue
 
