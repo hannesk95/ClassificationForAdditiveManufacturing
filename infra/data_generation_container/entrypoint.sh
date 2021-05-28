@@ -10,7 +10,7 @@ cd /
 mv /TUM-DI-LAB/infra/data_generation_container/config.ini /TUM-DI-LAB/src/data_generation/config.ini
 
 # Clone and compile binaries for CUDA voxelizer
-git clone https://github.com/kctess5/voxelizer.git
+# git clone https://github.com/kctess5/voxelizer.git
 cd voxelizer
 mkdir build 
 cd build
