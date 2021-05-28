@@ -1,14 +1,13 @@
-# import sys
-# sys.path.append(".")   #TODO Ugly - currently needed for LRZ AI System - find better solution
-# sys.path.append("..")
-# sys.path.append("../..")
+import sys
+sys.path.append(".")   #TODO Ugly - currently needed for LRZ AI System - find better solution
+sys.path.append("..")
+sys.path.append("../..")
 import logging
 import torch
 from src.data_generation.ParamConfigurator import ParamConfigurator
 from src.data_generation.ModelSelector import ModelSelector
 from src.data_generation.BatchDataProcessor import BatchDataProcessor
-from src.data_generation.transformations import Normalizer, Aligner, Cleaner, Voxelizer, VoxelizerGPU, DefectorRotation, \
-    ComposeTransformer
+from src.data_generation.transformations import Normalizer, Aligner, Cleaner, Voxelizer, VoxelizerGPU, DefectorRotation, ComposeTransformer
 
 
 def main():
