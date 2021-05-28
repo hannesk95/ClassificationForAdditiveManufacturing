@@ -3,6 +3,7 @@ sys.path.append(".")   #TODO Ugly - currently needed for LRZ AI System - find be
 sys.path.append("..")
 sys.path.append("../..")
 import logging
+import torch
 from src.data_generation.ParamConfigurator import ParamConfigurator
 from src.data_generation.ModelSelector import ModelSelector
 from src.data_generation.BatchDataProcessor import BatchDataProcessor
@@ -23,7 +24,10 @@ def main():
     normalizer = Normalizer()
     aligner = Aligner()
     cleaner = Cleaner()
-    voxelizer = Voxelizer(dimension=config.voxel_dimensions, representation=config.voxel_representation)
+    if torch.cuda.is_available():
+        voxelizer = VoxelizerGPU(dimension=config.voxel_dimensions)
+    else:
+        voxelizer = Voxelizer(dimension=config.voxel_dimensions, representation=config.voxel_representation)
     defector = DefectorRotation(radius=config.hole_radius, border=config.border)
 
     # 4. Compose transformations
