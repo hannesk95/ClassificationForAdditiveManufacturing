@@ -1,20 +1,18 @@
 import torch
 
 def training_configuration():
-    batch_size = 
-    number_epochs = 
-    learning_rate = 
+    batch_size = 4
+    number_epochs = 50
+    learning_rate = 0.0001
     resnet_depth = 50
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     number_workers = 4
-    plot_frequency = 
+    plot_frequency = 10
 
 def train_data_configuration():
-    training_data_size = 
+    training_data_size = 10
     training_set_dir = 
-    training_gt_dir = 
 
 def validation_data_configuration():
-    validation_data_size = 
+    validation_data_size = 10
     validation_set_dir = 
-    validation_gt_dir = 
