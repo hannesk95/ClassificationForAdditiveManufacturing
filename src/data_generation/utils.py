@@ -18,14 +18,12 @@ def extract_file_name(path, suffix='stl'):
 
 def binvox2npz(path_voxel_model: str, label: np.ndarray = np.array([1])) -> object:
 
-    # TODO: Adjust label handover. For now it is included in order not to forget it later!
-
     with open(path_voxel_model, 'rb') as file:
         model = _read_as_3d_array(file)
 
-    filepath = str(Path(path_voxel_model).with_suffix(''))
-    # np.savez_compressed(filepath, model=model.astype(int), label=label) # TODO remove line if not needed anymores
-    model = VoxelModel(model.astype(int), label, filepath)
+    # filepath = str(Path(path_voxel_model).with_suffix(''))
+    filename = extract_file_name(path_voxel_model, 'binvox')
+    model = VoxelModel(model.astype(int), label, filename)
     return model
 
 
