@@ -1,6 +1,6 @@
 import torch
 
-def training_configuration():
+class training_configuration():
     batch_size = 4
     number_epochs = 50
     learning_rate = 0.0001
@@ -9,10 +9,10 @@ def training_configuration():
     number_workers = 4
     plot_frequency = 10
 
-def train_data_configuration():
+class train_data_configuration():
     training_data_size = 10
     training_set_dir = 
 
-def validation_data_configuration():
+class validation_data_configuration():
     validation_data_size = 10
     validation_set_dir = 
