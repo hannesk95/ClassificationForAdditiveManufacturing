@@ -12,6 +12,7 @@ from src.data_generation.transformations import Normalizer, Aligner, Cleaner, Vo
 
 
 def main():
+    """# TODO"""
     # 1. Define configuration parameters
     config = ParamConfigurator()
 

@@ -3,10 +3,13 @@ import copy
 
 
 class Defector:
+    """# TODO"""
     def __init__(self, arg):
+        """# TODO"""
         self.mesh = arg
 
     def __call__(self, model):
+        """# TODO"""
         # TODO fix class
         # get the voxel grid indices out of the occupancy grid
         model = np.load("5.npz")['model']

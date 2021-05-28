@@ -5,7 +5,9 @@ import pymeshlab
 
 
 class Cleaner:
+    """# TODO"""
     def __call__(self, model):
+        """# TODO"""
         # PyMeshLab
         cleaned_vertices, cleaned_faces, cleaned_normals = self.clean(model)
         model.set_model_data(cleaned_vertices, cleaned_normals, cleaned_faces)

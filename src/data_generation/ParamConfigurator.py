@@ -3,8 +3,10 @@ import configparser
 
 
 class ParamConfigurator:
+    """# TODO"""
 
     def __init__(self):
+        """# TODO"""
         config = configparser.ConfigParser()
         config.read('config.ini')
 

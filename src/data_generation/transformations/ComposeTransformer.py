@@ -7,6 +7,7 @@ class ComposeTransformer:
         self.transforms = transforms
 
     def __call__(self, model):
+        """# TODO"""
         for transform in self.transforms:
             model = transform(model)
         return model

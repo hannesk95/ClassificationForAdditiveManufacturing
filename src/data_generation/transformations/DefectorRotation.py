@@ -3,11 +3,11 @@ import numpy as np
 import random
 from scipy.ndimage.interpolation import rotate
 import seaborn as sns
-
 from src.data_generation.VoxelModel import VoxelModel
 
 
 def add_vertical_hole(model_data, radius, offset):
+    """# TODO"""
     xx = np.arange(model_data.shape[0])
     yy = np.arange(model_data.shape[1])
     out = np.zeros_like(model_data)
@@ -23,6 +23,7 @@ def add_vertical_hole(model_data, radius, offset):
 
 
 def determine_first_unique_horizontal_elements(source, number_of_elements):
+    """# TODO"""
     to_remove = []
     value = 0
     idx = 0
@@ -41,6 +42,7 @@ def determine_first_unique_horizontal_elements(source, number_of_elements):
 
 
 def determine_last_unique_horizontal_elements(source, number_of_elements):
+    """# TODO"""
     to_remove = []
     idx = 0
     while idx < len(source) - number_of_elements:
@@ -62,6 +64,7 @@ def determine_last_unique_horizontal_elements(source, number_of_elements):
 
 
 def check_hole_feasibility(model_data, radius, offset):
+    """# TODO"""
     xx = np.arange(model_data.shape[0])
     yy = np.arange(model_data.shape[1])
     top_down_view = np.sum(model_data, axis=2)
@@ -74,6 +77,7 @@ def check_hole_feasibility(model_data, radius, offset):
 
 
 def rotate_model(model_data, x_rotation, y_rotation, z_rotation):
+    """# TODO"""
     model_data = np.around(rotate(model_data, x_rotation))
     model_data = np.around(rotate(model_data, y_rotation, (1, 2)))
     model_data = np.around(rotate(model_data, z_rotation, (0, 2)))
@@ -82,6 +86,7 @@ def rotate_model(model_data, x_rotation, y_rotation, z_rotation):
 
 
 def _visualize_top_down_view(model_data, possible_offsets_final):
+    """# TODO"""
     top_down_view = np.sum(model_data, axis=2)
     basis = np.zeros_like(top_down_view)
     for indices in possible_offsets_final:
@@ -92,7 +97,9 @@ def _visualize_top_down_view(model_data, possible_offsets_final):
 
 
 class DefectorRotation:
+    """# TODO"""
     def __init__(self, radius=2, border=5, rotation=True, number_of_trials=5, visualize_top_down_view=False):
+        """# TODO"""
         self.radius = radius
         self.border = border
         self.rotation = rotation
@@ -100,6 +107,7 @@ class DefectorRotation:
         self.number_of_trials = number_of_trials
 
     def __call__(self, model):
+        """# TODO"""
         model_data = model.model
 
         if self.rotation:
@@ -130,6 +138,7 @@ class DefectorRotation:
         return [model, model_with_defect]
 
     def _find_feasible_offset(self, model_data):
+        """# TODO"""
         # Get top down view and all non-zero elements in the top down view
         top_down_view = np.sum(model_data, axis=2)
         possible_offsets = np.array(np.where(top_down_view > 0)).T

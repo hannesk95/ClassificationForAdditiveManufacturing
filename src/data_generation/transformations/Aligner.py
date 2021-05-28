@@ -4,10 +4,13 @@ import pymeshlab
 
 
 class Aligner:
+    """# TODO"""
     def __init__(self, version: int = 1):
+        """# TODO"""
         self.version = version
 
     def __call__(self, model):
+        """# TODO"""
         if self.version == 1:
             mesh = model.mesh
             min_MOI_axis = self.min_MOI_axis(mesh)

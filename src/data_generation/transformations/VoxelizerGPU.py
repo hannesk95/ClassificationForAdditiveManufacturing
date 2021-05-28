@@ -17,6 +17,7 @@ def _convert_stl2obj(model: object) -> str:
 
 
 class VoxelizerGPU:
+    """# TODO"""
 
     def __init__(self, dimension: int = 128):
         """ # TODO """

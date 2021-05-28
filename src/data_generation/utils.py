@@ -17,6 +17,7 @@ def extract_file_name(path, suffix='stl'):
 
 
 def binvox2npz(path_voxel_model: str, label: np.ndarray = np.array([1])) -> object:
+    """# TODO"""
 
     with open(path_voxel_model, 'rb') as file:
         model = _read_as_3d_array(file)

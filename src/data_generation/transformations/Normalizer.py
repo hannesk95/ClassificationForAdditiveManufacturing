@@ -4,7 +4,9 @@ from stl import mesh
 import pymeshlab
 
 class Normalizer:
+    """# TODO"""
     def __call__(self, model):
+        """# TODO"""
         mesh = model.mesh
         self.center_mesh_around_origin(mesh)
         scale_factor = 1 / np.max(mesh.get_max_bound() - mesh.get_min_bound())
