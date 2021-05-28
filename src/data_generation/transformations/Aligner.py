@@ -1,22 +1,26 @@
 import numpy as np
 import open3d as o3d
-from stl import mesh
 import pymeshlab
 
+
 class Aligner:
-    def __init__(self, mesh,version):
-        self.mesh = mesh
+    def __init__(self, version: int = 1):
         self.version = version
 
-    def __call__(self):
-        if self.version == 1 :
-            min_MOI_axis = self.min_MOI_axis(self.mesh)
-            coordinate_axis =  np.array([0., 0., 1.])
-            rotation_matrix = self.align_vectors(self.mesh, min_MOI_axis, coordinate_axis)
-            min_MOI_axis = rotation_matrix.dot(min_MOI_axis)
+    def __call__(self, model):
+        if self.version == 1:
+            mesh = model.mesh
+            min_MOI_axis = self.min_MOI_axis(mesh)
+            coordinate_axis = np.array([0., 0., 1.])
+            self.align_vectors(mesh, min_MOI_axis, coordinate_axis)
+            model.set_model_data(np.asarray(mesh.vertices), np.asarray(mesh.triangle_normals), np.asarray(mesh.triangles))
+
         elif self.version == 2:
-            aligned_vertices, aligned_faces, aligned_normals = self.align(self.mesh.vertices, self.mesh.faces)
-            self.mesh.set_model_data(aligned_vertices, aligned_faces, aligned_normals)
+            aligned_vertices, aligned_faces, aligned_normals = self.align(model.mesh.vertices, model.mesh.faces)
+            model.set_model_data(aligned_vertices, aligned_faces, aligned_normals)
+
+        return model
+
     def align(self, mesh):
         """
         align 3D models
@@ -37,7 +41,7 @@ class Aligner:
         # construct numpy arrays
         faces_aligned = np.array(face_matrix)
         vertices_aligned = np.array(vertex_matrix)
-        normals_aligned  = np.array(normal_matrix)
+        normals_aligned = np.array(normal_matrix)
         return vertices_aligned, faces_aligned, normals_aligned
 
     def min_MOI_axis(self, mesh):

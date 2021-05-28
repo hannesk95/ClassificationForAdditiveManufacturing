@@ -6,6 +6,7 @@ import logging
 
 
 def _get_filesize(input_path: str, max_filesize: float) -> dict:
+    """Method for getting the filesize of each file."""
 
     files = {}
     models = os.listdir(input_path)
@@ -28,17 +29,20 @@ def _get_filesize(input_path: str, max_filesize: float) -> dict:
 
 def _compute_compactness(mesh: object) -> float:
     """
-    Method which calculates the compactenss of a given 3D model.
+    Method which calculates the compactness of a given 3D model.
     @param mesh: 3D mesh object which was read in by Open3D
     @return: number which indicated compactness of mesh object
     """
+
+    # TODO: Check metadata in order to calculate compactness for non-watertight models
+    # TODO: Get intuition about feasible compactness parameter value
 
     bounding_box = mesh.get_axis_aligned_bounding_box()
     volume_bb = bounding_box.volume()
 
     try:
         volume_mesh = mesh.get_volume()
-        compactness = volume_bb / volume_mesh
+        compactness = volume_mesh / volume_bb
     except RuntimeError as err:
         compactness = None
         print(err)
@@ -47,7 +51,7 @@ def _compute_compactness(mesh: object) -> float:
 
 
 class ModelSelector:
-    """Class for pre-selecting 3D models according to filesize and compactness"""
+    """Class for pre-selecting 3D models according to filesize and compactness."""
 
     def __init__(self, input_path: str = None, max_filesize: float = None,
                  min_compactness: float = 0.0, num_files: int = 0):
@@ -80,13 +84,14 @@ class ModelSelector:
             logging.info("Number of files was not specified, return all files which fulfill requirements!")
 
     def _load_model(self, files: dict, min_compactness: float) -> dict:
+        """Method for loading the models."""
 
         filepaths = list(files.keys())
 
         for file in tqdm(iterable=filepaths, desc='[INFO]: Calculate compactness of files!'):
             mesh = o3d.io.read_triangle_mesh(file)
             mesh.scale(1 / np.max(mesh.get_max_bound() - mesh.get_min_bound()), center=mesh.get_center())
-            mesh_compactness = _compute_compactness()
+            mesh_compactness = _compute_compactness(mesh)
 
             if mesh_compactness < min_compactness or mesh_compactness is None:
                 del files[file]
@@ -95,7 +100,7 @@ class ModelSelector:
 
     def select_models(self) -> list:
         """
-        method which returns a list of preselected files according to maximum filesize
+        Method which returns a list of preselected files according to maximum filesize
         and minimum compactness (if specified).
         @return: list of selected files according to filesize and compactness
         """

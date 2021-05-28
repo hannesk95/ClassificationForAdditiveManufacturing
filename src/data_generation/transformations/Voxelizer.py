@@ -14,6 +14,7 @@ def sdf_to_binary(sdf):
     binay_voxels = np.ones_like(sdf)
     dims = [sdf.shape[0], sdf.shape[1], sdf.shape[2]]
 
+    # TODO Use numpy
     for i in range(dims[0]):
         for j in range(dims[1]):
             for k in range(dims[2]):
@@ -52,6 +53,11 @@ def sdf_to_tsdf(sdf):
 
 class Voxelizer:
     def __init__(self, dimension=64, representation='occupancy'):
+        """
+        # TODO
+        :param dimension:
+        :param representation:
+        """
         self.dimension = dimension
         self.representation = representation
 

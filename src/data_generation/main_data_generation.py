@@ -20,17 +20,17 @@ def main():
     final_models = selector.select_models()
 
     # 3. Define transformations
-    # normalizer = Normalizer()
-    # aligner = Aligner()
-    # cleaner = Cleaner()
+    normalizer = Normalizer()
+    aligner = Aligner()
+    cleaner = Cleaner()
     voxelizer = Voxelizer(dimension=config.voxel_dimensions, representation=config.voxel_representation)
     defector = DefectorRotation(radius=config.hole_radius, border=config.border)
 
     # 4. Compose transformations
-    # composer = ComposeTransformer([normalizer, aligner, cleaner, voxelizer, defector])
+    composer = ComposeTransformer([cleaner, normalizer, aligner, voxelizer, defector])
 
     # 5. Start processing using batch of files
-    batch_processor = BatchDataProcessor(final_models, batch_size=config.batch_size, transformer=voxelizer,
+    batch_processor = BatchDataProcessor(final_models, batch_size=config.batch_size, transformer=composer,
                                          target_path=config.target_path)
     batch_processor.process()
 

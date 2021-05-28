@@ -1,15 +1,31 @@
-import os
-import logging
 import numpy as np
-import matplotlib.pyplot as plt
 import open3d as o3d
 from src.data_generation.utils import extract_file_name
+
+
+def _convert_to_o3d_mesh(vertices, faces):
+    """
+    # TODO
+    :param vertices:
+    :param faces:
+    :return:
+    """
+    # from numpy array to o3d Vector3dVector
+    vertices_o3d = o3d.utility.Vector3dVector(vertices)
+    # from numpy array to o3d Vector3iVector
+    faces_o3d = o3d.utility.Vector3iVector(faces)
+    # create o3d TriangleMesh
+    mesh = o3d.geometry.TriangleMesh(vertices=vertices_o3d, triangles=faces_o3d)
+    # compute normal to save as stl file
+    mesh.compute_triangle_normals()
+
+    return mesh
 
 
 class MeshModel:
     """
     Model class, for handling mesh models
-
+    # TODO Add docstrings
     :param path: Path to the stl file
     """
     def __init__(self, path):
@@ -26,14 +42,7 @@ class MeshModel:
         if target_path is None:
             target_path = self.path
 
-        # from numpy array to o3d Vector3dVector
-        vertices_o3d = o3d.utility.Vector3dVector(self.vertices)
-        # from numpy array to o3d Vector3iVector
-        faces_o3d = o3d.utility.Vector3iVector(self.faces)
-        # create o3d TriangleMesh
-        mesh = o3d.geometry.TriangleMesh(vertices=vertices_o3d, triangles=faces_o3d)
-        # compute normal to save as stl file
-        mesh.compute_triangle_normals()
+        mesh = _convert_to_o3d_mesh(self.vertices, self.faces)
         # save the mesh to path
         o3d.io.write_triangle_mesh(target_path, mesh)
 
@@ -45,6 +54,7 @@ class MeshModel:
         self.vertices = vertices
         self.normals = normals
         self.faces = faces
+        self.mesh = _convert_to_o3d_mesh(vertices, faces)
 
     def visualize(self, geometries):
         """
@@ -55,3 +65,16 @@ class MeshModel:
         """
 
         o3d.visualization.draw_geometries([self.mesh] + geometries)
+
+    def mesh_checks(self):
+        """
+        Prints O3D TriangleMesh validity checks
+
+        :param mesh: O3D mesh object
+        """
+        # tests if all vertices are manifold
+        print("all vertices manifold:", self.mesh.is_vertex_manifold())
+        # tests if all edges are manifold
+        print("all edges manifold:", self.mesh.is_edge_manifold())
+        # tests if the mesh is watertight
+        print("mesh is watertight:", self.mesh.is_watertight())

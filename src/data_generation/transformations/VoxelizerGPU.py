@@ -9,7 +9,6 @@ def _convert_stl2obj(model: object) -> str:
     """ Internal method in order to convert .stl files into .obj files.
     This is needed as the CUDA voxelizer requires .obj input file format. """
 
-    #mesh_stl = o3d.io.read_triangle_mesh(model_path)
     mesh_stl = model.mesh
     mesh_obj_path = str(Path(model.path).with_suffix('.obj'))
     o3d.io.write_triangle_mesh(mesh_obj_path, mesh_stl)
@@ -20,6 +19,7 @@ def _convert_stl2obj(model: object) -> str:
 class VoxelizerGPU:
 
     def __init__(self, dimension: int = 128):
+        """ # TODO """
         self.dimension = dimension
 
     def __call__(self, model: object):
@@ -34,13 +34,15 @@ class VoxelizerGPU:
             model_path = _convert_stl2obj(model)
             cmd, voxel_model_path = self._get_shell_command(model_path)
             subprocess.call(cmd, shell=True)
-            binvox2npz(str(Path(voxel_model_path).with_suffix('.binvox')))
+            model = binvox2npz(str(Path(voxel_model_path).with_suffix('.binvox')))
             os.remove(model_path)
 
         else:
             cmd = self._get_shell_command(model_path)
             subprocess.call(cmd, shell=True)
-            binvox2npz(Path(model_path).with_suffix('.binvox'))
+            model = binvox2npz(Path(model_path).with_suffix('.binvox'))
+
+        return model
 
     def _get_shell_command(self, model_path: str) -> list:
         """ Internal method in order to prepare the shell command to be executed in order

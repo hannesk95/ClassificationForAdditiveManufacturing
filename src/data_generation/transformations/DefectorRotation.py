@@ -66,7 +66,7 @@ def check_hole_feasibility(model_data, radius, offset):
     yy = np.arange(model_data.shape[1])
     top_down_view = np.sum(model_data, axis=2)
     inside = (xx[:, None] - offset[0]) ** 2 + (yy[None, :] - offset[1]) ** 2 > (radius ** 2)
-    inidices_to_remove = np.array(np.where(inside == False)).T
+    inidices_to_remove = np.array(np.where(inside is False)).T
     for indices in inidices_to_remove:
         if top_down_view[indices[0], indices[1]] == 0:
             return False
@@ -110,6 +110,8 @@ class DefectorRotation:
 
         # Remove elements at the border
         possible_offsets_final = np.delete(possible_offsets, list(set(to_remove)), axis=0)
+        if len(possible_offsets_final) == 0:
+            return model
 
         for trial in range(self.number_of_trials):
             offset = possible_offsets_final[random.randrange(0, len(possible_offsets_final))]
@@ -119,6 +121,7 @@ class DefectorRotation:
 
         if (trial-1) == self.number_of_trials:
             logging.warning(f'Could not find feasible offset for model: {model.model_name}')
+            # TODO Think about returning empty list
             return model
 
         model_data = add_vertical_hole(model.model, self.radius, offset)
