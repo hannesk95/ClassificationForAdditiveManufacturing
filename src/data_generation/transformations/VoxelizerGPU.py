@@ -10,6 +10,7 @@ def _convert_stl2obj(model: object) -> str:
     This is needed as the CUDA voxelizer requires .obj input file format. """
 
     mesh_stl = model.mesh
+    mesh_stl.triangle_normals = o3d.utility.Vector3dVector([])
     mesh_obj_path = str(Path(model.path).with_suffix('.obj'))
     o3d.io.write_triangle_mesh(mesh_obj_path, mesh_stl)
 
