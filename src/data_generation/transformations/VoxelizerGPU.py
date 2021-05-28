@@ -53,6 +53,6 @@ class VoxelizerGPU:
         path_voxelizer = "/voxelizer/build/bin/voxelizer "  # Do not change this path!
         resolution = f"-r {self.dimension} "
         path_input = model_path + " "
-        path_output = str(Path(model_path).with_suffix('')) + str(self.dimension)
+        path_output = str(Path(model_path).with_suffix('')) + f"_resolution{str(self.dimension)}"
 
         return [path_voxelizer + resolution + path_input + path_output, path_output]
