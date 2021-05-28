@@ -1,6 +1,5 @@
 import torch
 import torchvision
-import pickle
 from torchvision import transforms
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
@@ -13,6 +12,7 @@ import wandb
 from wandb_log import training_log
 import configuration
 from network.ResNet import ResNet
+from dataloader import Data
 
 
 def wandb_initiliazer(arguments):
@@ -29,15 +29,15 @@ def nn_model(config):
     data_transforms = transforms.Compose([transforms.ToTensor()])
 
 
-    train_set = ...
-    validation_set = ...
+    train_set = Data(data_transforms)
+    validation_set = Data(data_transforms)
 
     #Loading train and validation set
     train_set_loader = DataLoader(train_set,batch_size=config.batch_size,shuffle=False,num_workers=configuration.training_configuration.number_workers)
     validation_set_loader = DataLoader(validation_set,batch_size=config.batch_size,shuffle=False,num_workers=configuration.training_configuration.number_workers)
 
     #Build the model
-    net = ResNet()
+    net = ResNet.generate_model(config.resnet_depth)
 
     if configuration.training_configuration.device.type == 'cuda':
         net.cuda()
@@ -54,14 +54,17 @@ def validation_phase(NN_model,val_set_loader,loss_function,epoch):
     print("Validating...")
     NN_model.eval()
     
+    mini_batches = 0
     loss_val = 0
 
-    for batch_id, (...) in enumerate(val_set_loader, 1):
+    for batch_id, (model,label) in enumerate(val_set_loader, 1):
         if(configuration.training_configuration.device.type == 'cuda'):
-            pass
+            model, label = model.cuda(), label
+        else:
+            model, label = model, label
 
-        output = NN_model(...)
-        loss = loss_function(...)
+        output = NN_model(model.float())
+        loss = loss_function(output, label)
 
         mini_batches += 1
         loss_val += float(loss)
@@ -72,31 +75,27 @@ def validation_phase(NN_model,val_set_loader,loss_function,epoch):
 def train(NN_model,train_set_loader,val_set_loader,loss_function,optimizer, config):
     wandb.watch(NN_model,loss_function,log='all',log_freq=50)
 
-    num_seen_samples = 0
     mini_batches = 0
     loss_value = 0
 
     for epoch in range(config.epochs):
-        for batch_id, (...) in enumerate(train_set_loader, 1):
+        for batch_id, (model,label) in enumerate(train_set_loader, 1):
             NN_model.train()
             if(configuration.training_configuration.device.type == 'cuda'):
-                pass
+                model, label = model.cuda(), label
+            else:
+                model, label = model, label
 
 
-            output = NN_model(...)
-            loss = loss_function(...)
+            output = NN_model(model.float())
+            loss = loss_function(output, label)
 
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
-            num_seen_samples += len(...)
             mini_batches += 1
             loss_value += float(loss)
-
-            if (mini_batches % 200) == 0:
-                print("Training loss after %d batches"%(int(num_seen_samples/configuration.training_configuration.train_batch_size)))
-
 
             #Plotting in wandb
             if (mini_batches % configuration.training_configuration.plot_frequency == 0):
