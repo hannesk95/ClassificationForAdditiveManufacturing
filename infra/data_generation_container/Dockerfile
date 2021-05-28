@@ -36,6 +36,9 @@ RUN apt -y install freeglut3-dev
 # Copy config.ini file into container
 COPY config.ini config.ini
 
+# Copy CUDA accelerated Voxelizer into container
+COPY voxelizer voxelizer
+
 # Define entrypoint
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["bash","/entrypoint.sh"]
