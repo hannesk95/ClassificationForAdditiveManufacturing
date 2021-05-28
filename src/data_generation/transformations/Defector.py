@@ -1,11 +1,13 @@
 import numpy as np
 import copy
 
+
 class Defector:
     def __init__(self, arg):
         self.mesh = arg
 
-    def __call__(self, model): 
+    def __call__(self, model):
+        # TODO fix class
         # get the voxel grid indices out of the occupancy grid
         model = np.load("5.npz")['model']
         voxels = np.argwhere(model == 1)
@@ -30,7 +32,7 @@ class Defector:
         pt2[idx] =  maxx[idx]
 
         # identify voxels to be removed
-        idx = points_in_cylinder(pt1, pt2, radius, voxels)
+        idx = self.points_in_cylinder(pt1, pt2, radius, voxels)
         to_be_removed = voxels[idx]
 
         # remove selected voxels from the occupancy grid
@@ -59,7 +61,7 @@ class Defector:
         return cond5
 
 
-    def find_radius(voxels, cylinder_axis):
+    def find_radius(self, voxels, cylinder_axis):
         """
         find an appropriate radius for the cylinder
         :voxels: voxel grid indices
@@ -93,7 +95,7 @@ class Defector:
         return None
 
 
-    def find_axis_and_radius_greedy(voxels):
+    def find_axis_and_radius_greedy(self, voxels):
         """
         find an appropriate radius for the cylinder
         :voxels: voxel grid indices
@@ -103,13 +105,13 @@ class Defector:
         axis = range(3)
         for a in axis:
             # return 1st axis with largest diameter
-            r = find_radius(voxels, a)
+            r = self.find_radius(voxels, a)
             print(a, r)
             if r != None:
                 return a, r
 
     
-    def find_axis_and_radius_exhaustive(voxels):
+    def find_axis_and_radius_exhaustive(self, voxels):
         """
         find an appropriate radius for the cylinder
         :voxels: voxel grid indices
@@ -119,13 +121,13 @@ class Defector:
         axis = range(3)
         result = []
         for a in axis:
-            r = find_radius(voxels, a)
+            r = self.find_radius(voxels, a)
             print(a, r)
             result.append(r)
         # return axis, radius 
         return np.argmax(result), np.max(result)
 
-    def find_axis_and_radius(voxels, version = 1):
+    def find_axis_and_radius(self, voxels, version = 1):
         """
         find an appropriate radius for the cylinder
         :voxels: voxel grid indices
@@ -133,7 +135,7 @@ class Defector:
         :return: pair: selected axis and radius
         """
         if version == 1:
-            return find_axis_and_radius_greedy(voxels)
+            return self.find_axis_and_radius_greedy(voxels)
         else:
-            return find_axis_and_radius_exhaustive(voxels)
+            return self.find_axis_and_radius_exhaustive(voxels)
     

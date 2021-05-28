@@ -24,7 +24,7 @@ def binvox2npz(path_voxel_model: str, label: np.ndarray = np.array([1])) -> obje
         model = _read_as_3d_array(file)
 
     filepath = str(Path(path_voxel_model).with_suffix(''))
-    np.savez_compressed(filepath, model=model.astype(int), label=label)
+    # np.savez_compressed(filepath, model=model.astype(int), label=label) # TODO remove line if not needed anymores
     model = VoxelModel(model.astype(int), label, filepath)
     return model
 
