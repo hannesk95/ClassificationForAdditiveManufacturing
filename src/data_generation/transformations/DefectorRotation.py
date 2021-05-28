@@ -96,6 +96,8 @@ class DefectorRotation:
         # Get top down view and all non-zero elements in the top down view
         top_down_view = np.sum(model_data, axis=2)
         possible_offsets = np.array(np.where(top_down_view > 0)).T
+        if len(possible_offsets) == 0:
+            return model # TODO return empty list
 
         to_remove = []
         # Define horizontal elements to be removed
@@ -111,7 +113,7 @@ class DefectorRotation:
         # Remove elements at the border
         possible_offsets_final = np.delete(possible_offsets, list(set(to_remove)), axis=0)
         if len(possible_offsets_final) == 0:
-            return model
+            return model # TODO return empty list
 
         for trial in range(self.number_of_trials):
             offset = possible_offsets_final[random.randrange(0, len(possible_offsets_final))]
