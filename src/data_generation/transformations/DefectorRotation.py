@@ -109,7 +109,7 @@ class DefectorRotation:
             z_rotation = random.randrange(0, 360)
             model_data = rotate_model(model_data, x_rotation, y_rotation, z_rotation)
 
-        offset, top_down_view, possible_offsets_final = self._find_feasable_offset(model_data)
+        offset, possible_offsets_final = self._find_feasible_offset(model_data)
         if offset is None:
             logging.warning(f"Could not find a feasable offset for model: {model.model_name}")
             return model
@@ -129,13 +129,13 @@ class DefectorRotation:
 
         return [model, model_with_defect]
 
-    def _find_feasable_offset(self, model_data):
+    def _find_feasible_offset(self, model_data):
         # Get top down view and all non-zero elements in the top down view
         top_down_view = np.sum(model_data, axis=2)
         possible_offsets = np.array(np.where(top_down_view > 0)).T
 
         if len(possible_offsets) == 0:
-            return None
+            return None, None
 
         to_remove = []
         # Define horizontal elements to be removed
@@ -151,10 +151,10 @@ class DefectorRotation:
         try: # TODO Find problem here
             possible_offsets_final = np.delete(possible_offsets, list(set(to_remove)), axis=0)
         except:
-            return None
+            return None, None
 
         if len(possible_offsets_final) == 0:
-            return None
+            return None, None
 
         for trial in range(self.number_of_trials):
             offset = possible_offsets_final[random.randrange(0, len(possible_offsets_final))]
@@ -163,6 +163,6 @@ class DefectorRotation:
                 break
 
         if (trial - 1) == self.number_of_trials:
-            return None
+            return None, None
 
-        return offset, possible_offsets, possible_offsets_final
+        return offset, possible_offsets_final
