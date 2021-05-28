@@ -73,8 +73,26 @@ def check_hole_feasibility(model_data, radius, offset):
     return True
 
 
+def rotate_model(model_data, x_rotation, y_rotation, z_rotation):
+    model_data = np.around(rotate(model_data, x_rotation))
+    model_data = np.around(rotate(model_data, y_rotation, (1, 2)))
+    model_data = np.around(rotate(model_data, z_rotation, (0, 2)))
+
+    return model_data
+
+
+def _visualize_top_down_view(model_data, possible_offsets_final):
+    top_down_view = np.sum(model_data, axis=2)
+    basis = np.zeros_like(top_down_view)
+    for indices in possible_offsets_final:
+        idx = indices[0]
+        idy = indices[1]
+        basis[idx, idy] = 1
+    sns.heatmap(basis + (top_down_view > 0))
+
+
 class DefectorRotation:
-    def __init__(self, radius=2, border=5, rotation=True, visualize_top_down_view=False, number_of_trials=5):
+    def __init__(self, radius=2, border=5, rotation=True, number_of_trials=5, visualize_top_down_view=False):
         self.radius = radius
         self.border = border
         self.rotation = rotation
@@ -89,21 +107,40 @@ class DefectorRotation:
             x_rotation = random.randrange(0, 360)
             y_rotation = random.randrange(0, 360)
             z_rotation = random.randrange(0, 360)
-            model_data = np.around(rotate(model_data, x_rotation))
-            model_data = np.around(rotate(model_data, y_rotation, (1, 2)))
-            model_data = np.around(rotate(model_data, z_rotation, (0, 2)))
+            model_data = rotate_model(model_data, x_rotation, y_rotation, z_rotation)
 
+        offset, top_down_view, possible_offsets_final = self._find_feasable_offset(model_data)
+        if offset is None:
+            logging.warning(f"Could not find a feasable offset for model: {model.model_name}")
+            return model
+
+        model_data = add_vertical_hole(model.model, self.radius, offset)
+
+        if self.rotation:
+            # Rotate model back
+            model_data = rotate_model(model_data, 360-x_rotation, 360-y_rotation, 360-z_rotation)
+
+        # TODO Put model in shape as before
+
+        if self.visualize_top_down_view:
+            _visualize_top_down_view(model_data, possible_offsets_final)
+
+        model_with_defect = VoxelModel(model_data, np.array([0]), model.model_name + f'_defect_radius{self.radius}')
+
+        return [model, model_with_defect]
+
+    def _find_feasable_offset(self, model_data):
         # Get top down view and all non-zero elements in the top down view
         top_down_view = np.sum(model_data, axis=2)
         possible_offsets = np.array(np.where(top_down_view > 0)).T
+
         if len(possible_offsets) == 0:
-            return model # TODO return empty list
+            return None
 
         to_remove = []
         # Define horizontal elements to be removed
         to_remove += determine_first_unique_horizontal_elements(possible_offsets[:, 0], self.border)
         to_remove += determine_last_unique_horizontal_elements(possible_offsets[:, 0], self.border)
-
         # Define vertical elements to be removed
         for value in list(set(possible_offsets[:, 1])):
             values = np.where(possible_offsets[:, 1] == value)[0]
@@ -111,13 +148,13 @@ class DefectorRotation:
             to_remove += values[len(values) - self.border:len(values)].tolist()
 
         # Remove elements at the border
-        try:
+        try: # TODO Find problem here
             possible_offsets_final = np.delete(possible_offsets, list(set(to_remove)), axis=0)
         except:
-            return model
-        
+            return None
+
         if len(possible_offsets_final) == 0:
-            return model # TODO return empty list
+            return None
 
         for trial in range(self.number_of_trials):
             offset = possible_offsets_final[random.randrange(0, len(possible_offsets_final))]
@@ -125,30 +162,7 @@ class DefectorRotation:
             if check_hole_feasibility(model_data, self.radius, offset):
                 break
 
-        if (trial-1) == self.number_of_trials:
-            logging.warning(f'Could not find feasible offset for model: {model.model_name}')
-            # TODO Think about returning empty list
-            return model
+        if (trial - 1) == self.number_of_trials:
+            return None
 
-        model_data = add_vertical_hole(model.model, self.radius, offset)
-
-        if self.rotation:
-            # Rotate model back
-            model_data = np.around(rotate(model_data, 360 - x_rotation))
-            model_data = np.around(rotate(model_data, 360 - y_rotation, (1, 2)))
-            model_data = np.around(rotate(model_data, 360 - z_rotation, (0, 2)))
-
-        # TODO Put model in shape as before
-
-        if self.visualize_top_down_view:
-            basis = np.zeros_like(top_down_view)
-            for indices in possible_offsets_final:
-                idx = indices[0]
-                idy = indices[1]
-                basis[idx, idy] = 1
-            top_down_view = np.sum(model_data, axis=2)
-            sns.heatmap(basis + (top_down_view > 0))
-
-        model_with_defect = VoxelModel(model_data, np.array([0]), model.model_name + f'_defect_radius{self.radius}')
-
-        return [model, model_with_defect]
+        return offset, possible_offsets, possible_offsets_final
