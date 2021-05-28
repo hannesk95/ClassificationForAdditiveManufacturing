@@ -30,8 +30,8 @@ RUN apt-get -y install libc++1 libpng16-16 libglfw3
 RUN dpkg -i open3d-app-0.12.0_Ubuntu-18.04.deb
 
 # Install GLU
-RUN apt install libgl1-mesa-dev libglu1-mesa-dev
-RUN apt install freeglut3-dev
+RUN apt -y install libgl1-mesa-dev libglu1-mesa-dev
+RUN apt -y install freeglut3-dev
 
 # Copy config.ini file into container
 COPY config.ini config.ini
