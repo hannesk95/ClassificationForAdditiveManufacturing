@@ -111,7 +111,11 @@ class DefectorRotation:
             to_remove += values[len(values) - self.border:len(values)].tolist()
 
         # Remove elements at the border
-        possible_offsets_final = np.delete(possible_offsets, list(set(to_remove)), axis=0)
+        try:
+            possible_offsets_final = np.delete(possible_offsets, list(set(to_remove)), axis=0)
+        except:
+            return model
+        
         if len(possible_offsets_final) == 0:
             return model # TODO return empty list
 
