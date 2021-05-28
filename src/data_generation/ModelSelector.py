@@ -77,7 +77,7 @@ class ModelSelector:
             raise ValueError("[ERROR]: Please specify maximum filesize!")
 
         if min_compactness == 0.0:
-            logging.info("Compactness was not specified, continuing without checking compactness!")
+            # logging.info("Compactness was not specified, continuing without checking compactness!")
             self.check_compactness = False
 
         if num_files == 0:

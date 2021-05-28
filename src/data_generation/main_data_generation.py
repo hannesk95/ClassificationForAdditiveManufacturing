@@ -50,10 +50,10 @@ def main():
 
 
 if __name__ == '__main__':
-    logging.basicConfig(filename='main_data_generation.log', encoding='utf-8',
-                        format='%(asctime)s %(levelname)s: %(message)s', level=logging.DEBUG)
-    logging.info('Started main_data_generation')
-
+    # logging.basicConfig(filename='main_data_generation.log', encoding='utf-8',
+    #                     format='%(asctime)s %(levelname)s: %(message)s', level=logging.DEBUG)
+    # logging.info('Started main_data_generation')
+    #
     main()
-
-    logging.info('Finished main_data_generation')
+    #
+    # logging.info('Finished main_data_generation')
