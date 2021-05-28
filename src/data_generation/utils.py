@@ -11,7 +11,7 @@ def extract_file_name(path, suffix='stl'):
     :param suffix:
     :return: Name of the file
     """
-    file_name = path.split('//')[-1]
+    file_name = path.split('/')[-1]
     file_name = re.sub('.' + suffix + '$', '', file_name)
     return file_name
 
@@ -22,7 +22,7 @@ def binvox2npz(path_voxel_model: str, label: np.ndarray = np.array([1])) -> obje
         model = _read_as_3d_array(file)
 
     # filepath = str(Path(path_voxel_model).with_suffix(''))
-    filename = extract_file_name(path_voxel_model)
+    filename = extract_file_name(path_voxel_model, 'binvox')
     model = VoxelModel(model.astype(int), label, filename)
     return model
 
