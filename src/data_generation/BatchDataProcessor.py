@@ -17,10 +17,9 @@ class BatchDataProcessor:
 
     def _load_data_batch(self):
         """# TODO"""
-        for _ in tqdm(range(int(np.floor(len(self.filepaths) / self.batch_size))), desc="[INFO]: Processing batch"):
+        for _ in range(int(np.floor(len(self.filepaths) / self.batch_size))):
             data_batch = []
-            for self.file in tqdm(self.filepaths[self.pointer:(self.pointer + self.batch_size)],
-                                  desc=f"[INFO]: Loading data batches of size {self.batch_size}!"):
+            for self.file in self.filepaths[self.pointer:(self.pointer + self.batch_size)]:
                 data_batch.append(MeshModel(self.file))
             self.pointer += self.batch_size
 
@@ -28,8 +27,7 @@ class BatchDataProcessor:
 
         data_batch = []
         if self.pointer != len(self.filepaths):
-            for self.file in tqdm(self.filepaths[self.pointer:len(self.filepaths)],
-                                  desc=f"[INFO]: Loading data batches of size {len(self.filepaths) - self.pointer}!"):
+            for self.file in self.filepaths[self.pointer:len(self.filepaths)]:
                 data_batch.append(MeshModel(self.file))
 
             yield data_batch
