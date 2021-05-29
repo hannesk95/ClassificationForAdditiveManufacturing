@@ -259,7 +259,7 @@ Define most important terms and expressions.
 | ----------------------------------- | -------------------------------- |
 | Bouziane, Nouhayla                  | nouhayla.bouziane@tum.de         |
 | Ebid, Ahmed                         | ahmed.ebid@tum.de                |
-| Srinivas, Aditya                    | aditya.srinivas@tum.de           |
+| Srinivas, Aditya Sai                | aditya.srinivas@tum.de           |
 | Bok, Felix                          | felix.bok@tum.de                 |
 | Kiechle, Johannes                   | johannes.kiechle@tum.de          |
 | Lux, Kerstin (Supervisor TUM)       | kerstin.lux@tum.de               |
