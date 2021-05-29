@@ -6,9 +6,9 @@ import numpy as np
 from torch.utils.data import Dataset
 import configuration
 
-class Data(Dataset):
+class VW_Data(Dataset):
     def __init__(self,transform=None):
-        super(Data,self).__init__()
+        super(VW_Data,self).__init__()
         self.transform = transform
         self.model_data = self.load_model_path()
 
