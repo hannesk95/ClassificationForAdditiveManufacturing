@@ -12,7 +12,7 @@ import wandb
 from wandb_log import training_log
 import configuration
 from network.ResNet import ResNet
-from dataloader import Data
+from dataloader import VW_Data
 
 
 def wandb_initiliazer(arguments):
@@ -29,8 +29,8 @@ def nn_model(config):
     data_transforms = transforms.Compose([transforms.ToTensor()])
 
 
-    train_set = Data(data_transforms)
-    validation_set = Data(data_transforms)
+    train_set = VW_Data(data_transforms)
+    validation_set = VW_Data(data_transforms)
 
     #Loading train and validation set
     train_set_loader = DataLoader(train_set,batch_size=config.batch_size,shuffle=False,num_workers=configuration.training_configuration.number_workers)
