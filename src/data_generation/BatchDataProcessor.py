@@ -4,11 +4,10 @@ from src.data_generation.MeshModel import MeshModel
 
 
 class BatchDataProcessor:
-    """
-    Data generator class which yields data batches to the caller.
-    """
+    """Data generator class which yields data batches to the caller."""
 
     def __init__(self, filepaths: list, batch_size: int, transformer: object, target_path: str):
+        """# TODO"""
         self.filepaths = filepaths
         self.file = None
         self.batch_size = batch_size
@@ -17,10 +16,10 @@ class BatchDataProcessor:
         self.target_path = target_path
 
     def _load_data_batch(self):
-        for _ in tqdm(range(int(np.floor(len(self.filepaths) / self.batch_size))), desc="[INFO]: Processing batch"):
+        """# TODO"""
+        for _ in range(int(np.floor(len(self.filepaths) / self.batch_size))):
             data_batch = []
-            for self.file in tqdm(self.filepaths[self.pointer:(self.pointer + self.batch_size)],
-                                  desc=f"[INFO]: Loading data batches of size {self.batch_size}!"):
+            for self.file in self.filepaths[self.pointer:(self.pointer + self.batch_size)]:
                 data_batch.append(MeshModel(self.file))
             self.pointer += self.batch_size
 
@@ -28,13 +27,13 @@ class BatchDataProcessor:
 
         data_batch = []
         if self.pointer != len(self.filepaths):
-            for self.file in tqdm(self.filepaths[self.pointer:len(self.filepaths)],
-                                  desc=f"[INFO]: Loading data batches of size {len(self.filepaths) - self.pointer}!"):
+            for self.file in self.filepaths[self.pointer:len(self.filepaths)]:
                 data_batch.append(MeshModel(self.file))
 
             yield data_batch
 
     def _save_model(self, models):
+        """# TODO"""
         if type(models) is list:
             for model_instance in models:
                 model_instance.save(self.target_path)
@@ -42,8 +41,9 @@ class BatchDataProcessor:
             models.save(self.target_path)
 
     def process(self):
+        """# TODO"""
         for batch in self._load_data_batch():
-            for model in tqdm(batch, desc="[INFO]: Running models through the pipeline"):
+            for model in tqdm(batch, desc="INFO - Running models through the pipeline"):
                 if self.transformer is not None:
                     models = self.transformer(model)
                 self._save_model(models)

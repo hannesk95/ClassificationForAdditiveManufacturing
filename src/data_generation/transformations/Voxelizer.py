@@ -52,6 +52,7 @@ def sdf_to_tsdf(sdf):
 
 
 class Voxelizer:
+    """# TODO"""
     def __init__(self, dimension=64, representation='occupancy'):
         """
         # TODO
@@ -62,6 +63,7 @@ class Voxelizer:
         self.representation = representation
 
     def __call__(self, model):
+        """# TODO"""
         voxels = self.mesh_to_sdf(model)
         if self.representation == 'sdf':
             model = VoxelModel(voxels, np.array([1]), model.model_name)

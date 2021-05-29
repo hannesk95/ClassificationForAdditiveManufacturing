@@ -10,6 +10,7 @@ def _convert_stl2obj(model: object) -> str:
     This is needed as the CUDA voxelizer requires .obj input file format. """
 
     mesh_stl = model.mesh
+    mesh_stl.triangle_normals = o3d.utility.Vector3dVector([])
     mesh_obj_path = str(Path(model.path).with_suffix('.obj'))
     o3d.io.write_triangle_mesh(mesh_obj_path, mesh_stl)
 
@@ -17,6 +18,7 @@ def _convert_stl2obj(model: object) -> str:
 
 
 class VoxelizerGPU:
+    """# TODO"""
 
     def __init__(self, dimension: int = 128):
         """ # TODO """
@@ -51,6 +53,6 @@ class VoxelizerGPU:
         path_voxelizer = "/voxelizer/build/bin/voxelizer "  # Do not change this path!
         resolution = f"-r {self.dimension} "
         path_input = model_path + " "
-        path_output = str(Path(model_path).with_suffix('')) + str(self.dimension)
+        path_output = str(Path(model_path).with_suffix('')) + f"_resolution{str(self.dimension)}"
 
         return [path_voxelizer + resolution + path_input + path_output, path_output]

@@ -27,6 +27,7 @@ class VoxelModel:
         return self.model
 
     def visualize(self, target_path=None):
+        """# TODO"""
         fig = plt.figure(figsize=(6.4*2, 4.8*2))
         ax = fig.gca(projection='3d')
         ax.voxels(self.model)

@@ -4,6 +4,7 @@ Currently, there are several files inside this `data_generation_container` direc
 
 |File|Purpose|
 |----|-------|
+|[`voxelizer`](./voxelizer)|Directory which contains all necessary files in order to compile the binaries for the CUDA accelerated voxelizer.|
 |[`Dockerfile`](./Dockerfile)|The main file which incorporates all commands in order to define the structure and software stack of the docker container.|
 |[`config.ini`](./config.ini)|Config file which incoroprates all necessary parameters for the LRZ AI System.|
 |[`convert_container.sh`](convert_container.sh)|This script converts the docker image of the local docker deamon into a container file representation which the AI System at LRZ is able to read (.sqsh file format for Nvidia enroot containers). Attention: This only works if the docker_build.sh script has been executed before.|

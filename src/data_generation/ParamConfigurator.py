@@ -3,8 +3,10 @@ import configparser
 
 
 class ParamConfigurator:
+    """# TODO"""
 
     def __init__(self):
+        """# TODO"""
         config = configparser.ConfigParser()
         config.read('config.ini')
 
@@ -16,8 +18,8 @@ class ParamConfigurator:
         if self.target_path == 'None':
             self.target_path = os.path.abspath(
                 os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'SyntheticDataset'))
-            if not os.path.exists(self.target_path):
-                os.makedirs(self.target_path)
+        if not os.path.exists(self.target_path):
+            os.makedirs(self.target_path)
 
         self.num_files = config['ModelSelector'].getint('num_files')
         self.max_filesize = config['ModelSelector'].getfloat('max_filesize')

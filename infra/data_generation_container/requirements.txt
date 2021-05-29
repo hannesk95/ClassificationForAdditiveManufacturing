@@ -9,3 +9,4 @@ mesh-to-sdf
 trimesh
 scikit-image
 pymeshlab
+torch

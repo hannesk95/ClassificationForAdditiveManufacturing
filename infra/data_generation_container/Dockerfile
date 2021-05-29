@@ -29,8 +29,15 @@ RUN apt-get -y install ffmpeg libsm6 libxext6
 RUN apt-get -y install libc++1 libpng16-16 libglfw3
 RUN dpkg -i open3d-app-0.12.0_Ubuntu-18.04.deb
 
+# Install GLU
+RUN apt -y install libgl1-mesa-dev libglu1-mesa-dev
+RUN apt -y install freeglut3-dev
+
 # Copy config.ini file into container
 COPY config.ini config.ini
+
+# Copy CUDA accelerated Voxelizer into container
+COPY voxelizer voxelizer
 
 # Define entrypoint
 COPY entrypoint.sh /entrypoint.sh

@@ -11,7 +11,7 @@ def _get_filesize(input_path: str, max_filesize: float) -> dict:
     files = {}
     models = os.listdir(input_path)
 
-    for model in tqdm(iterable=models, desc='[INFO]: Getting size of files!'):
+    for model in tqdm(iterable=models, desc='INFO - Getting size of files!'):
         if not model.endswith('.stl'):
             continue
 
@@ -77,7 +77,7 @@ class ModelSelector:
             raise ValueError("[ERROR]: Please specify maximum filesize!")
 
         if min_compactness == 0.0:
-            logging.info("Compactness was not specified, continuing without checking compactness!")
+            # logging.info("Compactness was not specified, continuing without checking compactness!")
             self.check_compactness = False
 
         if num_files == 0:

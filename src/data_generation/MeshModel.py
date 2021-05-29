@@ -29,16 +29,19 @@ class MeshModel:
     :param path: Path to the stl file
     """
     def __init__(self, path):
+        """# TODO"""
         self.path = path
         self.mesh, self.vertices, self.normals, self.faces = self._load_model()
         self.model_name = extract_file_name(path)
 
     def _load_model(self):
+        """# TODO"""
         mesh = o3d.io.read_triangle_mesh(self.path)
         mesh.compute_vertex_normals()
         return mesh, np.asarray(mesh.vertices), mesh.triangle_normals, np.asarray(mesh.triangles)
 
     def save(self, target_path=None):
+        """# TODO"""
         if target_path is None:
             target_path = self.path
 
@@ -51,6 +54,7 @@ class MeshModel:
         return self.vertices, self.normals, self.faces
 
     def set_model_data(self, vertices, normals, faces):
+        """# TODO"""
         self.vertices = vertices
         self.normals = normals
         self.faces = faces
