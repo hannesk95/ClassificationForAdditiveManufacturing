@@ -1,41 +1,48 @@
 import numpy as np
 import copy
+from src.data_generation.VoxelModel import VoxelModel
 
 class Defector:
 
-    def __call__(self, model): 
-        original_model = copy.deepcopy(model)
+    def __call__(self, voxel_model): 
+        model = voxel_model.model
         # get the voxel grid indices out of the occupancy grid
         voxels = np.argwhere(model == 1)
 
         # find appropriate axis and radius of the cylinder
         axis, radius = self.find_axis_and_radius(voxels)
+        print("selected:", axis, radius)
 
-        # find center of the voxels grid
-        center = np.round(voxels.mean(axis = 0))
+        if axis != None and radius != None:
+            # find center of the voxels grid
+            center = np.round(voxels.mean(axis = 0))
 
-        # maximum and minimum grid index 
-        maxx = np.max(voxels, axis=0)
-        minn = np.min(voxels, axis=0)
+            # maximum and minimum grid index 
+            maxx = np.max(voxels, axis=0)
+            minn = np.min(voxels, axis=0)
 
-        # set cylinder boundary points to the center
-        pt1 = copy.deepcopy(center)
-        pt2 = copy.deepcopy(center)
+            # set cylinder boundary points to the center
+            pt1 = copy.deepcopy(center)
+            pt2 = copy.deepcopy(center)
 
-        # change 1 component based on the selected axis
-        idx = axis
-        pt1[idx] =  minn[idx]
-        pt2[idx] =  maxx[idx]
+            # change 1 component based on the selected axis
+            idx = axis
+            pt1[idx] =  minn[idx]
+            pt2[idx] =  maxx[idx]
 
-        # identify voxels to be removed
-        idx = self.points_in_cylinder(pt1, pt2, radius, voxels)
-        to_be_removed = voxels[idx]
+            # identify voxels to be removed
+            idx = self.points_in_cylinder(pt1, pt2, radius, voxels)
+            to_be_removed = voxels[idx]
 
-        # remove selected voxels from the occupancy grid
-        for v in to_be_removed:
-            model[v[0], v[1], v[2]] = 0
+            # remove selected voxels from the occupancy grid
+            for v in to_be_removed:
+                model[v[0], v[1], v[2]] = 0
+        else:
+            print("hole creation not possible")
 
-        return [original_model, model]
+        model_with_defect = VoxelModel(model, np.array([0]), voxel_model.model_name + f'_defect_radius{radius}')
+
+        return [voxel_model, model_with_defect]
 
 
     def points_in_cylinder(self, pt1, pt2, radius, points):
@@ -104,9 +111,11 @@ class Defector:
         for a in axis:
             # return 1st axis with largest diameter
             r = self.find_radius(voxels, a)
-            print(a, r)
+            # print(a, r)
             if r != None:
                 return a, r
+        # return None if no appropriate radius and axis were found    
+        return None, None
 
     
     def find_axis_and_radius_exhaustive(self, voxels):
@@ -120,10 +129,20 @@ class Defector:
         result = []
         for a in axis:
             r = self.find_radius(voxels, a)
-            print(a, r)
+            # print(a, r)
             result.append(r)
-        # return axis, radius 
-        return np.argmax(result), np.max(result)
+        
+        # replace None with -1 to compute max
+        result = [x or -1 for x in result]
+        axis, radius = np.argmax(result), np.max(result)
+        
+        radius = -1
+        
+        # return None if no appropriate radius and axis were found
+        if radius == -1: 
+            axis, radius = None, None
+        
+        return axis, radius
 
     def find_axis_and_radius(self, voxels, version = 1):
         """
