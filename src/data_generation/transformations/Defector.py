@@ -1,22 +1,15 @@
 import numpy as np
 import copy
 
-
 class Defector:
-    """# TODO"""
-    def __init__(self, arg):
-        """# TODO"""
-        self.mesh = arg
 
-    def __call__(self, model):
-        """# TODO"""
-        # TODO fix class
+    def __call__(self, model): 
+        original_model = copy.deepcopy(model)
         # get the voxel grid indices out of the occupancy grid
-        model = np.load("5.npz")['model']
         voxels = np.argwhere(model == 1)
 
         # find appropriate axis and radius of the cylinder
-        axis, radius = find_axis_and_radius(voxels)
+        axis, radius = self.find_axis_and_radius(voxels)
 
         # find center of the voxels grid
         center = np.round(voxels.mean(axis = 0))
@@ -42,8 +35,10 @@ class Defector:
         for v in to_be_removed:
             model[v[0], v[1], v[2]] = 0
 
+        return [original_model, model]
 
-    def points_in_cylinder(pt1, pt2, radius, points):
+
+    def points_in_cylinder(self, pt1, pt2, radius, points):
         # reference: https://stackoverflow.com/questions/47932955/how-to-check-if-a-3d-point-is-inside-a-cylinder
         """
         find the points in a cylinder
@@ -71,8 +66,8 @@ class Defector:
         :cylinder_axis: axis of the cylinder {0, 1, 2}
         :return: selected radius
         """
-        # list of possible diameters [1, 10]
-        diameters = list(range(10, 0, -1))
+        # list of possible diameters [2, 10]
+        diameters = list(range(10, 1, -1))
         
         # 2d plane perpendicular to the cylinder axis
         plane = list(range(3))
