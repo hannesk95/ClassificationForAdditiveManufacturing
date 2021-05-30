@@ -137,4 +137,4 @@ dmypy.json
 .vscode/
 data
 PyMesh/
-*.ipynb
+# *.ipynb
