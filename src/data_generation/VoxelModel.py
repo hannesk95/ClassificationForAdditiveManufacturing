@@ -38,3 +38,4 @@ class VoxelModel:
             plt.show()
         else:
             plt.savefig(os.path.join(target_path, self.model_name))
+            plt.close(fig)
