@@ -10,7 +10,7 @@ import sys
 import os
 import wandb 
 import configuration
-from network.ResNet import ResNet,VGGNet
+from network import ResNet,VGGNet
 from dataloader import VW_Data
 
 
@@ -36,8 +36,8 @@ def nn_model(config):
     validation_set_loader = DataLoader(validation_set,batch_size=config.batch_size,shuffle=False,num_workers=configuration.training_configuration.number_workers)
 
     #Build the model
-    net = ResNet.generate_model(config.resnet_depth)
-    #net = VGGNet() #Please uncomment to use VGGNet
+    net = ResNet.ResNet.generate_model(config.resnet_depth)
+    #net = VGGNet.VGGNet() #Please uncomment to use VGGNet
 
     if configuration.training_configuration.device.type == 'cuda':
         net.cuda()
