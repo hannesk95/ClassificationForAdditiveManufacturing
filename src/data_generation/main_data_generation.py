@@ -7,11 +7,11 @@ import torch
 from src.data_generation.ParamConfigurator import ParamConfigurator
 from src.data_generation.ModelSelector import ModelSelector
 from src.data_generation.BatchDataProcessor import BatchDataProcessor
-from src.data_generation.transformations import Normalizer, Aligner, Cleaner, Voxelizer, VoxelizerGPU, DefectorRotation, ComposeTransformer
+from src.data_generation.transformations import Normalizer, Aligner, Cleaner, Voxelizer, VoxelizerGPU, DefectorRotation, \
+    ComposeTransformer
 
 
 def main():
-    """# TODO"""
     # 1. Define configuration parameters
     config = ParamConfigurator()
 
@@ -21,24 +21,15 @@ def main():
     final_models = selector.select_models()
 
     # 3. Define transformations
-
-    # 3.1 Normalizer
     normalizer = Normalizer()
-
-    # 3.2 Aligner
-    aligner = Aligner()
-
-    # 3.3 Cleaner
+    aligner = Aligner(version=config.version, axis_to_align=config.axis_to_align)
     cleaner = Cleaner()
-
-    # 3.4 Voxelizer
     if torch.cuda.is_available():
         voxelizer = VoxelizerGPU(dimension=config.voxel_dimensions)
     else:
         voxelizer = Voxelizer(dimension=config.voxel_dimensions, representation=config.voxel_representation)
-
-    # 3.5 Defector
-    defector = DefectorRotation(radius=config.hole_radius, border=config.border)
+    defector = DefectorRotation(radius=config.hole_radius, border=config.border, rotation=config.rotation,
+                                number_of_trials=config.number_of_trials)
 
     # 4. Compose transformations
     composer = ComposeTransformer([cleaner, normalizer, aligner, voxelizer, defector])
@@ -50,10 +41,10 @@ def main():
 
 
 if __name__ == '__main__':
-    # logging.basicConfig(filename='main_data_generation.log', encoding='utf-8',
-    #                     format='%(asctime)s %(levelname)s: %(message)s', level=logging.DEBUG)
-    # logging.info('Started main_data_generation')
-    #
+    logging.basicConfig(filename='main_data_generation.log', encoding='utf-8',
+                        format='%(asctime)s %(levelname)s: %(message)s', level=logging.DEBUG)
+    logging.info('Started main_data_generation')
+
     main()
-    #
-    # logging.info('Finished main_data_generation')
+
+    logging.info('Finished main_data_generation')

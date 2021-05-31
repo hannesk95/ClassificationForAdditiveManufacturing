@@ -1,12 +1,11 @@
 import os
 import configparser
+import numpy as np
 
 
 class ParamConfigurator:
-    """# TODO"""
 
     def __init__(self):
-        """# TODO"""
         config = configparser.ConfigParser()
         config.read('config.ini')
 
@@ -31,5 +30,14 @@ class ParamConfigurator:
 
         self.hole_radius = config['Defector'].getint('hole_radius')
         self.border = config['Defector'].getint('border')
+        self.rotation = config['Defector'].getboolean('rotation')
+        self.number_of_trials = config['Defector'].getint('number_of_trials')
 
-
+        self.version = config['Aligner'].getint('version')
+        axis_to_align = config['Aligner']['axis_to_align']
+        if axis_to_align == 'x':
+            self.axis_to_align = np.array([1., 0., 0.])
+        elif axis_to_align == 'y':
+            self.axis_to_align = np.array([0., 1., 0.])
+        elif axis_to_align == 'z':
+            self.axis_to_align = np.array([0., 0., 1.])

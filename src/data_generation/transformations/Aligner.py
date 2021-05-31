@@ -5,17 +5,17 @@ import pymeshlab
 
 class Aligner:
     """# TODO"""
-    def __init__(self, version: int = 1, coordinate_axis: np.ndarray = np.array([1., 0., 0.])):
+    def __init__(self, version: int = 1, axis_to_align: np.ndarray = np.array([1., 0., 0.])):
         """# TODO"""
         self.version = version
-        self.coordinate_axis = coordinate_axis
+        self.axis_to_align = axis_to_align
 
     def __call__(self, model):
         """# TODO"""
         if self.version == 1:
             mesh = model.mesh
             min_MOI_axis = self.min_MOI_axis(mesh)
-            self.align_vectors(mesh, min_MOI_axis, self.coordinate_axis)
+            self.align_vectors(mesh, min_MOI_axis, self.axis_to_align)
             model.set_model_data(np.asarray(mesh.vertices), np.asarray(mesh.triangle_normals), np.asarray(mesh.triangles))
 
         elif self.version == 2:
