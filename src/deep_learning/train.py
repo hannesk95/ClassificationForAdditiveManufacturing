@@ -8,10 +8,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys
 import os
-import wandb
-from wandb_log import training_log
+import wandb 
 import configuration
-from network.ResNet import ResNet
+from network.ResNet import ResNet,VGGNet
 from dataloader import VW_Data
 
 
@@ -38,6 +37,7 @@ def nn_model(config):
 
     #Build the model
     net = ResNet.generate_model(config.resnet_depth)
+    #net = VGGNet() #Please uncomment to use VGGNet
 
     if configuration.training_configuration.device.type == 'cuda':
         net.cuda()
