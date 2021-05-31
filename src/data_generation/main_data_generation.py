@@ -9,6 +9,7 @@ from src.data_generation.ModelSelector import ModelSelector
 from src.data_generation.BatchDataProcessor import BatchDataProcessor
 from src.data_generation.transformations import Normalizer, Aligner, Cleaner, Voxelizer, VoxelizerGPU, DefectorRotation, \
     ComposeTransformer
+from src.data_generation import utils
 
 
 def main():
@@ -38,6 +39,8 @@ def main():
     batch_processor = BatchDataProcessor(final_models, batch_size=config.batch_size, transformer=composer,
                                          target_path=config.target_path)
     batch_processor.process()
+
+    utils.plot_all_models(source_path=config.target_path, cutoff=50)
 
 
 if __name__ == '__main__':

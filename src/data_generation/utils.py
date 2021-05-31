@@ -2,6 +2,8 @@ import re
 import numpy as np
 from pathlib import Path
 from src.data_generation.VoxelModel import VoxelModel
+import os
+from tqdm import tqdm
 
 
 def extract_file_name(path, suffix='stl'):
@@ -17,7 +19,6 @@ def extract_file_name(path, suffix='stl'):
 
 
 def binvox2npz(path_voxel_model: str, label: np.ndarray = np.array([1])) -> object:
-    """# TODO"""
 
     with open(path_voxel_model, 'rb') as file:
         model = _read_as_3d_array(file)
@@ -72,3 +73,26 @@ def _read_as_3d_array(fp, fix_coords=True):
     else:
         axis_order = 'xzy'
     return data
+
+
+def plot_all_models(source_path, target_path=None, cutoff=25):
+    """
+    Creates for all voxeliezed model in source_path a plot and save them in target_path
+    :param source_path:
+    :param target_path:
+    :param cutoff: Number where to cut off the model_list
+    :return:
+    """
+    if target_path is None:
+        target_path = os.path.join(source_path, 'plots')
+    if not os.path.exists(target_path):
+        os.makedirs(target_path)
+    models = os.listdir(source_path)
+    models = [elem for elem in models if elem.endswith('.npz')]
+    models = models[:cutoff]
+    models = [os.path.join(source_path, model_path) for model_path in models]
+    for model in tqdm(models, desc="[INFO]: Create images from given models"):
+        model_data = np.load(model)['model']
+        model_name = extract_file_name(model, 'npz')
+        model = VoxelModel(model_data, 1, model_name)
+        model.visualize(target_path=target_path)
