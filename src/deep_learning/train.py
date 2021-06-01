@@ -44,14 +44,13 @@ def nn_model(config):
 
     if configuration.training_configuration.device.type == 'cuda':
         net.cuda()
-
    
     loss_function = torch.nn.BCELoss()
-    
 
     optimizer = torch.optim.Adam(net.parameters(),lr=config.lr)
     
-    return net,train_set_loader,validation_set_loader,loss_function,optimizer
+    return net, train_set_loader, validation_set_loader, loss_function, optimizer
+
 
 def validation_phase(NN_model,val_set_loader,loss_function,epoch):
     print("Validating...")
