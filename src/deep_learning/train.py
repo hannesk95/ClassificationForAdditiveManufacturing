@@ -12,7 +12,7 @@ import wandb
 import configuration
 from network.ResNet import ResNet
 from network.VGGNet import VGGNet
-from dataloader import VW_Data
+from DataLoader import VW_Data
 
 
 def wandb_initiliazer(arguments):

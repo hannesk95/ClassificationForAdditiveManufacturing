@@ -3,7 +3,7 @@ import train
 import wandb
 import configuration
 from src.deep_learning.ArchitectureSelector import ArchitectureSelector
-from src.deep_learning.dataloader import VW_Data
+from src.deep_learning.DataLoader import VW_Data
 from src.deep_learning.ParamConfigurator import ParamConfigurator
 from src.deep_learning.NetworkTrainer import NetworkTrainer
 
