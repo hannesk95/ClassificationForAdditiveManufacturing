@@ -6,7 +6,7 @@ from torchsummary import summary
 class Vanilla3DCNN(nn.Module):
     """#TODO: Add docstring."""
 
-    def __init__(self, num_classes):
+    def __init__(self):
         """#TODO: Add docstring."""
 
         super(Vanilla3DCNN, self).__init__()
@@ -15,7 +15,7 @@ class Vanilla3DCNN(nn.Module):
         self.conv2 = nn.Conv3d(in_channels=32, out_channels=32, kernel_size=(7, 7, 7))
         self.conv3 = nn.Conv3d(in_channels=32, out_channels=64, kernel_size=(5, 5, 5))
         self.fc1 = nn.Linear(64, 64)
-        self.fc2 = nn.Linear(64, num_classes)
+        self.fc2 = nn.Linear(64, 1)
 
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(p=0.2)
