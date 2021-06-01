@@ -141,7 +141,7 @@ class ResNet(nn.Module):
 
 
     def generate_model(model_depth, **kwargs):
-        assert model_depth in [50, 101, 152]
+        assert model_depth in [18, 50, 101, 152]
 
         if model_depth == 18:
             model = ResNet(BasicBlock, [2,2,2,2], get_inplanes(), **kwargs)

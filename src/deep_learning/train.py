@@ -39,8 +39,8 @@ def nn_model(config):
     validation_set_loader = DataLoader(validation_set,batch_size=config.batch_size,shuffle=False,num_workers=configuration.training_configuration.number_workers)
 
     #Build the model
-    #net = ResNet.generate_model(50)
-    net = VGGNet() #Please uncomment to use VGGNet
+    net = ResNet.generate_model(50)
+    #net = VGGNet() #Please uncomment to use VGGNet
 
     if configuration.training_configuration.device.type == 'cuda':
         net.cuda()
@@ -91,6 +91,8 @@ def train(NN_model,train_set_loader,val_set_loader,loss_function,optimizer, conf
 
 
             output = NN_model(model)
+            output = output.to(torch.float32)
+            label = label.to(torch.float32)
             loss = loss_function(output, label)
 
             optimizer.zero_grad()
