@@ -39,8 +39,8 @@ def nn_model(config):
     validation_set_loader = DataLoader(validation_set,batch_size=config.batch_size,shuffle=False,num_workers=configuration.training_configuration.number_workers)
 
     #Build the model
-    #net = ResNet.generate_model(50)
-    net = VGGNet() #Please uncomment to use VGGNet
+    net = ResNet.generate_model(50)
+    #net = VGGNet() #Please uncomment to use VGGNet
 
     if configuration.training_configuration.device.type == 'cuda':
         net.cuda()
