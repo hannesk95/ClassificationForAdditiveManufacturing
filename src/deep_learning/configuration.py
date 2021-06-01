@@ -2,7 +2,7 @@ import torch
 
 class training_configuration():
     batch_size = 4
-    number_epochs = 50
+    number_epochs = 18
     learning_rate = 0.0001
     resnet_depth = 50
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
