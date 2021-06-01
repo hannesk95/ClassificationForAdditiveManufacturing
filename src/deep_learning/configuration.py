@@ -11,8 +11,8 @@ class training_configuration():
 
 class train_data_configuration():
     training_data_size = 10
-    training_set_dir = "/dataset/voxel_data/"
+    training_set_dir = "/workspace/dataset/voxel_data/"
 
 class validation_data_configuration():
     validation_data_size = 10
-    validation_set_dir = "/dataset/voxel_data/"
+    validation_set_dir = "/workspace/dataset/voxel_data/"
