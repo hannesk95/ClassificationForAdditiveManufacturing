@@ -10,6 +10,8 @@ import sys
 import os
 import wandb 
 import configuration
+import sys
+sys.path.append("./network")
 from network.ResNet import ResNet
 from dataloader import VW_Data
 
