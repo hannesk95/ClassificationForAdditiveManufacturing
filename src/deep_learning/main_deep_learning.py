@@ -4,11 +4,14 @@ import wandb
 import configuration
 from src.deep_learning.network import Vanilla3DCNN, ResNet, VGGNet, InceptionNet_v1, InceptionNet_v3
 from src.deep_learning.dataloader import VW_Data
+from src.deep_learning.ParamConfigurator import ParamConfigurator
 
 
 def main():
 
     # 1. Define configuration parameters
+    # config = ParamConfigurator()
+
     params = dict(epochs=configuration.training_configuration.number_epochs,
                   batch_size=configuration.training_configuration.batch_size,
                   lr=configuration.training_configuration.learning_rate,
