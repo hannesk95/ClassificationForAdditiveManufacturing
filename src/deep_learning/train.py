@@ -18,9 +18,9 @@ def wandb_initiliazer(arguments):
     with wandb.init(project="TUM_DI_Lab", config=arguments):
         config = wandb.config
 
-        model, train_loader,val_loader,loss_fn,loss_fn1, optimizer = nn_model(config)
+        model, train_loader,val_loader,loss_fn, optimizer = nn_model(config)
 
-        train(model, train_loader, val_loader, loss_fn,loss_fn1, optimizer, config)
+        train(model, train_loader, val_loader, loss_fn, optimizer, config)
     return model
 
 
