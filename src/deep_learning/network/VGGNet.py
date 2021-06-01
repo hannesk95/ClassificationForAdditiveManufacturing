@@ -53,7 +53,4 @@ class VGGNet(nn.Module):
 #Testing 
 if __name__ == "__main__":
     net = VGGNet()
-    if torch.cuda.device_count > 0:
-        summary(net.cuda(),(1,128,128,128))
-    else:
-        summary(net,(1,128,128,128))
+    summary(net,(1,128,128,128))
