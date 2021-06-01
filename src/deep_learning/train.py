@@ -66,7 +66,7 @@ def validation_phase(NN_model,val_set_loader,loss_function,epoch):
         else:
             model, label = model, label
 
-        output = NN_model(model.float())
+        output = NN_model(model)
         loss = loss_function(output, label)
 
         mini_batches += 1
@@ -90,7 +90,7 @@ def train(NN_model,train_set_loader,val_set_loader,loss_function,optimizer, conf
                 model, label = model, label
 
 
-            output = NN_model(model.float())
+            output = NN_model(model)
             loss = loss_function(output, label)
 
             optimizer.zero_grad()
