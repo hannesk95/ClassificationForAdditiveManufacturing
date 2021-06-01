@@ -91,6 +91,8 @@ def train(NN_model,train_set_loader,val_set_loader,loss_function,optimizer, conf
 
 
             output = NN_model(model)
+            output = output.to(torch.float32)
+            label = label.to(torch.float32)
             loss = loss_function(output, label)
 
             optimizer.zero_grad()
