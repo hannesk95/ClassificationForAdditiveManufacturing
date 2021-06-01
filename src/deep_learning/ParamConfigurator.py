@@ -10,6 +10,9 @@ class ParamConfigurator:
         config = configparser.ConfigParser()
         config.read('config.ini')
 
+        # architecture
+        self.architecture_type = config['architecture']['architecture_type']
+
         # training
         self.batch_size = config['training'].getint('batch_size')
         self.num_epochs = config['training'].getint('num_epochs')
@@ -17,6 +20,12 @@ class ParamConfigurator:
         self.num_workers = config['training'].getint('num_workers')
         self.plot_frequency = config['training'].getint('plot_frequency')
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.optimizer = config['training']['optimizer']
+        if self.optimizer is 'Adam':
+            self.optimizer = torch.optim.Adam(lr=self.learning_rate) # TODO: include model.parameters()
+        self.loss_function = config['training']['loss_function']
+        if self.loss_function is 'BCE':
+            self.loss_function = torch.nn.BCELoss()
 
         # train_data
         self.train_data_size = config['train_data'].getint('train_data_size')
