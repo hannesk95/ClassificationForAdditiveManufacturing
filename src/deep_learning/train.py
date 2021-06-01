@@ -13,6 +13,7 @@ import configuration
 import sys
 sys.path.append("./network")
 from network.ResNet import ResNet
+from network.VGGNet import VGGNet
 from dataloader import VW_Data
 
 
@@ -38,8 +39,8 @@ def nn_model(config):
     validation_set_loader = DataLoader(validation_set,batch_size=config.batch_size,shuffle=False,num_workers=configuration.training_configuration.number_workers)
 
     #Build the model
-    net = ResNet.generate_model(50)
-    #net = VGGNet.VGGNet() #Please uncomment to use VGGNet
+    #net = ResNet.generate_model(50)
+    net = VGGNet() #Please uncomment to use VGGNet
 
     if configuration.training_configuration.device.type == 'cuda':
         net.cuda()
@@ -65,7 +66,7 @@ def validation_phase(NN_model,val_set_loader,loss_function,epoch):
         else:
             model, label = model, label
 
-        output = NN_model(model.float())
+        output = NN_model(model)
         loss = loss_function(output, label)
 
         mini_batches += 1
@@ -89,7 +90,7 @@ def train(NN_model,train_set_loader,val_set_loader,loss_function,optimizer, conf
                 model, label = model, label
 
 
-            output = NN_model(model.float())
+            output = NN_model(model)
             loss = loss_function(output, label)
 
             optimizer.zero_grad()
