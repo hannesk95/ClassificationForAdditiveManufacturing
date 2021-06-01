@@ -6,10 +6,13 @@ import numpy as np
 from torch.utils.data import Dataset
 import configuration
 
+
 class VW_Data(Dataset):
-    def __init__(self,transform=None):
+    """3D Models dataset."""
+
+    def __init__(self, root_dir: str):
         super(VW_Data,self).__init__()
-        self.transform = transform
+        self.root_dir = root_dir
         self.model_data = self.load_model_path()
 
     def __len__(self):
