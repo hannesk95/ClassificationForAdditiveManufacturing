@@ -61,12 +61,14 @@ def determine_last_unique_horizontal_elements(source, number_of_elements):
     return to_remove
 
 
-def check_hole_feasibility(model_data, radius, offset):
-    xx = np.arange(model_data.shape[0])
-    yy = np.arange(model_data.shape[1])
+def check_hole_feasibility(model_data, radius, border, offset):
+    radius += border
     top_down_view = np.sum(model_data, axis=2)
+    top_down_view = np.pad(top_down_view, pad_width=1, mode='constant', constant_values=0)
+    xx = np.arange(top_down_view.shape[0])
+    yy = np.arange(top_down_view.shape[1])
     inside = (xx[:, None] - offset[0]) ** 2 + (yy[None, :] - offset[1]) ** 2 > (radius ** 2)
-    inidices_to_remove = np.array(np.where(inside is False)).T
+    inidices_to_remove = np.array(np.where(inside == False)).T
     for indices in inidices_to_remove:
         if top_down_view[indices[0], indices[1]] == 0:
             return False
@@ -92,7 +94,7 @@ def _visualize_top_down_view(model_data, possible_offsets_final):
 
 
 class DefectorRotation:
-    def __init__(self, radius=2, border=5, rotation=False, number_of_trials=5, visualize_top_down_view=False):
+    def __init__(self, radius=2, border=5, rotation=False,number_of_trials=5, visualize_top_down_view=False):
         self.radius = radius
         self.border = border
         self.rotation = rotation
@@ -159,10 +161,10 @@ class DefectorRotation:
         for trial in range(self.number_of_trials):
             offset = possible_offsets_final[random.randrange(0, len(possible_offsets_final))]
             offset.astype(int)
-            if check_hole_feasibility(model_data, self.radius, offset):
+            if check_hole_feasibility(model_data, self.radius, self.border, offset):
                 break
 
-        if (trial - 1) == self.number_of_trials:
+        if (trial + 1) == self.number_of_trials:
             return None, None
 
         return offset, possible_offsets_final
