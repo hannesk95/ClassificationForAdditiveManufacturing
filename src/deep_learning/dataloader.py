@@ -1,4 +1,3 @@
-from numpy.lib.utils import source
 import torch
 import os
 import random
@@ -26,7 +25,7 @@ class VW_Data(Dataset):
             data = np.load(source_dir + files[i])['model']
             label = np.load(source_dir + files[i])['label']
             models[i].append((data,label))
-
+        
         print("Data loading complete")
         return models
 
@@ -45,7 +44,7 @@ class VW_Data(Dataset):
         path, dirs, files = next(os.walk(source_dir))
         files = sorted(files)
 
-        id = random.randint(0,len(files))
+        id = random.randint(0,len(files) - 1)
         data, label = random.choice(self.model_data[id])
 
         if self.transform is not None:
