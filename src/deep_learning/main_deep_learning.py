@@ -2,6 +2,7 @@ import logging
 import train
 import wandb
 import configuration
+from torchvision.transforms import transforms
 from src.deep_learning.ArchitectureSelector import ArchitectureSelector
 from src.deep_learning.DataLoader import VW_Data
 from src.deep_learning.ParamConfigurator import ParamConfigurator
@@ -20,10 +21,12 @@ def main():
                   resnet_depth=configuration.training_configuration.resnet_depth)
 
     # 2. Select neural network architecture and create model
-    # selector = ArchitectureSelector(config.architecture_type)
+    # selector = ArchitectureSelector(config.architecture_type, config)
     # model = selector.select_architecture()
 
-    # 3. Dataloader
+    # 3. Initialize Dataset
+    # data_transforms = transforms.Compose([transforms.ToTensor()])
+
     # train_set_loader = VW_Data(config.train_data_dir)
     # validation_set_loader = VW_Data(config.validation_data_dir)
 
