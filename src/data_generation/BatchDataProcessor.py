@@ -46,4 +46,5 @@ class BatchDataProcessor:
             for model in tqdm(batch, desc="INFO - Running models through the pipeline"):
                 if self.transformer is not None:
                     models = self.transformer(model)
-                self._save_model(models)
+                if models is not None:
+                    self._save_model(models)

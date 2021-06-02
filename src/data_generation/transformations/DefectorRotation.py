@@ -141,6 +141,7 @@ class DefectorRotation:
         self.rotation = rotation
         self.visualize_top_down_view = visualize_top_down_view
         self.number_of_trials = number_of_trials
+        random.seed(42)
 
     def __call__(self, model):
         model_data = model.model
@@ -155,7 +156,7 @@ class DefectorRotation:
         offset, possible_offsets_final = self._find_feasible_offset(model_data)
         if offset is None:
             logging.warning(f"Could not find a feasable offset for model: {model.model_name}")
-            return model
+            return None
 
         model_data = add_vertical_hole(model.model, self.radius, offset)
 
