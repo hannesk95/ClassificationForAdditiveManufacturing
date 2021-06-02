@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from torch.utils.data import Dataset
+import torch
 
 
 class AMCDataset(Dataset):
@@ -10,9 +11,9 @@ class AMCDataset(Dataset):
         """# TODO: Docstring"""
         super(AMCDataset, self).__init__()
         self.root_dir = root_dir
-        self.models = self._load_model_paths(self.root_dir)
-        self.transform = transform
         self.cutoff = cutoff
+        self.models = self._load_model_paths()
+        self.transform = transform
 
     def __len__(self):
         """# TODO: Docstring"""
@@ -32,8 +33,8 @@ class AMCDataset(Dataset):
         model = np.load(self.models[idx])['model']
         label = np.load(self.models[idx])['label']
 
-        sample = {'model': model, 'label': label}
         if self.transform:
-            sample = self.transform(sample)
+            model = self.transform(model)
 
+        sample = {'model': torch.from_numpy(model), 'label': torch.from_numpy(label)}
         return sample
