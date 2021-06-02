@@ -2,31 +2,35 @@ import logging
 import train
 import wandb
 import configuration
-from src.deep_learning.network import Vanilla3DCNN, ResNet, VGGNet, InceptionNet_v1, InceptionNet_v3
-from src.deep_learning.dataloader import VW_Data
+from src.deep_learning.ArchitectureSelector import ArchitectureSelector
+from src.deep_learning.DataLoader import VW_Data
+from src.deep_learning.ParamConfigurator import ParamConfigurator
+from src.deep_learning.NetworkTrainer import NetworkTrainer
 
 
 def main():
 
     # 1. Define configuration parameters
+    # config = ParamConfigurator()
+
     params = dict(epochs=configuration.training_configuration.number_epochs,
                   batch_size=configuration.training_configuration.batch_size,
                   lr=configuration.training_configuration.learning_rate,
                   dataset_size=configuration.train_data_configuration.training_data_size,
                   resnet_depth=configuration.training_configuration.resnet_depth)
 
-    # 2. Define network architecture
-    model = Vanilla3DCNN()
-    # model = ResNet()
-    # model = VGGNet
-    # model = InceptionNet_v1
-    # model = InceptionNet_v3
+    # 2. Select neural network architecture and create model
+    # selector = ArchitectureSelector(config.architecture_type)
+    # model = selector.select_architecture()
 
     # 3. Dataloader
-    # train_set_loader = VW_Data(configuration.train_data_configuration.training_set_dir)
-    # validation_set_loader = VW_Data(configuration.validation_data_configuration.validation_set_dir)
+    # train_set_loader = VW_Data(config.train_data_dir)
+    # validation_set_loader = VW_Data(config.validation_data_dir)
 
     # 4. Start training
+    # trainer = NetworkTrainer(model, train_set_loader, validation_set_loader, config)
+    # trainer.start_training()
+
     wandb.login()
     model = train.wandb_initiliazer(params)
 

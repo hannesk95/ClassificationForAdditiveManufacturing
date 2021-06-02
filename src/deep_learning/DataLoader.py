@@ -7,10 +7,11 @@ import configuration
 
 
 class VW_Data(Dataset):
-    """3D Models dataset."""
+    """3D Models dataloader."""
 
-    def __init__(self, root_dir: str):
-        super(VW_Data,self).__init__()
+    def __init__(self, root_dir: str, transform=None):
+        super(VW_Data, self).__init__()
+        self.transform = transform
         self.root_dir = root_dir
         self.model_data = self.load_model_path()
 
@@ -27,7 +28,7 @@ class VW_Data(Dataset):
         for i in range(len(files)):
             data = np.load(source_dir + files[i])['model']
             label = np.load(source_dir + files[i])['label']
-            models[i].append((data,label))
+            models[i].append((data, label))
         
         print("Data loading complete")
         return models
@@ -53,5 +54,4 @@ class VW_Data(Dataset):
         if self.transform is not None:
             data = torch.Tensor([data])
         
-        return data,label
-        
+        return data, label

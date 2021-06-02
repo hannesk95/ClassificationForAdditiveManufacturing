@@ -12,14 +12,14 @@ import wandb
 import configuration
 from network.ResNet import ResNet
 from network.VGGNet import VGGNet
-from dataloader import VW_Data
+from DataLoader import VW_Data
 
 
 def wandb_initiliazer(arguments):
     with wandb.init(project="TUM_DI_Lab", config=arguments):
         config = wandb.config
 
-        model, train_loader,val_loader,loss_fn, optimizer = nn_model(config)
+        model, train_loader, val_loader, loss_fn, optimizer = nn_model(config)
 
         train(model, train_loader, val_loader, loss_fn, optimizer, config)
     return model
@@ -28,24 +28,25 @@ def wandb_initiliazer(arguments):
 def nn_model(config):
     data_transforms = transforms.Compose([transforms.ToTensor()])
 
-
     train_set = VW_Data(data_transforms)
     validation_set = VW_Data(data_transforms)
 
-    #Loading train and validation set
-    train_set_loader = DataLoader(train_set,batch_size=config.batch_size,shuffle=False,num_workers=configuration.training_configuration.number_workers)
-    validation_set_loader = DataLoader(validation_set,batch_size=config.batch_size,shuffle=False,num_workers=configuration.training_configuration.number_workers)
+    # Loading train and validation set
+    train_set_loader = DataLoader(train_set, batch_size=config.batch_size, shuffle=False,
+                                  num_workers=configuration.training_configuration.number_workers)
+    validation_set_loader = DataLoader(validation_set, batch_size=config.batch_size, shuffle=False,
+                                       num_workers=configuration.training_configuration.number_workers)
 
-    #Build the model
+    # Build the model
     net = ResNet.generate_model(config.resnet_depth)
-    #net = VGGNet() #Please uncomment to use VGGNet
+    # net = VGGNet()
 
     if configuration.training_configuration.device.type == 'cuda':
         net.cuda()
    
     loss_function = torch.nn.BCELoss()
 
-    optimizer = torch.optim.Adam(net.parameters(),lr=config.lr)
+    optimizer = torch.optim.Adam(net.parameters(), lr=config.lr)
     
     return net, train_set_loader, validation_set_loader, loss_function, optimizer
 
@@ -58,7 +59,8 @@ def validation_phase(NN_model,val_set_loader,loss_function,epoch):
     loss_val = 0
 
     for batch_id, (model,label) in enumerate(val_set_loader, 1):
-        if(configuration.training_configuration.device.type == 'cuda'):
+
+        if configuration.training_configuration.device.type == 'cuda':
             model, label = model.cuda(), label
         else:
             model, label = model, label
@@ -72,20 +74,21 @@ def validation_phase(NN_model,val_set_loader,loss_function,epoch):
     loss_val = loss_val/mini_batches
     return loss_val
 
-def train(NN_model,train_set_loader,val_set_loader,loss_function,optimizer, config):
-    wandb.watch(NN_model,loss_function,log='all',log_freq=50)
+
+def train(NN_model, train_set_loader, val_set_loader, loss_function, optimizer, config):
+    wandb.watch(NN_model, loss_function, log='all', log_freq=50)
 
     mini_batches = 0
     loss_value = 0
 
     for epoch in range(config.epochs):
-        for batch_id, (model,label) in enumerate(train_set_loader, 1):
+        for batch_id, (model, label) in enumerate(train_set_loader, 1):
             NN_model.train()
-            if(configuration.training_configuration.device.type == 'cuda'):
+
+            if configuration.training_configuration.device.type == 'cuda':
                 model, label = model.cuda(), label
             else:
                 model, label = model, label
-
 
             output = NN_model(model)
             output = output.to(torch.float32)
@@ -99,21 +102,23 @@ def train(NN_model,train_set_loader,val_set_loader,loss_function,optimizer, conf
             mini_batches += 1
             loss_value += float(loss)
 
-            #Plotting in wandb
-            if (mini_batches % configuration.training_configuration.plot_frequency == 0):
+            # Plotting in wandb
+            if mini_batches % configuration.training_configuration.plot_frequency == 0:
                 val_loss = validation_phase(NN_model,val_set_loader,loss_function,epoch)
                 training_log(loss_value/configuration.training_configuration.plot_frequency, mini_batches)
                 training_log(val_loss,mini_batches,False)
 
                 PATH = "model.pt"
-                torch.save({'epoch':epoch,'model_state_dict':NN_model.state_dict(),'optimimizer_state_dict':optimizer.state_dict(),'loss':loss_value},PATH)
+                torch.save({'epoch': epoch, 'model_state_dict': NN_model.state_dict(),
+                            'optimizer_state_dict': optimizer.state_dict(), 'loss': loss_value}, PATH)
 
                 loss_value = 0
 
             print('Epoch-{0} lr: {1:f}'.format(epoch, optimizer.param_groups[0]['lr']))
 
-def training_log(loss,mini_batch,train=True):
-    if train == True:
-        wandb.log({'batch':mini_batch,'loss':loss})
+
+def training_log(loss, mini_batch, train=True):
+    if train:
+        wandb.log({'batch': mini_batch, 'loss': loss})
     else:
-        wandb.log({'batch':mini_batch,'loss':loss})
+        wandb.log({'batch': mini_batch, 'loss': loss})
