@@ -89,6 +89,7 @@ def plot_all_models(source_path, target_path=None, cutoff=25):
         os.makedirs(target_path)
     models = os.listdir(source_path)
     models = [elem for elem in models if elem.endswith('.npz')]
+    models = sorted(models)
     models = models[:cutoff]
     models = [os.path.join(source_path, model_path) for model_path in models]
     for model in tqdm(models, desc="[INFO]: Create images from given models"):
