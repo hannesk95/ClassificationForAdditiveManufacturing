@@ -2,8 +2,10 @@ import logging
 import train
 import wandb
 import configuration
+from torchvision.transforms import transforms
+from torch.utils.data import DataLoader
 from src.deep_learning.ArchitectureSelector import ArchitectureSelector
-from src.deep_learning.DataLoader import VW_Data
+from src.deep_learning.AMCDataset import AMCDataset
 from src.deep_learning.ParamConfigurator import ParamConfigurator
 from src.deep_learning.NetworkTrainer import NetworkTrainer
 
@@ -11,7 +13,7 @@ from src.deep_learning.NetworkTrainer import NetworkTrainer
 def main():
 
     # 1. Define configuration parameters
-    # config = ParamConfigurator()
+    config = ParamConfigurator()
 
     params = dict(epochs=configuration.training_configuration.number_epochs,
                   batch_size=configuration.training_configuration.batch_size,
@@ -20,16 +22,25 @@ def main():
                   resnet_depth=configuration.training_configuration.resnet_depth)
 
     # 2. Select neural network architecture and create model
-    # selector = ArchitectureSelector(config.architecture_type)
-    # model = selector.select_architecture()
+    selector = ArchitectureSelector(config.architecture_type, config)
+    model = selector.select_architecture()
 
-    # 3. Dataloader
-    # train_set_loader = VW_Data(config.train_data_dir)
-    # validation_set_loader = VW_Data(config.validation_data_dir)
+    # 3. Define transformations
+    transformations = transforms.Compose([transforms.ToTensor()])
 
-    # 4. Start training
-    # trainer = NetworkTrainer(model, train_set_loader, validation_set_loader, config)
-    # trainer.start_training()
+    # 3. Initialize dataset
+    train_dataset = AMCDataset(config.train_data_dir, transform=transformations)
+    validation_dataset = AMCDataset(config.validation_data_dir, transform=transformations)
+
+    # 4. Create dataloader
+    train_data_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=False,
+                                   num_workers=config.num_workers)
+    validation_data_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=False,
+                                        num_workers=config.num_workers)
+
+    # 5. Start training
+    trainer = NetworkTrainer(model, train_data_loader, validation_data_loader, config)
+    trainer.start_training()
 
     wandb.login()
     model = train.wandb_initiliazer(params)

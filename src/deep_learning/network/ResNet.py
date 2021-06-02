@@ -9,11 +9,12 @@ def get_inplanes():
 
 
 def conv3x3x3(in_planes, out_planes, stride=1):
-    return nn.Conv3d(in_planes,out_planes,kernel_size=3,stride=stride,padding=1,bias=False)
+    return nn.Conv3d(in_planes, out_planes, kernel_size=(3, 3, 3), stride=(stride, stride, stride),
+                     padding=(1, 1, 1), bias=False)
 
 
 def conv1x1x1(in_planes, out_planes, stride=1):
-    return nn.Conv3d(in_planes,out_planes,kernel_size=1,stride=stride,bias=False)
+    return nn.Conv3d(in_planes, out_planes, kernel_size=(1, 1, 1), stride=(stride, stride, stride), bias=False)
 
 
 class BasicBlock(nn.Module):
@@ -44,7 +45,6 @@ class BasicBlock(nn.Module):
         out = self.bn2(out)
         out = self.dropout2(out)
 
-
         if self.downsample is not None:
             residual = self.downsample(x)
 
@@ -56,39 +56,41 @@ class BasicBlock(nn.Module):
 
 class ResNet(nn.Module):
 
-    def __init__(self,block,layer,block_inplanes,n_input_channels=1,conv1_t_size=7,conv1_t_stride=1,no_max_pool=False,shortcut_type='B',widen_factor=1.0,n_classes=512):
+    def __init__(self, block, layer, block_inplanes, n_input_channels=1, conv1_t_size=7, conv1_t_stride=1,
+                 no_max_pool=False, shortcut_type='B', widen_factor=1.0, n_classes=512):
         super().__init__()
 
         block_inplanes = [int(x * widen_factor) for x in block_inplanes]
         self.in_planes = block_inplanes[0]
         self.no_max_pool = no_max_pool
 
-        self.conv1 = nn.Conv3d(n_input_channels,self.in_planes,kernel_size=(7, 7, 7),stride=(2, 2, 2),padding=(3, 3, 3),bias=False)
+        self.conv1 = nn.Conv3d(n_input_channels, self.in_planes, kernel_size=(7, 7, 7), stride=(2, 2, 2),
+                               padding=(3, 3, 3), bias=False)
         self.bn1 = nn.BatchNorm3d(self.in_planes)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool3d(kernel_size=3, stride=2, padding=1)
-        self.layer1 = self._make_layer(block, block_inplanes[0], layer[0],shortcut_type)
-        self.layer2 = self._make_layer(block,block_inplanes[1],layer[1],shortcut_type,stride=2)
-        self.layer3 = self._make_layer(block,block_inplanes[2],layer[2],shortcut_type,stride=2)
-        self.layer4 = self._make_layer(block,block_inplanes[3],layer[3],shortcut_type,stride=2)
+        self.layer1 = self._make_layer(block, block_inplanes[0], layer[0], shortcut_type)
+        self.layer2 = self._make_layer(block, block_inplanes[1], layer[1], shortcut_type, stride=2)
+        self.layer3 = self._make_layer(block, block_inplanes[2], layer[2], shortcut_type, stride=2)
+        self.layer4 = self._make_layer(block, block_inplanes[3], layer[3], shortcut_type, stride=2)
 
         self.avgpool = nn.AdaptiveAvgPool3d((1, 1, 1))
         self.fc1 = nn.Linear(block_inplanes[3] * block.expansion, n_classes)
-        self.fc2 = nn.Linear(n_classes,128)
-        self.fc3 = nn.Linear(128,64)
-        self.fc4 = nn.Linear(64,1)
+        self.fc2 = nn.Linear(n_classes, 128)
+        self.fc3 = nn.Linear(128, 64)
+        self.fc4 = nn.Linear(64, 1)
         self.sigmoid = nn.Sigmoid()
 
         for m in self.modules():
             if isinstance(m, nn.Conv3d):
-                nn.init.kaiming_normal_(m.weight,mode='fan_out',nonlinearity='relu')
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
             elif isinstance(m, nn.BatchNorm3d):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
 
     def _downsample_basic_block(self, x, planes, stride):
         out = F.avg_pool3d(x, kernel_size=1, stride=stride)
-        zero_pads = torch.zeros(out.size(0), planes - out.size(1), out.size(2),out.size(3), out.size(4))
+        zero_pads = torch.zeros(out.size(0), planes - out.size(1), out.size(2), out.size(3), out.size(4))
         if isinstance(out.data, torch.cuda.FloatTensor):
             zero_pads = zero_pads.cuda()
 
@@ -100,12 +102,13 @@ class ResNet(nn.Module):
         downsample = None
         if stride != 1 or self.in_planes != planes * block.expansion:
             if shortcut_type == 'A':
-                downsample = partial(self._downsample_basic_block,planes=planes * block.expansion,stride=stride)
+                downsample = partial(self._downsample_basic_block, planes=planes * block.expansion, stride=stride)
             else:
-                downsample = nn.Sequential(conv1x1x1(self.in_planes, planes * block.expansion, stride),nn.BatchNorm3d(planes * block.expansion))
+                downsample = nn.Sequential(conv1x1x1(self.in_planes, planes * block.expansion, stride),
+                                           nn.BatchNorm3d(planes * block.expansion))
 
         layers = []
-        layers.append(block(in_planes=self.in_planes,planes=planes,stride=stride,downsample=downsample))
+        layers.append(block(in_planes=self.in_planes, planes=planes, stride=stride, downsample=downsample))
 
         self.in_planes = planes * block.expansion
         for i in range(1, blocks):
@@ -113,8 +116,8 @@ class ResNet(nn.Module):
 
         return nn.Sequential(*layers)
 
-    def normalize(self,x):
-        n = torch.sqrt(torch.sum(x*x,dim=-1,keepdim=True))
+    def normalize(self, x):
+        n = torch.sqrt(torch.sum(x*x, dim=-1, keepdim=True))
         return x/n
 
     def forward(self, x):
@@ -131,7 +134,7 @@ class ResNet(nn.Module):
         
         x = self.avgpool(x)
         
-        x = x.view(x.size(0),-1)
+        x = x.view(x.size(0), -1)
         x = self.fc1(x)
         x = self.relu(self.fc2(x))
         x = self.relu(self.fc3(x))
@@ -139,27 +142,27 @@ class ResNet(nn.Module):
         
         return x
 
-
     def generate_model(model_depth, **kwargs):
         assert model_depth in [18, 50, 101, 152]
 
         if model_depth == 18:
-            model = ResNet(BasicBlock, [2,2,2,2], get_inplanes(), **kwargs)
+            model = ResNet(BasicBlock, [2, 2, 2, 2], get_inplanes(), **kwargs)
         elif model_depth == 50:
-            model = ResNet(BasicBlock, [3,4,6,3], get_inplanes(), **kwargs)
+            model = ResNet(BasicBlock, [3, 4, 6, 3], get_inplanes(), **kwargs)
         elif model_depth == 101:
-            model = ResNet(BasicBlock, [3,4,23,3], get_inplanes(), **kwargs)
+            model = ResNet(BasicBlock, [3, 4, 23, 3], get_inplanes(), **kwargs)
         elif model_depth == 152:
-            model = ResNet(BasicBlock, [3,8,36,3], get_inplanes(), **kwargs)
+            model = ResNet(BasicBlock, [3, 8, 36, 3], get_inplanes(), **kwargs)
 
         return model
 
 
 # For test only
 if __name__ == '__main__':
-    net = generate_model(101)
+
+    net = ResNet.generate_model(18)
     
     if torch.cuda.device_count() > 0:
-        summary(net.cuda(),(1,64,64,64))
+        summary(net.cuda(), (1, 64, 64, 64))
     else:
-        summary(net,(1,64,64,64))
+        summary(net, (1, 64, 64, 64))

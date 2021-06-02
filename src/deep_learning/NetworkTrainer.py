@@ -16,25 +16,32 @@ class NetworkTrainer:
 
     def start_training(self):
         """# TODO: Docstring"""
-        wandb.watch(self.nn_model, self.loss_function, log='all', log_freq=50)
+        # wandb.watch(self.nn_model, self.loss_function, log='all', log_freq=50)
 
         mini_batches = 0
         loss_value = 0
 
         for epoch in range(self.config.num_epochs):
-            for batch_id, (model, label) in enumerate(self.train_set_loader, 1):
-                self.nn_model.train()
+            for batch_id, (model, label) in enumerate(self.train_set_loader):
+                # self.nn_model.train()
 
                 if self.config.device.type == 'cuda':
                     model, label = model.cuda(), label
                 else:
                     model, label = model, label
 
+                # model = torch.reshape(model, (model.shape[0], 1, model.shape[1], model.shape[2], model.shape[3]))
+                # model = model.to(torch.float32)
+
+                # calculate output
                 output = self.nn_model(model)
                 output = output.to(torch.float32)
                 label = label.to(torch.float32)
+
+                # calculate loss
                 loss = self.loss_function(output, label)
 
+                # backpropagation
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()

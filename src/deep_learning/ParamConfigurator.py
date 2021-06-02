@@ -25,17 +25,17 @@ class ParamConfigurator:
         if self.optimizer not in ['Adam', 'SGD']:
             raise ValueError(f"[ERROR] Chosen optimizer is not valid! Please choose out of ['Adam, 'SGD].")
         self.loss_function = config['training']['loss_function']
-        if self.loss_function is 'BCE':
+        if self.loss_function == 'BCE':
             self.loss_function = torch.nn.BCELoss()
 
         # train_data
-        self.train_data_size = config['train_data'].getint('train_data_size')
+        # self.train_data_size = config['train_data'].getint('train_data_size')
         self.train_data_dir = config['train_data']['train_data_dir']
         if not os.path.exists(self.train_data_dir):
             raise ValueError(f"[ERROR] Directory specified for training data does not exist!")
 
         # validation_data
-        self.validation_data_size = config['validation_data'].getint('validation_data_size')
+        # self.validation_data_size = config['validation_data'].getint('validation_data_size')
         self.validation_data_dir = config['validation_data']['validation_data_dir']
         if not os.path.exists(self.validation_data_dir):
             raise ValueError(f"[ERROR] Directory specified for validation data does not exist!")
@@ -47,8 +47,8 @@ class ParamConfigurator:
 
         # Inception
         self.inception_version = config['ResNet'].getint('version')
-        if self.inception_version not in [1, 3]:
-            raise ValueError(f"[ERROR] InceptionNet is only available for version 1 and for version 3.")
+        # if self.inception_version not in [int(1), int(3)]:
+            # raise ValueError(f"[ERROR] InceptionNet is only available for version 1 and for version 3.")
 
 
 
