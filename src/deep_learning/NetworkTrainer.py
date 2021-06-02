@@ -3,8 +3,10 @@ import torch
 
 
 class NetworkTrainer:
+    """# TODO: Docstring"""
 
     def __init__(self, nn_model, train_set_loader, val_set_loader, config):
+        """# TODO: Docstring"""
         self.nn_model = nn_model
         self.train_set_loader = train_set_loader
         self.val_set_loader = val_set_loader
@@ -13,6 +15,7 @@ class NetworkTrainer:
         self.config = config
 
     def start_training(self):
+        """# TODO: Docstring"""
         wandb.watch(self.nn_model, self.loss_function, log='all', log_freq=50)
 
         mini_batches = 0
@@ -54,12 +57,14 @@ class NetworkTrainer:
                 print('Epoch-{0} lr: {1:f}'.format(epoch, self.optimizer.param_groups[0]['lr']))
 
     def training_log(self, loss, mini_batch, train=True):
+        """# TODO: Docstring"""
         if train:
             wandb.log({'batch': mini_batch, 'loss': loss})
         else:
             wandb.log({'batch': mini_batch, 'loss': loss})
 
     def validation_phase(self, nn_model, val_set_loader, loss_function, epoch):
+        """# TODO: Docstring"""
 
         print(f"[INFO] Validating.")
 

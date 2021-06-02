@@ -3,8 +3,10 @@ from src.deep_learning.network import Vanilla3DCNN, ResNet, VGGNet, InceptionNet
 
 
 class ArchitectureSelector:
+    """# TODO: Docstring"""
 
     def __init__(self, nn_architecture: str, config):
+        """# TODO: Docstring"""
 
         self.nn_architecture = nn_architecture
         self.architectures = ['Vanilla3DCNN, ResNet, VGGNet, InceptionNet']
@@ -12,6 +14,7 @@ class ArchitectureSelector:
         self.model = None
 
     def select_architecture(self):
+        """# TODO: Docstring"""
 
         if self.nn_architecture not in self.architectures:
             raise ValueError(f"Chosen neural network architecture is not valid! Choose out of {self.architectures}")
@@ -31,6 +34,9 @@ class ArchitectureSelector:
             else:
                 self.model = InceptionNet_v3()
 
-        self.config.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.config.learning_rate)
+        if self.config.optimizer is 'Adam':
+            self.config.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.config.learning_rate)
+        if self.config.optimizer is 'SGD':
+            self.config.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.config.learning_rate)
 
         return self.model

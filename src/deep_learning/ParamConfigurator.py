@@ -7,6 +7,7 @@ class ParamConfigurator:
     """Parameter configurator class for deep learning pipeline."""
 
     def __init__(self):
+        """# TODO: Docstring"""
         config = configparser.ConfigParser()
         config.read('config.ini')
 
@@ -21,8 +22,8 @@ class ParamConfigurator:
         self.plot_frequency = config['training'].getint('plot_frequency')
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.optimizer = config['training']['optimizer']
-        if self.optimizer is 'Adam':
-            self.optimizer = torch.optim.Adam(lr=self.learning_rate) # TODO: include model.parameters()
+        if self.optimizer not in ['Adam', 'SGD']:
+            raise ValueError(f"[ERROR] Chosen optimizer is not valid! Please choose out of ['Adam, 'SGD].")
         self.loss_function = config['training']['loss_function']
         if self.loss_function is 'BCE':
             self.loss_function = torch.nn.BCELoss()
