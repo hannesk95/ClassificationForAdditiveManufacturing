@@ -7,7 +7,14 @@ import seaborn as sns
 from src.data_generation.VoxelModel import VoxelModel
 
 
-def add_vertical_hole(model_data, radius, offset):
+def add_vertical_hole(model_data: np.ndarray, radius: int, offset: np.ndarray) -> np.ndarray:
+    """
+    Adds a hole through the z axis
+    :param model_data: Voxelized model data
+    :param radius: Radius of the hole
+    :param offset: Offset, i.e. where to put the hole
+    :return: model_data_with_defect: voxelized model with a added hole
+    """
     xx = np.arange(model_data.shape[0])
     yy = np.arange(model_data.shape[1])
     out = np.zeros_like(model_data)
@@ -22,7 +29,13 @@ def add_vertical_hole(model_data, radius, offset):
     return model_data_with_defect
 
 
-def determine_first_unique_horizontal_elements(source, number_of_elements):
+def determine_first_unique_horizontal_elements(source: list, number_of_elements: int) -> list:
+    """
+    Determines the first number_of_elements from the left in order to remove them
+    :param source: List of indices
+    :param number_of_elements: Number of indices to be removed from the left
+    :return: List containing the indices to be removed
+    """
     to_remove = []
     value = 0
     idx = 0
@@ -40,7 +53,13 @@ def determine_first_unique_horizontal_elements(source, number_of_elements):
     return to_remove
 
 
-def determine_last_unique_horizontal_elements(source, number_of_elements):
+def determine_last_unique_horizontal_elements(source: list, number_of_elements: int) -> list:
+    """
+    Determines the first number_of_elements from the right in order to remove them
+    :param source: List of indices
+    :param number_of_elements: Number of indices to be removed from the right
+    :return: List containing the indices to be removed
+    """
     to_remove = []
     idx = 0
     while idx < len(source) - number_of_elements:
@@ -61,7 +80,15 @@ def determine_last_unique_horizontal_elements(source, number_of_elements):
     return to_remove
 
 
-def check_hole_feasibility(model_data, radius, border, offset):
+def check_hole_feasibility(model_data: np.ndarray, radius: int, border: int, offset: np.ndarray) -> bool:
+    """
+    Checks whether a larger hole (radius+offset) around the offset would be still fully in the model
+    :param model_data: Voxelized model data
+    :param radius: Radius of the hole to be added
+    :param border: Border in each direction
+    :param offset: Offset parameter
+    :return: Boolean indicating whether or nor a hole with radius radius+offset at offset would be fully in the model
+    """
     radius += border
     top_down_view = np.sum(model_data, axis=2)
     top_down_view = np.pad(top_down_view, pad_width=1, mode='constant', constant_values=0)
@@ -75,7 +102,15 @@ def check_hole_feasibility(model_data, radius, border, offset):
     return True
 
 
-def rotate_model(model_data, x_rotation, y_rotation, z_rotation):
+def rotate_model(model_data: np.ndarray, x_rotation: int, y_rotation: int, z_rotation: int) -> np.ndarray:
+    """
+    Rotates the voxelized model
+    :param model_data: Voxelized model data
+    :param x_rotation: Degrees of rotation around the x axis
+    :param y_rotation: Degrees of rotation around the y axis
+    :param z_rotation:Degrees of rotation around the z axis
+    :return: Rotated voxelized model
+    """
     model_data = np.around(rotate(model_data, x_rotation))
     model_data = np.around(rotate(model_data, y_rotation, (1, 2)))
     model_data = np.around(rotate(model_data, z_rotation, (0, 2)))
@@ -83,7 +118,13 @@ def rotate_model(model_data, x_rotation, y_rotation, z_rotation):
     return model_data
 
 
-def _visualize_top_down_view(model_data, possible_offsets_final):
+def _visualize_top_down_view(model_data: np.ndarray, possible_offsets_final: list):
+    """
+    Visulizes the top down view of a model
+    :param model_data: Voxelized model data
+    :param possible_offsets_final: List containing the possible offsets
+    :return:
+    """
     top_down_view = np.sum(model_data, axis=2)
     basis = np.zeros_like(top_down_view)
     for indices in possible_offsets_final:
@@ -94,7 +135,7 @@ def _visualize_top_down_view(model_data, possible_offsets_final):
 
 
 class DefectorRotation:
-    def __init__(self, radius=2, border=5, rotation=False,number_of_trials=5, visualize_top_down_view=False):
+    def __init__(self, radius=2, border=5, rotation=False, number_of_trials=5, visualize_top_down_view=False):
         self.radius = radius
         self.border = border
         self.rotation = rotation
@@ -132,6 +173,12 @@ class DefectorRotation:
         return [model, model_with_defect]
 
     def _find_feasible_offset(self, model_data):
+        """
+        Finds a feasible offset where to put randomly hole. It analyses the top down view of a model and samples a
+        offset from a adapted subsample of offsets, that guarantee that the hole fully goes through the model
+        :param model_data:
+        :return: offset (np.ndarray), possible_offsets_final (np.ndarray, containing the final subset of offsets
+        """
         # Get top down view and all non-zero elements in the top down view
         top_down_view = np.sum(model_data, axis=2)
         possible_offsets = np.array(np.where(top_down_view > 0)).T
@@ -150,7 +197,7 @@ class DefectorRotation:
             to_remove += values[len(values) - self.border:len(values)].tolist()
 
         # Remove elements at the border
-        try: # TODO Find problem here
+        try:  # TODO Find problem here
             possible_offsets_final = np.delete(possible_offsets, list(set(to_remove)), axis=0)
         except:
             return None, None
@@ -158,6 +205,7 @@ class DefectorRotation:
         if len(possible_offsets_final) == 0:
             return None, None
 
+        # Check if the hole has a large enough boarder around it
         for trial in range(self.number_of_trials):
             offset = possible_offsets_final[random.randrange(0, len(possible_offsets_final))]
             offset.astype(int)
