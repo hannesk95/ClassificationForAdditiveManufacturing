@@ -160,7 +160,7 @@ class ResNet(nn.Module):
 # For test only
 if __name__ == '__main__':
 
-    net = ResNet.generate_model(50)
+    net = ResNet.generate_model(18)
     
     if torch.cuda.device_count() > 0:
         summary(net.cuda(), (1, 64, 64, 64))
