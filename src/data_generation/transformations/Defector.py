@@ -9,6 +9,11 @@ class Defector:
         # get the voxel grid indices out of the occupancy grid
         voxels = np.argwhere(model == 1)
 
+        if voxels.shape[0] == 0:
+            print("empty model")
+            model_with_defect = VoxelModel(model, np.array([0]), voxel_model.model_name + f'_no_defect')
+            return [voxel_model, model_with_defect]
+
         # find appropriate axis and radius of the cylinder
         axis, radius = self.find_axis_and_radius(voxels)
         print("selected:", axis, radius)
