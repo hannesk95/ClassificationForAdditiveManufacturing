@@ -204,12 +204,15 @@ def _visualize_top_down_view(model_data: np.ndarray, possible_offsets_final: lis
     :return:
     """
     top_down_view = np.sum(model_data, axis=2)
+    '''
     basis = np.zeros_like(top_down_view)
     for indices in possible_offsets_final:
         idx = indices[0]
         idy = indices[1]
         basis[idx, idy] = 1
-    sns.heatmap(basis + (top_down_view > 0))
+    '''
+    #sns.heatmap(basis + (top_down_view > 0))
+    sns.heatmap((top_down_view > 0))
 
 
 class DefectorRotation2:
@@ -227,15 +230,11 @@ class DefectorRotation2:
         model_data_tmp = deepcopy(model_data)
         # First rotation
         if self.rotation:
-            # Rotate model randomly
-            x_rotation = random.randrange(0, 360)
-            y_rotation = random.randrange(0, 360)
-            z_rotation = random.randrange(0, 360)
-            #model_data_tmp = rotate_model(model_data_tmp, x_rotation, y_rotation, z_rotation)
-
-            voxels_indices_model_data_tmp = np.argwhere(model_data_tmp==1)
-            voxel_rotated_r, voxels_rotated = rotate_voxels_round(voxels_indices_model_data_tmp, radians(x_rotation), 0)
-            model_data_tmp = voxel_to_occupancy(voxel_rotated_r)
+            # Rotate model randomly  random.randrange(0, 360)
+            x_rotation = 45
+            y_rotation = 0
+            z_rotation = 0
+            model_data_tmp = rotate_model(model_data_tmp, x_rotation, y_rotation, z_rotation)
 
         offset, possible_offsets_final = self._find_feasible_offset(model_data_tmp)
         if offset is None:
@@ -248,19 +247,21 @@ class DefectorRotation2:
             #model_data = rotate_model(model_data, 360-x_rotation, 360-y_rotation, 360-z_rotation)
             voxels_rotated = np.argwhere(model_data_tmp == 1)
             # find voxels to remove in rotated model
-            height = model_data_tmp.shape[2]
-            idx = voxels_in_cylinder(offset, self.radius, height, voxels_rotated)
+            height = model_data_tmp.shape[2]+1000
+            idx = voxels_in_cylinder(offset,height,self.radius, voxels_rotated)
             to_be_removed = voxels_rotated[idx]
             # cylinder in rotated model rotated back
             voxels_removed_rotated_r, voxels_removed_rotated = rotate_voxels_round(to_be_removed, radians(360 - x_rotation),0)
             # remove from object
             for v in voxels_removed_rotated_r:
-                model_data[v[0], v[1], v[2]] = 0
+                shape = model_data.shape
+                if v[0]< shape[0] and v[1]< shape[1] and v[2] < shape[2]:
+                    model_data[v[0], v[1], v[2]] = 0
         else:
             model_data = add_vertical_hole(model_data_tmp, self.radius, offset)
 
         if self.visualize_top_down_view:
-            _visualize_top_down_view(model_data_tmp, possible_offsets_final)
+            _visualize_top_down_view(model_data, possible_offsets_final)
 
         model_with_defect = VoxelModel(model_data, np.array([0]), model.model_name + f'_defect_radius{self.radius}')
 
