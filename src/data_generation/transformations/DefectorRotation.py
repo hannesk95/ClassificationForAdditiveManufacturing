@@ -155,7 +155,7 @@ class DefectorRotation:
 
         offset, possible_offsets_final = self._find_feasible_offset(model_data)
         if offset is None:
-            logging.warning(f"Could not find a feasable offset for model: {model.model_name}")
+            # logging.warning(f"Could not find a feasable offset for model: {model.model_name}")
             return None
 
         model_data = add_vertical_hole(model.model, self.radius, offset)
