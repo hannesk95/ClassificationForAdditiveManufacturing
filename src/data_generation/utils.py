@@ -75,12 +75,13 @@ def _read_as_3d_array(fp, fix_coords=True):
     return data
 
 
-def plot_all_models(source_path, target_path=None, cutoff=25):
+def plot_all_models(source_path, target_path=None, cutoff=25, skip_images=True):
     """
     Creates for all voxeliezed model in source_path a plot and save them in target_path
     :param source_path:
     :param target_path:
     :param cutoff: Number where to cut off the model_list
+    :param skip_images: If set to True will skip the models that where already plotted
     :return:
     """
     if target_path is None:
@@ -95,5 +96,7 @@ def plot_all_models(source_path, target_path=None, cutoff=25):
     for model in tqdm(models, desc="[INFO]: Create images from given models"):
         model_data = np.load(model)['model']
         model_name = extract_file_name(model, 'npz')
+        if os.path.exists(os.path.join(target_path, model_name)):
+            continue
         model = VoxelModel(model_data, 1, model_name)
         model.visualize(target_path=target_path)

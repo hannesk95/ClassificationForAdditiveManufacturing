@@ -40,7 +40,7 @@ def main():
                                          target_path=config.target_path)
     batch_processor.process()
 
-    utils.plot_all_models(source_path=config.target_path, cutoff=50)
+    utils.plot_all_models(source_path=config.target_path, cutoff=50, skip_images=True)
 
 
 if __name__ == '__main__':
