@@ -1,4 +1,5 @@
 import os
+import torch
 import numpy as np
 from torch.utils.data import Dataset
 
@@ -30,9 +31,20 @@ class AMCDataset(Dataset):
     def __getitem__(self, idx):
         """# TODO: Docstring"""
         model = np.load(self.models[idx])['model']
-        label = np.load(self.models[idx])['label']
+        # model = np.reshape(model, (1, model.shape[0], model.shape[1], model.shape[2]))
+        # model = model.astype(np.float32)
+
+        label = torch.tensor(np.load(self.models[idx])['label'], dtype=torch.float32)
+        # label = torch.FloatTensor(label).unsqueeze(-1)
+        # label = np.reshape(label, (-1, 1))
+        # label = label.astype(np.float32)
 
         if self.transform:
             model = self.transform(model)
+            # label = self.transform(label)
+
+        model = torch.reshape(model, (1, model.shape[0], model.shape[1], model.shape[2]))
+        model = model.to(torch.float32)
+        # label = label.to(torch.float32)
 
         return model, label
