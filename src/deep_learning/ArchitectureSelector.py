@@ -1,5 +1,4 @@
 import torch
-import horovod.torch as hvd
 from src.deep_learning.network import Vanilla3DCNN, ResNet, VGGNet, InceptionNet_v1, InceptionNet_v3
 
 
@@ -40,6 +39,7 @@ class ArchitectureSelector:
             # Send network to GPU if available
             self.model.cuda()
 
+            import horovod.torch as hvd
             # Initialize Horovod
             hvd.init()
 
