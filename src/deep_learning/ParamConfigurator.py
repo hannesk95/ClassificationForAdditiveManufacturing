@@ -55,6 +55,10 @@ class ParamConfigurator:
         if self.inception_version not in [int(1), int(3)]:
             raise ValueError(f"[ERROR] InceptionNet is only available for version 1 and for version 3.")
 
+        # Horovod
+        self.hvd_size = None
+        self.hvd_rank = None
+
 
 
 
