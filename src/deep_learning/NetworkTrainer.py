@@ -27,6 +27,10 @@ class NetworkTrainer:
                 # Make sure network is in training mode
                 self.nn_model.train()
 
+                # Copy to GPU if available
+                if self.config.device.type == 'cuda':
+                    model, label = model.cuda(), label.cuda()
+
                 # Set gradients to zero
                 self.optimizer.zero_grad()
 
