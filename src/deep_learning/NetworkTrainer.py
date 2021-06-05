@@ -18,50 +18,67 @@ class NetworkTrainer:
         """# TODO: Docstring"""
         # wandb.watch(self.nn_model, self.loss_function, log='all', log_freq=50)
 
-        mini_batches = 0
-        loss_value = 0
+        # mini_batches = 0
+        # loss_value = 0
 
-        for epoch in range(self.config.num_epochs):
+        for epoch in range(1, self.config.num_epochs + 1):
             for batch_id, (model, label) in enumerate(self.train_set_loader):
-                # self.nn_model.train()
 
-                if self.config.device.type == 'cuda':
-                    model, label = model.cuda(), label
-                else:
-                    model, label = model, label
+                # Make sure network is in training mode
+                self.nn_model.train()
+
+                # Set gradients to zero
+                self.optimizer.zero_grad()
+
+                # Calculate output
+                output = self.nn_model(model)
+                output = torch.reshape(output, (-1, 1))
+
+                # Calculate loss
+                loss = self.loss_function(output, label)
+
+                # Backpropagation
+                loss.backward()
+                self.optimizer.step()
+
+                # if self.config.device.type == 'cuda':
+                #     model, label = model.cuda(), label
+                # else:
+                #     model, label = model, label
 
                 # model = torch.reshape(model, (model.shape[0], 1, model.shape[1], model.shape[2], model.shape[3]))
                 # model = model.to(torch.float32)
 
                 # calculate output
-                output = self.nn_model(model)
-                output = output.to(torch.float32)
-                label = label.to(torch.float32)
+                # output = self.nn_model(model)
+                # output = output.to(torch.float32)
+                # label = label.to(torch.float32)
 
                 # calculate loss
-                loss = self.loss_function(output, label)
+                # loss = self.loss_function(output, label)
 
                 # backpropagation
-                self.optimizer.zero_grad()
-                loss.backward()
-                self.optimizer.step()
+                # self.optimizer.zero_grad()
+                # loss.backward()
+                # self.optimizer.step()
 
-                mini_batches += 1
-                loss_value += float(loss)
+                # mini_batches += 1
+                # loss_value += float(loss)
 
                 # Plotting in wandb
-                if mini_batches % self.config.plot_frequency == 0:
-                    val_loss = self.validation_phase(self.nn_model, self.val_set_loader, self.loss_function, epoch)
-                    self.training_log(loss_value / self.config.plot_frequency, mini_batches)
-                    self.training_log(val_loss, mini_batches, False)
+                # if mini_batches % self.config.plot_frequency == 0:
+                #     val_loss = self.validation_phase(self.nn_model, self.val_set_loader, self.loss_function, epoch)
+                #     self.training_log(loss_value / self.config.plot_frequency, mini_batches)
+                #     self.training_log(val_loss, mini_batches, False)
+                #
+                #     path = "model.pt"
+                #     torch.save({'epoch': epoch, 'model_state_dict': self.nn_model.state_dict(),
+                #                 'optimizer_state_dict': self.optimizer.state_dict(), 'loss': loss_value}, path)
+                #
+                #     loss_value = 0
 
-                    path = "model.pt"
-                    torch.save({'epoch': epoch, 'model_state_dict': self.nn_model.state_dict(),
-                                'optimizer_state_dict': self.optimizer.state_dict(), 'loss': loss_value}, path)
-
-                    loss_value = 0
-
-                print('Epoch-{0} lr: {1:f}'.format(epoch, self.optimizer.param_groups[0]['lr']))
+                # print(f"Epoch: {epoch} | Loss: {loss} | Learning-Rate: {self.optimizer.param_groups[0]['lr']}")
+                print(f"Epoch: {epoch} | Loss: {loss}")
 
     def training_log(self, loss, mini_batch, train=True):
         """# TODO: Docstring"""
