@@ -64,5 +64,6 @@ class ArchitectureSelector:
 
             # Broadcast parameters from rank 0 to all other processes.
             hvd.broadcast_parameters(self.model.state_dict(), root_rank=0)
+            hvd.broadcast_optimizer_state(self.config.optimizer, root_rank=0)
 
         return self.model
