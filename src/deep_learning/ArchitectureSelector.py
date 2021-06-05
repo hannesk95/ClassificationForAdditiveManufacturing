@@ -34,6 +34,11 @@ class ArchitectureSelector:
             else:
                 self.model = InceptionNet_v3()
 
+        # Send network to GPU if available
+        if self.config.device.type == 'cuda':
+            self.model.cuda()
+
+        # Define optimizer
         if self.config.optimizer == 'Adam':
             self.config.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.config.learning_rate)
         if self.config.optimizer == 'SGD':
