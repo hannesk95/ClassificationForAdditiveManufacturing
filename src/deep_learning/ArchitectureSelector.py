@@ -46,6 +46,8 @@ class ArchitectureSelector:
             # Pin GPU to be used to process local rank (one GPU per process)
             torch.cuda.set_device(hvd.local_rank())
 
+            torch.set_num_threads(1)
+
             # Store size and rank into config parameters
             self.config.hvd_size = hvd.size()
             self.config.hvd_rank = hvd.rank()
@@ -58,12 +60,12 @@ class ArchitectureSelector:
 
         if self.config.device.type == 'cuda':
 
-            # Add Horovod Distributed Optimizer
+            # Horovod: broadcast parameters & optimizer state.
+            hvd.broadcast_parameters(self.model.state_dict(), root_rank=0)
+            hvd.broadcast_optimizer_state(self.config.optimizer, root_rank=0)
+
+            # Horovod: wrap optimizer with DistributedOptimizer.
             self.config.optimizer = hvd.DistributedOptimizer(self.config.optimizer,
                                                              named_parameters=self.model.named_parameters())
-
-            # Broadcast parameters from rank 0 to all other processes.
-            hvd.broadcast_parameters(self.model.state_dict(), root_rank=0)
-            # hvd.broadcast_optimizer_state(self.config.optimizer, root_rank=0)
 
         return self.model
