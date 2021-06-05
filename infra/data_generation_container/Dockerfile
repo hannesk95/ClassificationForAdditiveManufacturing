@@ -33,6 +33,9 @@ RUN dpkg -i open3d-app-0.12.0_Ubuntu-18.04.deb
 RUN apt -y install libgl1-mesa-dev libglu1-mesa-dev
 RUN apt -y install freeglut3-dev
 
+# Install screen
+RUN apt -y install screen
+
 # Copy config.ini file into container
 COPY config.ini config.ini
 

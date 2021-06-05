@@ -26,6 +26,9 @@ RUN apt update
 RUN apt install libnccl2 libnccl-dev
 RUN HOROVOD_GPU_OPERATIONS=NCCL pip install horovod
 
+# Install screen
+RUN apt -y install screen
+
 # Copy .sbatch script into container
 COPY script.sbatch script.sbatch
 
