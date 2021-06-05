@@ -1,4 +1,5 @@
 import torch
+import horovod.torch as hvd
 from src.deep_learning.network import Vanilla3DCNN, ResNet, VGGNet, InceptionNet_v1, InceptionNet_v3
 
 
@@ -34,14 +35,34 @@ class ArchitectureSelector:
             else:
                 self.model = InceptionNet_v3()
 
-        # Send network to GPU if available
         if self.config.device.type == 'cuda':
+
+            # Send network to GPU if available
             self.model.cuda()
+
+            # Initialize Horovod
+            hvd.init()
+
+            # Pin GPU to be used to process local rank (one GPU per process)
+            torch.cuda.set_device(hvd.local_rank())
+
+            # Store size and rank into config parameters
+            self.config.hvd_size = hvd.size()
+            self.config.hvd_rank = hvd.rank()
 
         # Define optimizer
         if self.config.optimizer == 'Adam':
             self.config.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.config.learning_rate)
         if self.config.optimizer == 'SGD':
             self.config.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.config.learning_rate)
+
+        if self.config.device.type == 'cuda':
+
+            # Add Horovod Distributed Optimizer
+            self.config.optimizer = hvd.DistributedOptimizer(self.config.optimizer,
+                                                             named_parameters=self.model.named_parameters())
+
+            # Broadcast parameters from rank 0 to all other processes.
+            hvd.broadcast_parameters(self.model.state_dict(), root_rank=0)
 
         return self.model
