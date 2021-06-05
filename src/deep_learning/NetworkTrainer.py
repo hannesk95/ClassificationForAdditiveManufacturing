@@ -22,6 +22,8 @@ class NetworkTrainer:
         # loss_value = 0
 
         for epoch in range(1, self.config.num_epochs + 1):
+            correct = 0
+            total = 0
             for batch_id, (model, label) in enumerate(self.train_set_loader):
 
                 # Make sure network is in training mode
@@ -44,6 +46,11 @@ class NetworkTrainer:
                 # Backpropagation
                 loss.backward()
                 self.optimizer.step()
+
+                correct += (output > 0.5).float().sum()
+                total = total + len(label)
+
+
 
                 # if self.config.device.type == 'cuda':
                 #     model, label = model.cuda(), label
@@ -82,7 +89,8 @@ class NetworkTrainer:
                 #     loss_value = 0
 
                 # print(f"Epoch: {epoch} | Loss: {loss} | Learning-Rate: {self.optimizer.param_groups[0]['lr']}")
-                print(f"Epoch: {epoch} | Loss: {loss}")
+            accuracy = 100 * correct / total
+            print(f"Epoch: {epoch} | Loss: {loss} | Accuracy: {accuracy}")
 
     def training_log(self, loss, mini_batch, train=True):
         """# TODO: Docstring"""
