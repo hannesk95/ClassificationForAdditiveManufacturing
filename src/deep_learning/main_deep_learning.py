@@ -34,16 +34,16 @@ def main():
 
     # 4. Create dataloader
     train_data_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=False,
-                                   num_workers=config.num_workers)
+                                   num_workers=config.num_workers, pin_memory=config.pin_memory)
     validation_data_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=False,
-                                        num_workers=config.num_workers)
+                                        num_workers=config.num_workers, pin_memory=config.pin_memory)
 
     # 5. Start training
     trainer = NetworkTrainer(model, train_data_loader, validation_data_loader, config)
     trainer.start_training()
 
-    wandb.login()
-    model = train.wandb_initiliazer(params)
+    # wandb.login()
+    # model = train.wandb_initiliazer(params)
 
 
 if __name__ == '__main__':
