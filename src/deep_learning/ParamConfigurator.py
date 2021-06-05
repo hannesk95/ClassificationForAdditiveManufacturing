@@ -18,9 +18,14 @@ class ParamConfigurator:
         self.batch_size = config['training'].getint('batch_size')
         self.num_epochs = config['training'].getint('num_epochs')
         self.learning_rate = config['training'].getfloat('learning_rate')
+        self.momentum = config['training'].getfloat('momentum')
         self.num_workers = config['training'].getint('num_workers')
         self.plot_frequency = config['training'].getint('plot_frequency')
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        if self.device.type == 'cuda':
+            self.pin_memory = True
+        else:
+            self.pin_memory = False
         self.optimizer = config['training']['optimizer']
         if self.optimizer not in ['Adam', 'SGD']:
             raise ValueError(f"[ERROR] Chosen optimizer is not valid! Please choose out of ['Adam, 'SGD].")
@@ -46,9 +51,9 @@ class ParamConfigurator:
             raise ValueError(f"[ERROR] ResNet is only available for depths of [18, 50, 101, 152].")
 
         # Inception
-        self.inception_version = config['ResNet'].getint('version')
-        # if self.inception_version not in [int(1), int(3)]:
-            # raise ValueError(f"[ERROR] InceptionNet is only available for version 1 and for version 3.")
+        self.inception_version = config['InceptionNet'].getint('version')
+        if self.inception_version not in [int(1), int(3)]:
+            raise ValueError(f"[ERROR] InceptionNet is only available for version 1 and for version 3.")
 
 
 
