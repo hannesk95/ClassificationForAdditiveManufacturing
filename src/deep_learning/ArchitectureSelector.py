@@ -44,9 +44,9 @@ class ArchitectureSelector:
             hvd.init()
 
             # Pin GPU to be used to process local rank (one GPU per process)
-            gpus = [torch.cuda.device(i) for i in range(torch.cuda.device_count())]
+            gpus = [torch.cuda.set_device(hvd.local_rank()) for i in range(torch.cuda.device_count())]
 
-            gpus[torch.cuda.set_device(hvd.local_rank())]
+            # torch.cuda.set_device(hvd.local_rank())
 
             torch.set_num_threads(1)
 
