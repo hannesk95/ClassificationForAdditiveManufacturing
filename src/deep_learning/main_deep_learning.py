@@ -1,4 +1,7 @@
 import sys
+
+import torch.utils.data
+
 sys.path.append(".")   #TODO Ugly - currently needed for LRZ AI System - find better solution
 sys.path.append("..")
 sys.path.append("../..")
@@ -36,9 +39,20 @@ def main():
     train_dataset = AMCDataset(config.train_data_dir, transform=transformations)
     validation_dataset = AMCDataset(config.validation_data_dir, transform=transformations)
 
+    # 3.1 Partition dataset among workers using DistributedSampler if GPUs are available
+    if config.device.type == 'cuda':
+        train_sampler = torch.utils.data.DistributedSampler(train_dataset,
+                                                            num_replicas=config.hvd_size, rank=config.hvd_rank)
+
     # 4. Create dataloader
-    train_data_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=False,
-                                   num_workers=config.num_workers, pin_memory=config.pin_memory)
+    if config.device.type == 'cuda':
+        train_data_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=False,
+                                       num_workers=config.num_workers, pin_memory=config.pin_memory,
+                                       sampler=train_sampler)
+    else:
+        train_data_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=False,
+                                       num_workers=config.num_workers, pin_memory=config.pin_memory)
+
     validation_data_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=False,
                                         num_workers=config.num_workers, pin_memory=config.pin_memory)
 
