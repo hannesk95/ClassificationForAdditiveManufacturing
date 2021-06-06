@@ -1,5 +1,6 @@
 import wandb
 import torch
+import horovod.torch as hvd
 
 
 class NetworkTrainer:
@@ -46,7 +47,7 @@ class NetworkTrainer:
                         epoch, batch_idx * len(model), len(self.config.train_sampler),
                                100. * batch_idx / len(self.train_set_loader), loss.item()))
 
-            self.validate()
+        self.validate()
 
     def metric_average(self, val, name):
         tensor = torch.tensor(val)
@@ -54,8 +55,6 @@ class NetworkTrainer:
         return avg_tensor.item()
 
     def validate(self):
-
-        import horovod.torch as hvd
 
         self.nn_model.eval()
         test_loss = 0.
