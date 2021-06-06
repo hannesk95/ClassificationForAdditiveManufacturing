@@ -39,35 +39,26 @@ class ArchitectureSelector:
             # Send network to GPU if available
             self.model.cuda()
 
-            import horovod.torch as hvd
-            # Initialize Horovod
-            hvd.init()
-
-            # Pin GPU to be used to process local rank (one GPU per process)
-            gpus = [torch.cuda.set_device(hvd.local_rank()) for i in range(torch.cuda.device_count())]
-
-            # torch.cuda.set_device(hvd.local_rank())
-
-            torch.set_num_threads(1)
-
-            # Store size and rank into config parameters
-            self.config.hvd_size = hvd.size()
-            self.config.hvd_rank = hvd.rank()
-
         # Define optimizer
         if self.config.optimizer == 'Adam':
             self.config.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.config.learning_rate)
         if self.config.optimizer == 'SGD':
-            self.config.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.config.learning_rate)
+            self.config.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.config.learning_rate,
+                                                    momentum=self.config.momentum)
 
         if self.config.device.type == 'cuda':
 
+            # Horovod: Import only if GPU is available
+            import horovod.torch as hvd
+
             # Horovod: broadcast parameters & optimizer state.
             hvd.broadcast_parameters(self.model.state_dict(), root_rank=0)
-            hvd.broadcast_optimizer_state(self.config.optimizer, root_rank=0)
+            hvd.broadcast_optimizer_state(self.optimizer, root_rank=0)
 
             # Horovod: wrap optimizer with DistributedOptimizer.
-            self.config.optimizer = hvd.DistributedOptimizer(self.config.optimizer,
-                                                             named_parameters=self.model.named_parameters())
+            optimizer = hvd.DistributedOptimizer(self.optimizer,
+                                                 named_parameters=self.model.named_parameters(),
+                                                 op=hvd.Adasum if False else hvd.Average,
+                                                 gradient_predivide_factor=1.0)
 
         return self.model
