@@ -1,6 +1,7 @@
 import configparser
 import torch
 import os
+import torch.multiprocessing as mp
 
 
 class ParamConfigurator:
@@ -16,19 +17,54 @@ class ParamConfigurator:
 
         # training
         self.batch_size = config['training'].getint('batch_size')
+
         self.num_epochs = config['training'].getint('num_epochs')
+
         self.learning_rate = config['training'].getfloat('learning_rate')
+
         self.momentum = config['training'].getfloat('momentum')
+
         self.num_workers = config['training'].getint('num_workers')
+
         self.plot_frequency = config['training'].getint('plot_frequency')
+
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         if self.device.type == 'cuda':
             self.pin_memory = True
+
+            # Horovod: Import only if GPU is available
+            import horovod.torch as hvd
+
+            # Horovod: Initialize
+            hvd.init()
+            torch.manual_seed(42)
+
+            # Horovod: Pin GPU to local rank.
+            torch.cuda.set_device(hvd.local_rank())
+            torch.cuda.manual_seed(42)
+
+            # Horovod: Limit # of CPU threads to be used per worker.
+            torch.set_num_threads(1)
+
+            self.kwargs = {'num_workers': 1, 'pin_memory': True}
+
+            # When supported, use 'forkserver' to spawn dataloader workers instead of 'fork' to prevent
+            # issues with Infiniband implementations that are not fork-safe
+            if (self.kwargs.get('num_workers', 0) > 0 and hasattr(mp, '_supports_context') and
+                    mp._supports_context and 'forkserver' in mp.get_all_start_methods()):
+                self.kwargs['multiprocessing_context'] = 'forkserver'
+
+            self.hvd_size = hvd.size()
+            self.hvd_rank = hvd.rank()
+
+
         else:
-            self.pin_memory = False
+            self.kwargs = {}
+
         self.optimizer = config['training']['optimizer']
         if self.optimizer not in ['Adam', 'SGD']:
             raise ValueError(f"[ERROR] Chosen optimizer is not valid! Please choose out of ['Adam, 'SGD].")
+
         self.loss_function = config['training']['loss_function']
         if self.loss_function == 'BCE':
             self.loss_function = torch.nn.BCELoss()
@@ -56,8 +92,7 @@ class ParamConfigurator:
             raise ValueError(f"[ERROR] InceptionNet is only available for version 1 and for version 3.")
 
         # Horovod
-        self.hvd_size = None
-        self.hvd_rank = None
+
 
 
 
