@@ -50,7 +50,9 @@ class NetworkTrainer:
             self.validate()
 
     def metric_average(self, val, name):
-        tensor = torch.tensor(val)
+
+        # tensor = torch.tensor(val)
+        tensor = val.clone().detach()
         avg_tensor = hvd.allreduce(tensor, name=name)
         return avg_tensor.item()
 
