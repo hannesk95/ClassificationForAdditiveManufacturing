@@ -80,6 +80,8 @@ def train(NN_model, train_set_loader, val_set_loader, loss_function, optimizer, 
 
     mini_batches = 0
     loss_value = 0
+    all_count = 0
+    correct_count = 0
 
     for epoch in range(config.epochs):
         for batch_id, (model, label) in enumerate(train_set_loader, 1):
@@ -93,6 +95,10 @@ def train(NN_model, train_set_loader, val_set_loader, loss_function, optimizer, 
             output = NN_model(model)
             output = output.to(torch.float32)
             label = label.to(torch.float32)
+            if(output == label):
+                correct_count += 1
+            all_count += 1
+
             loss = loss_function(output, label)
 
             optimizer.zero_grad()
@@ -113,8 +119,11 @@ def train(NN_model, train_set_loader, val_set_loader, loss_function, optimizer, 
                             'optimizer_state_dict': optimizer.state_dict(), 'loss': loss_value}, PATH)
 
                 loss_value = 0
-
+            accuracy = correct_count / all_count
+            
             print('Epoch-{0} lr: {1:f}'.format(epoch, optimizer.param_groups[0]['lr']))
+            print("Epoch - {0} accuracy:{1:f}".format(epoch,accuracy))
+
 
 
 def training_log(loss, mini_batch, train=True):
