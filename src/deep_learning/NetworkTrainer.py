@@ -16,15 +16,9 @@ class NetworkTrainer:
 
     def start_training(self):
         """# TODO: Docstring"""
-        # wandb.watch(self.nn_model, self.loss_function, log='all', log_freq=50)
-
-        # mini_batches = 0
-        # loss_value = 0
 
         for epoch in range(1, self.config.num_epochs + 1):
-            correct = 0
-            total = 0
-            for batch_id, (model, label) in enumerate(self.train_set_loader):
+            for batch_idx, (model, label) in enumerate(self.train_set_loader):
 
                 # Make sure network is in training mode
                 self.nn_model.train()
@@ -47,50 +41,54 @@ class NetworkTrainer:
                 loss.backward()
                 self.optimizer.step()
 
-                correct += (output > 0.5).float().sum()
-                total = total + len(label)
+                if batch_idx % self.config.plot_frequency == 0:
+                    print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                        epoch, batch_idx * len(model), len(self.config.train_sampler),
+                               100. * batch_idx / len(self.train_set_loader), loss.item()))
+
+            self.validate()
+
+    def metric_average(self, val, name):
+        tensor = torch.tensor(val)
+        avg_tensor = hvd.allreduce(tensor, name=name)
+        return avg_tensor.item()
+
+    def validate(self):
+
+        import horovod.torch as hvd
+
+        self.nn_model.eval()
+        test_loss = 0.
+        test_accuracy = 0.
+
+        for model, label in self.val_set_loader:
+
+            # Copy to GPU if available
+            if self.config.device.type == 'cuda':
+                model, label = model.cuda(), label.cuda()
+
+            # Calculate output
+            output = self.nn_model(model)
+            output = torch.reshape(output, (-1, 1))
+
+            # Sum up batch loss
+            test_loss += self.loss_function(output, label, size_average=False).item()
+            test_accuracy += (output > 0.5).float().sum()
+
+        test_loss /= len(self.config.validation_sampler)
+        test_accuracy /= len(self.config.validation_sampler)
+
+        # Horovod: average metric values across workers.
+        test_loss = self.metric_average(test_loss, 'avg_loss')
+        test_accuracy = self.metric_average(test_accuracy, 'avg_accuracy')
+
+        # Horovod: print output only on first rank.
+        if hvd.rank() == 0:
+            print('\nTest set: Average loss: {:.4f}, Accuracy: {:.2f}%\n'.format(
+                test_loss, 100. * test_accuracy))
 
 
 
-                # if self.config.device.type == 'cuda':
-                #     model, label = model.cuda(), label
-                # else:
-                #     model, label = model, label
-
-                # model = torch.reshape(model, (model.shape[0], 1, model.shape[1], model.shape[2], model.shape[3]))
-                # model = model.to(torch.float32)
-
-                # calculate output
-                # output = self.nn_model(model)
-                # output = output.to(torch.float32)
-                # label = label.to(torch.float32)
-
-                # calculate loss
-                # loss = self.loss_function(output, label)
-
-                # backpropagation
-                # self.optimizer.zero_grad()
-                # loss.backward()
-                # self.optimizer.step()
-
-                # mini_batches += 1
-                # loss_value += float(loss)
-
-                # Plotting in wandb
-                # if mini_batches % self.config.plot_frequency == 0:
-                #     val_loss = self.validation_phase(self.nn_model, self.val_set_loader, self.loss_function, epoch)
-                #     self.training_log(loss_value / self.config.plot_frequency, mini_batches)
-                #     self.training_log(val_loss, mini_batches, False)
-                #
-                #     path = "model.pt"
-                #     torch.save({'epoch': epoch, 'model_state_dict': self.nn_model.state_dict(),
-                #                 'optimizer_state_dict': self.optimizer.state_dict(), 'loss': loss_value}, path)
-                #
-                #     loss_value = 0
-
-                # print(f"Epoch: {epoch} | Loss: {loss} | Learning-Rate: {self.optimizer.param_groups[0]['lr']}")
-            accuracy = 100 * correct / total
-            print(f"Epoch: {epoch} | Loss: {loss} | Accuracy: {accuracy}")
 
     def training_log(self, loss, mini_batch, train=True):
         """# TODO: Docstring"""
