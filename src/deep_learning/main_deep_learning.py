@@ -35,16 +35,16 @@ def main():
     if config.device.type == 'cuda':
 
         # Training
-        train_sampler = torch.utils.data.DistributedSampler(train_dataset,
+        config.train_sampler = torch.utils.data.DistributedSampler(train_dataset,
                                                             num_replicas=config.hvd_size, rank=config.hvd_rank)
         train_data_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=False,
-                                       sampler=train_sampler, **config.kwargs)
+                                       sampler=config.train_sampler, **config.kwargs)
 
         # Validation
-        validation_sampler = torch.utils.data.DistributedSampler(validation_dataset,
+        config.validation_sampler = torch.utils.data.DistributedSampler(validation_dataset,
                                                                  num_replicas=config.hvd_size, rank=config.hvd_rank)
         validation_data_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=False,
-                                            sampler=validation_sampler, **config.kwargs)
+                                            sampler=config.validation_sampler, **config.kwargs)
     else:
         train_data_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=False, **config.kwargs)
         validation_data_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=False,
