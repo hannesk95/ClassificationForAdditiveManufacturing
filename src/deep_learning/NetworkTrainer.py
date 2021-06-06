@@ -47,7 +47,7 @@ class NetworkTrainer:
                         epoch, batch_idx * len(model), len(self.config.train_sampler),
                                100. * batch_idx / len(self.train_set_loader), loss.item()))
 
-        self.validate()
+            self.validate()
 
     def metric_average(self, val, name):
         tensor = torch.tensor(val)
