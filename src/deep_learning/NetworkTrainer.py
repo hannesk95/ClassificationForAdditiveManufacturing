@@ -50,12 +50,14 @@ class NetworkTrainer:
             self.validate()
 
     def metric_average(self, val, name):
+        """# TODO: Docstring"""
 
         tensor = torch.tensor(val)
         avg_tensor = hvd.allreduce(tensor, name=name)
         return avg_tensor.item()
 
     def validate(self):
+        """# TODO: Docstring"""
 
         self.nn_model.eval()
         test_loss = 0.
@@ -86,9 +88,6 @@ class NetworkTrainer:
         if hvd.rank() == 0:
             print('\nTest set: Average loss: {:.4f}, Accuracy: {:.2f}%\n'.format(
                 test_loss, 100. * test_accuracy))
-
-
-
 
     def training_log(self, loss, mini_batch, train=True):
         """# TODO: Docstring"""

@@ -30,7 +30,6 @@ class ParamConfigurator:
 
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         if self.device.type == 'cuda':
-            self.pin_memory = True
 
             # Horovod: Import only if GPU is available
             import horovod.torch as hvd
@@ -56,7 +55,6 @@ class ParamConfigurator:
 
             self.hvd_size = hvd.size()
             self.hvd_rank = hvd.rank()
-
 
         else:
             self.kwargs = {}
@@ -90,13 +88,3 @@ class ParamConfigurator:
         self.inception_version = config['InceptionNet'].getint('version')
         if self.inception_version not in [int(1), int(3)]:
             raise ValueError(f"[ERROR] InceptionNet is only available for version 1 and for version 3.")
-
-        # Horovod
-
-
-
-
-
-
-
-
