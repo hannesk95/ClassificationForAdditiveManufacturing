@@ -53,10 +53,10 @@ class ArchitectureSelector:
 
             # Horovod: broadcast parameters & optimizer state.
             hvd.broadcast_parameters(self.model.state_dict(), root_rank=0)
-            hvd.broadcast_optimizer_state(self.optimizer, root_rank=0)
+            hvd.broadcast_optimizer_state(self.config.optimizer, root_rank=0)
 
             # Horovod: wrap optimizer with DistributedOptimizer.
-            optimizer = hvd.DistributedOptimizer(self.optimizer,
+            optimizer = hvd.DistributedOptimizer(self.config.optimizer,
                                                  named_parameters=self.model.named_parameters(),
                                                  op=hvd.Adasum if False else hvd.Average,
                                                  gradient_predivide_factor=1.0)
