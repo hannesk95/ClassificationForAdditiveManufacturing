@@ -20,12 +20,6 @@ def main():
     # 1. Define configuration parameters
     config = ParamConfigurator()
 
-    params = dict(epochs=configuration.training_configuration.number_epochs,
-                  batch_size=configuration.training_configuration.batch_size,
-                  lr=configuration.training_configuration.learning_rate,
-                  dataset_size=configuration.train_data_configuration.training_data_size,
-                  resnet_depth=configuration.training_configuration.resnet_depth)
-
     # 2. Select neural network architecture and create model
     selector = ArchitectureSelector(config.architecture_type, config)
     model = selector.select_architecture()
@@ -37,29 +31,28 @@ def main():
     train_dataset = AMCDataset(config.train_data_dir, transform=transformations)
     validation_dataset = AMCDataset(config.validation_data_dir, transform=transformations)
 
-    # 3.1 Partition dataset among workers using DistributedSampler if GPUs are available
-    if config.device.type == 'cuda':
-        train_sampler = torch.utils.data.DistributedSampler(train_dataset,
-                                                            num_replicas=config.hvd_size, rank=config.hvd_rank)
-
     # 4. Create dataloader
     if config.device.type == 'cuda':
-        train_data_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=False,
-                                       num_workers=config.num_workers, pin_memory=config.pin_memory,
-                                       sampler=train_sampler)
-    else:
-        train_data_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=False,
-                                       num_workers=config.num_workers, pin_memory=config.pin_memory)
 
-    validation_data_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=False,
-                                        num_workers=config.num_workers, pin_memory=config.pin_memory)
+        # Training
+        train_sampler = torch.utils.data.DistributedSampler(train_dataset,
+                                                            num_replicas=config.hvd_size, rank=config.hvd_rank)
+        train_data_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=False,
+                                       sampler=train_sampler, **config.kwargs)
+
+        # Validation
+        validation_sampler = torch.utils.data.DistributedSampler(validation_dataset,
+                                                                 num_replicas=config.hvd_size, rank=config.hvd_rank)
+        validation_data_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=False,
+                                            sampler=validation_sampler, **config.kwargs)
+    else:
+        train_data_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=False, **config.kwargs)
+        validation_data_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=False,
+                                            **config.kwargs)
 
     # 5. Start training
     trainer = NetworkTrainer(model, train_data_loader, validation_data_loader, config)
     trainer.start_training()
-
-    # wandb.login()
-    # model = train.wandb_initiliazer(params)
 
 
 if __name__ == '__main__':
