@@ -72,7 +72,7 @@ class NetworkTrainer:
             output = torch.reshape(output, (-1, 1))
 
             # Sum up batch loss
-            test_loss += self.loss_function(output, label, size_average=False).item()
+            test_loss += self.loss_function(output, label).item()
             test_accuracy += (output > 0.5).float().sum()
 
         test_loss /= len(self.config.validation_sampler)
