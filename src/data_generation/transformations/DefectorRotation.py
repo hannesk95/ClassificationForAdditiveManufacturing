@@ -3,7 +3,7 @@ import numpy as np
 import random
 from scipy.ndimage.interpolation import rotate
 import seaborn as sns
-
+import matplotlib.pyplot as plt
 from src.data_generation.VoxelModel import VoxelModel
 
 
@@ -132,12 +132,20 @@ def _visualize_top_down_view(model_data: np.ndarray, possible_offsets_final: lis
         idy = indices[1]
         basis[idx, idy] = 1
     sns.heatmap(basis + (top_down_view > 0))
+    plt.show()
 
 
 class DefectorRotation:
-    def __init__(self, radius=2, border=5, rotation=False, number_of_trials=5, visualize_top_down_view=False):
-        self.radius = radius
-        self.border = border
+    def __init__(self, hole_radius_nonprintable: int = 5, hole_radius_printable: int = 10, border_nonprintable: int = 3,
+                 border_printable: int = 5, rotation: bool = False, number_of_trials: int = 5,
+                 visualize_top_down_view: bool = False):
+
+        self.hole_radius_nonprintable = hole_radius_nonprintable
+        self.hole_radius_printable = hole_radius_printable
+
+        self.border_nonprintable = border_nonprintable
+        self.border_printable = border_printable
+
         self.rotation = rotation
         self.visualize_top_down_view = visualize_top_down_view
         self.number_of_trials = number_of_trials
@@ -153,12 +161,12 @@ class DefectorRotation:
             z_rotation = random.randrange(0, 360)
             model_data = rotate_model(model_data, x_rotation, y_rotation, z_rotation)
 
-        offset, possible_offsets_final = self._find_feasible_offset(model_data)
-        if offset is None:
-            # logging.warning(f"Could not find a feasable offset for model: {model.model_name}")
-            return None
-
-        model_data = add_vertical_hole(model.model, self.radius, offset)
+        model_data_nonprintable_defect_middle = self._add_defect_middle(model_data, self.hole_radius_nonprintable,
+                                                                        self.border_nonprintable)
+        model_data_printable_defect_middle = self._add_defect_middle(model_data, self.hole_radius_printable,
+                                                                     self.border_printable)
+        model_data_nonprintable_defect_border = self._add_defect_border(model_data, self.hole_radius_printable,
+                                                                        self.border_nonprintable)
 
         if self.rotation:
             # Rotate model back
@@ -166,14 +174,33 @@ class DefectorRotation:
 
         # TODO Put model in shape as before
 
+        model_nonprintable_defect_middle = VoxelModel(model_data_nonprintable_defect_middle, np.array([0]),
+                                                      model.model_name +
+                                                      f'_nonprintable_defect_middle{self.hole_radius_nonprintable}')
+
+        model_printable_defect_middle = VoxelModel(model_data_printable_defect_middle, np.array([0]),
+                                                   model.model_name +
+                                                   f'_printable_defect_middle{self.hole_radius_printable}')
+
+        model_nonprintable_defect_border = VoxelModel(model_data_nonprintable_defect_border, np.array([0]),
+                                                      model.model_name +
+                                                      f'_nonprintable_defect_border{self.border_nonprintable}')
+
+        return [model, model_nonprintable_defect_middle, model_printable_defect_middle, model_nonprintable_defect_border]
+
+    def _add_defect_middle(self, model_data, radius, border):
+        offset = self._find_feasible_offset_middle(model_data, radius, border)
+        if offset is None:
+            # logging.warning(f"Could not find a feasable offset for model: {model.model_name}")
+            return None
+        model_data = add_vertical_hole(model_data, radius, offset)
+
         if self.visualize_top_down_view:
-            _visualize_top_down_view(model_data, possible_offsets_final)
+            _visualize_top_down_view(model_data, [])
 
-        model_with_defect = VoxelModel(model_data, np.array([0]), model.model_name + f'_defect_radius{self.radius}')
+        return model_data
 
-        return [model, model_with_defect]
-
-    def _find_feasible_offset(self, model_data):
+    def _find_feasible_offset_middle(self, model_data, radius, border):
         """
         Finds a feasible offset where to put randomly hole. It analyses the top down view of a model and samples a
         offset from a adapted subsample of offsets, that guarantee that the hole fully goes through the model
@@ -185,35 +212,95 @@ class DefectorRotation:
         possible_offsets = np.array(np.where(top_down_view > 0)).T
 
         if len(possible_offsets) == 0:
-            return None, None
+            return None
 
         to_remove = []
         # Define horizontal elements to be removed
-        to_remove += determine_first_unique_horizontal_elements(possible_offsets[:, 0], self.border)
-        to_remove += determine_last_unique_horizontal_elements(possible_offsets[:, 0], self.border)
+        to_remove += determine_first_unique_horizontal_elements(possible_offsets[:, 0], border)
+        to_remove += determine_last_unique_horizontal_elements(possible_offsets[:, 0], border)
         # Define vertical elements to be removed
         for value in list(set(possible_offsets[:, 1])):
             values = np.where(possible_offsets[:, 1] == value)[0]
-            to_remove += values[:self.border].tolist()
-            to_remove += values[len(values) - self.border:len(values)].tolist()
+            to_remove += values[:border].tolist()
+            to_remove += values[len(values) - border:len(values)].tolist()
 
         # Remove elements at the border
         try:  # TODO Find problem here
             possible_offsets_final = np.delete(possible_offsets, list(set(to_remove)), axis=0)
         except:
-            return None, None
+            return None
 
         if len(possible_offsets_final) == 0:
-            return None, None
+            return None
 
         # Check if the hole has a large enough boarder around it
         for trial in range(self.number_of_trials):
             offset = possible_offsets_final[random.randrange(0, len(possible_offsets_final))]
             offset.astype(int)
-            if check_hole_feasibility(model_data, self.radius, self.border, offset):
+            if check_hole_feasibility(model_data, radius, border, offset):
                 break
 
         if (trial + 1) == self.number_of_trials:
-            return None, None
+            return None
 
-        return offset, possible_offsets_final
+        if self.visualize_top_down_view:
+            _visualize_top_down_view(model_data, possible_offsets_final)
+
+        return offset
+
+    def _add_defect_border(self, model_data, radius, border):
+        offset = self._find_feasible_offset_border(model_data, radius, border)
+        if offset is None:
+            # logging.warning(f"Could not find a feasable offset for model: {model.model_name}")
+            return None
+        model_data = add_vertical_hole(model_data, radius, offset)
+
+        if self.visualize_top_down_view:
+            _visualize_top_down_view(model_data, [])
+
+        return model_data
+
+    def _find_feasible_offset_border(self, model_data, radius, border):
+        top_down_view = np.sum(model_data, axis=2)
+        possible_offsets = np.array(np.where(top_down_view > 0)).T
+
+        to_remove = []
+        # Define horizontal elements to be removed
+        to_remove += determine_first_unique_horizontal_elements(possible_offsets[:, 0], border + radius)
+        to_remove += determine_last_unique_horizontal_elements(possible_offsets[:, 0], border + radius)
+        # Define vertical elements to be removed
+        for value in list(set(possible_offsets[:, 1])):
+            values = np.where(possible_offsets[:, 1] == value)[0]
+            to_remove += values[:border + radius].tolist()
+            to_remove += values[len(values) - border + radius:len(values)].tolist()
+        possible_offsets_final = possible_offsets[list(set(to_remove))]
+
+        border -= 1
+        to_remove = []
+        # Define horizontal elements to be removed
+        to_remove += determine_first_unique_horizontal_elements(possible_offsets_final[:, 0], radius)
+        to_remove += determine_last_unique_horizontal_elements(possible_offsets_final[:, 0], radius)
+        # Define vertical elements to be removed
+        for value in list(set(possible_offsets_final[:, 1])):
+            values = np.where(possible_offsets_final[:, 1] == value)[0]
+            to_remove += values[:radius].tolist()
+            to_remove += values[len(values) - radius:len(values)].tolist()
+
+        if len(possible_offsets_final) == 0:
+            return None
+
+        possible_offsets_final = np.delete(possible_offsets_final, list(set(to_remove)), axis=0)
+
+        for trial in range(self.number_of_trials):
+            offset = possible_offsets_final[random.randrange(0, len(possible_offsets_final))]
+            offset.astype(int)
+            if check_hole_feasibility(model_data, radius, 1, offset):
+                break
+
+        if (trial + 1) == self.number_of_trials:
+            return None
+
+        if self.visualize_top_down_view:
+            _visualize_top_down_view(model_data, possible_offsets_final)
+
+        return offset

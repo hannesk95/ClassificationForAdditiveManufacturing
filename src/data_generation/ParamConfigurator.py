@@ -28,8 +28,10 @@ class ParamConfigurator:
         self.voxel_dimensions = config['Voxelization'].getint('voxel_dimensions')
         self.voxel_representation = config['Voxelization']['voxel_representation']
 
-        self.hole_radius = config['Defector'].getint('hole_radius')
-        self.border = config['Defector'].getint('border')
+        self.hole_radius_nonprintable = config['Defector'].getint('hole_radius_nonprintable')
+        self.hole_radius_printable = config['Defector'].getint('hole_radius_printable')
+        self.border_nonprintable = config['Defector'].getint('border_nonprintable')
+        self.border_printable = config['Defector'].getint('border_printable')
         self.rotation = config['Defector'].getboolean('rotation')
         self.number_of_trials = config['Defector'].getint('number_of_trials')
 
