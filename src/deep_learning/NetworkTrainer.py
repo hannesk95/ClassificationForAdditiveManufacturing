@@ -75,7 +75,7 @@ class NetworkTrainer:
 
             # Sum up batch loss
             test_loss += self.loss_function(output, label).item()
-            test_accuracy += (output > 0.5).float().sum()
+            test_accuracy += (torch.round(output) == label).sum()
 
         test_loss /= len(self.config.validation_sampler)
         test_accuracy /= len(self.config.validation_sampler)
