@@ -290,6 +290,9 @@ class DefectorRotation:
         except:
             return None
 
+        if len(possible_offsets_final) == 0:
+            return None
+
         for trial in range(self.number_of_trials):
             offset = possible_offsets_final[random.randrange(0, len(possible_offsets_final))]
             offset.astype(int)
