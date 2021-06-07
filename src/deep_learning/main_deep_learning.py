@@ -28,8 +28,8 @@ def main():
     transformations = transforms.Compose([transforms.ToTensor()])
 
     # 3. Initialize dataset
-    train_dataset = AMCDataset(config.train_data_dir, transform=transformations)
-    validation_dataset = AMCDataset(config.validation_data_dir, transform=transformations)
+    train_dataset = AMCDataset(config.train_data_dir, transform=transformations, cutoff=1)
+    validation_dataset = AMCDataset(config.validation_data_dir, transform=transformations, cutoff=1)
 
     # 4. Create dataloader
     if config.device.type == 'cuda':
