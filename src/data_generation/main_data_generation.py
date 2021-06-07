@@ -29,7 +29,11 @@ def main():
         voxelizer = VoxelizerGPU(dimension=config.voxel_dimensions)
     else:
         voxelizer = Voxelizer(dimension=config.voxel_dimensions, representation=config.voxel_representation)
-    defector = DefectorRotation(radius=config.hole_radius, border=config.border, rotation=config.rotation,
+    defector = DefectorRotation(hole_radius_nonprintable=config.hole_radius_nonprintable,
+                                hole_radius_printable=config.hole_radius_printable,
+                                border_nonprintable=config.border_nonprintable,
+                                border_printable=config.border_printable,
+                                rotation=config.rotation,
                                 number_of_trials=config.number_of_trials)
 
     # 4. Compose transformations
