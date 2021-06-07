@@ -172,21 +172,25 @@ class DefectorRotation:
             # Rotate model back
             model_data = rotate_model(model_data, 360-x_rotation, 360-y_rotation, 360-z_rotation)
 
-        # TODO Put model in shape as before
+        out = []
+        if model_data_nonprintable_defect_middle is not None:
+            out.append(model)
+            model_nonprintable_defect_middle = VoxelModel(model_data_nonprintable_defect_middle, np.array([0]),
+                                                          model.model_name +
+                                                          f'_nonprintable_defect_middle{self.hole_radius_nonprintable}')
+            out.append(model_nonprintable_defect_middle)
 
-        model_nonprintable_defect_middle = VoxelModel(model_data_nonprintable_defect_middle, np.array([0]),
-                                                      model.model_name +
-                                                      f'_nonprintable_defect_middle{self.hole_radius_nonprintable}')
+        if model_data_printable_defect_middle is not None and model_data_nonprintable_defect_border is not None:
+            model_printable_defect_middle = VoxelModel(model_data_printable_defect_middle, np.array([1]),
+                                                       model.model_name +
+                                                       f'_printable_defect_middle{self.hole_radius_printable}')
+            model_nonprintable_defect_border = VoxelModel(model_data_nonprintable_defect_border, np.array([0]),
+                                                          model.model_name +
+                                                          f'_nonprintable_defect_border{self.border_nonprintable}')
+            out.append(model_printable_defect_middle)
+            out.append(model_nonprintable_defect_border)
 
-        model_printable_defect_middle = VoxelModel(model_data_printable_defect_middle, np.array([0]),
-                                                   model.model_name +
-                                                   f'_printable_defect_middle{self.hole_radius_printable}')
-
-        model_nonprintable_defect_border = VoxelModel(model_data_nonprintable_defect_border, np.array([0]),
-                                                      model.model_name +
-                                                      f'_nonprintable_defect_border{self.border_nonprintable}')
-
-        return [model, model_nonprintable_defect_middle, model_printable_defect_middle, model_nonprintable_defect_border]
+        return out
 
     def _add_defect_middle(self, model_data, radius, border):
         offset = self._find_feasible_offset_middle(model_data, radius, border)
@@ -214,19 +218,11 @@ class DefectorRotation:
         if len(possible_offsets) == 0:
             return None
 
-        to_remove = []
-        # Define horizontal elements to be removed
-        to_remove += determine_first_unique_horizontal_elements(possible_offsets[:, 0], border)
-        to_remove += determine_last_unique_horizontal_elements(possible_offsets[:, 0], border)
-        # Define vertical elements to be removed
-        for value in list(set(possible_offsets[:, 1])):
-            values = np.where(possible_offsets[:, 1] == value)[0]
-            to_remove += values[:border].tolist()
-            to_remove += values[len(values) - border:len(values)].tolist()
+        to_remove = self._determine_indices_to_remove(possible_offsets, border)
 
         # Remove elements at the border
         try:  # TODO Find problem here
-            possible_offsets_final = np.delete(possible_offsets, list(set(to_remove)), axis=0)
+            possible_offsets_final = np.delete(possible_offsets, to_remove, axis=0)
         except:
             return None
 
@@ -260,36 +256,39 @@ class DefectorRotation:
 
         return model_data
 
+    def _determine_indices_to_remove(self, possible_offsets, border):
+        to_remove = []
+        # Define horizontal elements to be removed
+        to_remove += determine_first_unique_horizontal_elements(possible_offsets[:, 0], border)
+        to_remove += determine_last_unique_horizontal_elements(possible_offsets[:, 0], border)
+        # Define vertical elements to be removed
+        for value in list(set(possible_offsets[:, 1])):
+            values = np.where(possible_offsets[:, 1] == value)[0]
+            to_remove += values[:border].tolist()
+            to_remove += values[len(values) - border:len(values)].tolist()
+
+        return list(set(to_remove))
+
     def _find_feasible_offset_border(self, model_data, radius, border):
         top_down_view = np.sum(model_data, axis=2)
         possible_offsets = np.array(np.where(top_down_view > 0)).T
 
-        to_remove = []
-        # Define horizontal elements to be removed
-        to_remove += determine_first_unique_horizontal_elements(possible_offsets[:, 0], border + radius)
-        to_remove += determine_last_unique_horizontal_elements(possible_offsets[:, 0], border + radius)
-        # Define vertical elements to be removed
-        for value in list(set(possible_offsets[:, 1])):
-            values = np.where(possible_offsets[:, 1] == value)[0]
-            to_remove += values[:border + radius].tolist()
-            to_remove += values[len(values) - border + radius:len(values)].tolist()
-        possible_offsets_final = possible_offsets[list(set(to_remove))]
+        to_remove = self._determine_indices_to_remove(possible_offsets, border+radius+1)
 
-        border -= 1
-        to_remove = []
-        # Define horizontal elements to be removed
-        to_remove += determine_first_unique_horizontal_elements(possible_offsets_final[:, 0], radius)
-        to_remove += determine_last_unique_horizontal_elements(possible_offsets_final[:, 0], radius)
-        # Define vertical elements to be removed
-        for value in list(set(possible_offsets_final[:, 1])):
-            values = np.where(possible_offsets_final[:, 1] == value)[0]
-            to_remove += values[:radius].tolist()
-            to_remove += values[len(values) - radius:len(values)].tolist()
+        try:  # TODO Find problem here
+            possible_offsets_final = possible_offsets[list(set(to_remove))]
+        except:
+            return None
+
+        to_remove = self._determine_indices_to_remove(possible_offsets_final, radius)
 
         if len(possible_offsets_final) == 0:
             return None
 
-        possible_offsets_final = np.delete(possible_offsets_final, list(set(to_remove)), axis=0)
+        try:  # TODO Find problem here
+            possible_offsets_final = np.delete(possible_offsets_final, to_remove, axis=0)
+        except:
+            return None
 
         for trial in range(self.number_of_trials):
             offset = possible_offsets_final[random.randrange(0, len(possible_offsets_final))]
