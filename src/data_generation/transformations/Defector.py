@@ -5,6 +5,15 @@ from src.data_generation.VoxelModel import VoxelModel
 class Defector:
 
     def __call__(self, voxel_model): 
+
+        voxel_model_copy = copy.deepcopy(voxel_model)
+
+        # TODO move to config file
+        max_cylinder_diameter = 8
+        trials = 20
+        remaining_voxels = 30
+        factor = 1.5
+
         model = voxel_model.model
         # get the voxel grid indices out of the occupancy grid
         voxels = np.argwhere(model == 1)
@@ -15,13 +24,17 @@ class Defector:
             return [voxel_model, model_with_defect]
 
         # find appropriate axis and radius of the cylinder
-        axis, radius = self.find_axis_and_radius(voxels)
+        axis, radius = self.find_axis_and_radius_exhaustive(voxels, max_cylinder_diameter, remaining_voxels)
         print("selected:", axis, radius)
 
-        if axis != None and radius != None:
-            # find center of the voxels grid
-            center = np.round(voxels.mean(axis = 0))
+        if axis != None:
+            plane = list(range(3))
+            plane.remove(axis)
+            center = self.find_cylinder_center(voxels, trials, plane, radius, factor)
+            print("selected:", center)
 
+
+        if axis != None and radius != None and center.size !=0:
             # maximum and minimum grid index 
             maxx = np.max(voxels, axis=0)
             minn = np.min(voxels, axis=0)
@@ -47,7 +60,7 @@ class Defector:
 
         model_with_defect = VoxelModel(model, np.array([0]), voxel_model.model_name + f'_defect_radius{radius}')
 
-        return [voxel_model, model_with_defect]
+        return [voxel_model_copy, model_with_defect]
 
 
     def points_in_cylinder(self, pt1, pt2, radius, points):
@@ -71,15 +84,17 @@ class Defector:
         return cond5
 
 
-    def find_radius(self, voxels, cylinder_axis):
+    def find_radius(self, voxels, cylinder_axis, max_cylinder_diameter, remaining_voxels):
         """
         find an appropriate radius for the cylinder
         :voxels: voxel grid indices
         :cylinder_axis: axis of the cylinder {0, 1, 2}
+        :max_cylinder_diameter: max possible cylinder diameter
+        :remaining_voxels: number of remaining voxels after removing voxels from minimium dimension
         :return: selected radius
         """
-        # list of possible diameters [2, 10]
-        diameters = list(range(10, 1, -1))
+        # list of possible diameters [2, max_cylinder_diameter]
+        diameters = list(range(max_cylinder_diameter, 1, -1))
         
         # 2d plane perpendicular to the cylinder axis
         plane = list(range(3))
@@ -96,52 +111,33 @@ class Defector:
         # perpendicular plane smaller dimension
         min_dim = np.min([fir_dim, sec_dim])
 
-        # heuristic: there should be more than 10 voxels after making the hole
+        # heuristic: there should be more than 'remaining_voxels' voxels after making the hole
         for d in diameters:
             diff = min_dim - d
-            if diff > 10:
+            if diff > remaining_voxels:
                 return int(d/2)
             
         return None
-
-
-    def find_axis_and_radius_greedy(self, voxels):
-        """
-        find an appropriate radius for the cylinder
-        :voxels: voxel grid indices
-        :return: pair: selected axis and radius
-        """
-        # try out the 3 possible axes
-        axis = range(3)
-        for a in axis:
-            # return 1st axis with largest diameter
-            r = self.find_radius(voxels, a)
-            # print(a, r)
-            if r != None:
-                return a, r
-        # return None if no appropriate radius and axis were found    
-        return None, None
-
     
-    def find_axis_and_radius_exhaustive(self, voxels):
+    def find_axis_and_radius_exhaustive(self, voxels, max_cylinder_diameter, remaining_voxels):
         """
         find an appropriate radius for the cylinder
         :voxels: voxel grid indices
+        :max_cylinder_diameter: max possible cylinder diameter
+        :remaining_voxels: number of remaining voxels after removing voxels from minimium dimension
         :return: pair: selected axis and radius
         """
         # try out the 3 possible axes
-        axis = range(3)
+        axes = range(3)
         result = []
-        for a in axis:
-            r = self.find_radius(voxels, a)
-            # print(a, r)
-            result.append(r)
+        for axis in axes:
+            radius = self.find_radius(voxels, axis, max_cylinder_diameter, remaining_voxels)
+            # print(axis, radius)
+            result.append(radius)
         
         # replace None with -1 to compute max
         result = [x or -1 for x in result]
         axis, radius = np.argmax(result), np.max(result)
-        
-        radius = -1
         
         # return None if no appropriate radius and axis were found
         if radius == -1: 
@@ -149,15 +145,63 @@ class Defector:
         
         return axis, radius
 
-    def find_axis_and_radius(self, voxels, version = 1):
+    def find_cylinder_center(self, voxels, trials, plane, radius, factor):
         """
         find an appropriate radius for the cylinder
         :voxels: voxel grid indices
-        :version: 1 is greedy, otherwise exhaustive
-        :return: pair: selected axis and radius
+        :trials: number of attempts for finding a suitable cylinder center
+        :plane: 2d perpendicular plane of the cylinder
+        :radius: cylinder radius
+        :return: selected cylinder center voxel
         """
-        if version == 1:
-            return self.find_axis_and_radius_greedy(voxels)
-        else:
-            return self.find_axis_and_radius_exhaustive(voxels)
+        # maximum and minimum grid index 
+        maxx = np.max(voxels, axis=0)
+        minn = np.min(voxels, axis=0)
+        
+        axis = list(range(3))
+        axis.remove(plane[0]) 
+        axis.remove(plane[1])
+        axis = axis[0]
+        
+        centers = []
+        
+        for trial in range(trials):
+            # find a random voxel
+            random_voxel_index = np.random.choice(voxels.shape[0], 1)[0]
+            center_3d = voxels[random_voxel_index]
+            
+            # skip if cylinder center is too close to object boundaries.s
+            cond1 = (center_3d[plane[0]] >= minn[plane[0]] + radius*2) and (center_3d[plane[0]] <= maxx[plane[0]] - radius*2)
+            cond2 = (center_3d[plane[1]] >= minn[plane[1]] + radius*2) and (center_3d[plane[1]] <= maxx[plane[1]] - radius*2)
+            if not (cond1 and cond2) :
+                continue
+                
+            # set cylinder boundary points to the center
+            pt1 = copy.deepcopy(center_3d)
+            pt2 = copy.deepcopy(center_3d)
+
+            # change 1 component based on the selected axis
+            idx = axis
+            pt1[idx] =  minn[idx]
+            pt2[idx] =  maxx[idx]
+
+            # identify voxels to be removed
+            idx = self.points_in_cylinder(pt1, pt2, radius+2, voxels)
+            selected_voxels = voxels[idx]
+            selected_voxels = np.unique(selected_voxels[:, [plane[0], plane[1]]], axis = 0)
+            
+            # append possible centers
+            centers.append((center_3d, selected_voxels.shape[0]))
+        
+        # pick the center with the most voxels
+        centers.sort(key=lambda x: x[1])  
+        center_3d = centers[-1][0]
+        
+        # hole has to be full
+        min_voxels_num = np.ceil(np.pi * (radius)**2 * factor) 
+        if selected_voxels.shape[0] >= min_voxels_num:
+            return center_3d
+            
+        return np.array([])        
+
     
