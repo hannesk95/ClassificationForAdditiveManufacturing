@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 import torchvision
 from torchvision import transforms
 from torch.utils.data import DataLoader
@@ -13,6 +14,7 @@ import configuration
 from network.ResNet import ResNet
 from network.VGGNet import VGGNet
 from DataLoader import VW_Data
+from torchvision import models
 
 
 def wandb_initiliazer(arguments):
@@ -41,6 +43,12 @@ def nn_model(config):
     net = ResNet.generate_model(config.resnet_depth)
     # net = VGGNet()
 
+    
+    #Pretrained models
+    net = models.video.r3d_18(pretrained=True)
+    net.stem[0] = nn.Sequential(nn.Conv3d(in_channels=1,out_channels=64,kernel_size=(3,7,7),stride=(1,2,2),padding=(1,3,3),bias=False),nn.BatchNorm3d(64),nn.ReLU())
+    net.fc = nn.Sequential(nn.Linear(512,128),nn.ReLU(),nn.Linear(128,16),nn.ReLU(),nn.Linear(16,1),nn.Sigmoid())
+    
     if configuration.training_configuration.device.type == 'cuda':
         net.cuda()
    

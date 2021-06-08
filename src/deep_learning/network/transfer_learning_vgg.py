@@ -1,11 +1,16 @@
 from torchvision import models
 import torch
+import torch.nn as nn
 from torchsummary import summary
 
-res = models.video.r3d_18(pretrained=True)
-res.load_state_dict(torch.load("/home/aditya/.cache/torch/hub/checkpoints/r3d_18-b3b3357e.pth "))
+class Identity(nn.Module):
+    def __init__(self):
+        super(Identity,self).__init__()
 
-for param in res.features.parameters():
-    param.requires_grad = False
+    def forward(self,x):
+        return x
 
-num_features = res.
+model = models.video.r3d_18(pretrained=True)
+model.stem[0] = nn.Sequential(nn.Conv3d(1,64,(3,7,7),(1,2,2),(1,3,3,),bias=False), nn.BatchNorm3d(64),nn.ReLU())
+model.fc = nn.Linear(512,10)
+summary(model,(1,128,128,128))
