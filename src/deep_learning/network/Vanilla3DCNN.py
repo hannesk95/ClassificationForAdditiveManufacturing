@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 from torchsummary import summary
-# import torch.nn.functional as F
 
 
 class Vanilla3DCNN(nn.Module):
@@ -12,39 +11,50 @@ class Vanilla3DCNN(nn.Module):
 
         super(Vanilla3DCNN, self).__init__()
 
-        self.conv1 = nn.Conv3d(in_channels=1, out_channels=1, kernel_size=(3, 3, 3))
-        self.conv2 = nn.Conv3d(in_channels=1, out_channels=1, kernel_size=(3, 3, 3))
-        # self.conv3 = nn.Conv3d(in_channels=32, out_channels=64, kernel_size=(3, 3, 3))
-        self.fc1 = nn.Linear(24389, 64)
-        self.fc2 = nn.Linear(64, 1)
+        self.conv1 = nn.Conv3d(in_channels=1, out_channels=32, kernel_size=(9, 9, 9))
+        self.conv2 = nn.Conv3d(in_channels=32, out_channels=64, kernel_size=(7, 7, 7))
+        self.conv3 = nn.Conv3d(in_channels=64, out_channels=96, kernel_size=(5, 5, 5))
+        self.conv4 = nn.Conv3d(in_channels=96, out_channels=128, kernel_size=(3, 3, 3))
 
-        # self.relu = nn.ReLU()
-        # self.dropout = nn.Dropout(p=0.2)
-        # self.dropout3d = nn.Dropout3d(p=0.2)
-        self.max_pool3d = nn.MaxPool3d(kernel_size=(3, 3, 3), stride=2)
-        # self.sigmoid = nn.Sigmoid()
+        self.relu = nn.ReLU()
+        self.dropout = nn.Dropout(p=0.2)
+        self.max_pool3d = nn.MaxPool3d(kernel_size=(2, 2, 2), stride=2)
 
     def forward(self, x):
         """#TODO: Add docstring."""
 
-        x = torch.relu(self.conv1(x))
+        # Convolution block 1
+        x = self.conv1(x)
+        x = self.relu(x)
         x = self.max_pool3d(x)
-        # x = self.relu(x)
-        # x = self.dropout3d(x)
-        x = torch.relu(self.conv2(x))
+
+        # Convolution block 2
+        x = self.conv2(x)
+        x = self.relu(x)
         x = self.max_pool3d(x)
-        # x = self.relu(x)
-        # x = self.dropout3d(x)
-        # x = torch.relu(self.conv3(x))
-        # x = self.max_pool3d(x)
-        # x = self.relu(x)
-        # x = self.dropout3d(x)
-        # x = x.view(x.size(0), -1)
+
+        # Convolution block 3
+        x = self.conv3(x)
+        x = self.relu(x)
+        x = self.max_pool3d(x)
+
+        # Convolution block 4
+        x = self.conv4(x)
+        x = self.relu(x)
+        x = self.max_pool3d(x)
+
+        # Transition block to fully connected layers
+        x = nn.AvgPool3d(kernel_size=2, stride=1)(x)
+        x = nn.MaxPool3d(kernel_size=x.shape[-1])(x)
         x = torch.flatten(x)
-        x = torch.relu(self.fc1(x))
-        # x = self.relu(x)
-        # x = self.dropout(x)
-        x = torch.sigmoid(self.fc2(x))
+        x = self.dropout(x)
+
+        # Classification block (fully connected)
+        x = nn.Linear(x.shape[0], 32)(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+        x = nn.Linear(32, 1)(x)
+        x = torch.sigmoid(x)
 
         return x
 
