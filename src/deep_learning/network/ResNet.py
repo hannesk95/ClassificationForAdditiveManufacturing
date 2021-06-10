@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchsummary import summary
+from torchvision import models
 
 
 def get_inplanes():
@@ -142,11 +143,21 @@ class ResNet(nn.Module):
         
         return x
 
-    def generate_model(model_depth, **kwargs):
+    def generate_model(model_depth, pretrained: bool = False, **kwargs):
         assert model_depth in [18, 50, 101, 152]
 
         if model_depth == 18:
-            model = ResNet(BasicBlock, [2, 2, 2, 2], get_inplanes(), **kwargs)
+            if pretrained:
+                model = models.video.r3d_18(pretrained=True)
+                model.stem[0] = nn.Sequential(
+                    nn.Conv3d(in_channels=1, out_channels=64, kernel_size=(3, 7, 7), stride=(1, 2, 2),
+                              padding=(1, 3, 3),
+                              bias=False), nn.BatchNorm3d(64), nn.ReLU())
+                model.fc = nn.Sequential(nn.Linear(512, 128), nn.ReLU(), nn.Linear(128, 16), nn.ReLU(),
+                                         nn.Linear(16, 1),
+                                         nn.Sigmoid())
+            else:
+                model = ResNet(BasicBlock, [2, 2, 2, 2], get_inplanes(), **kwargs)
         elif model_depth == 50:
             model = ResNet(BasicBlock, [3, 4, 6, 3], get_inplanes(), **kwargs)
         elif model_depth == 101:
@@ -160,9 +171,9 @@ class ResNet(nn.Module):
 # For test only
 if __name__ == '__main__':
 
-    net = ResNet.generate_model(18)
+    net = ResNet.generate_model(18, pretrained=True)
     
     if torch.cuda.device_count() > 0:
-        summary(net.cuda(), (1, 64, 64, 64))
+        summary(net.cuda(), (1, 128, 128, 128))
     else:
-        summary(net, (1, 64, 64, 64))
+        summary(net, (1, 128, 128, 128))
