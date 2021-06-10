@@ -16,6 +16,9 @@ class Vanilla3DCNN(nn.Module):
         self.conv3 = nn.Conv3d(in_channels=64, out_channels=96, kernel_size=(5, 5, 5))
         self.conv4 = nn.Conv3d(in_channels=96, out_channels=128, kernel_size=(3, 3, 3))
 
+        self.fc1 = nn.Linear(in_features=256, out_features=32)
+        self.fc2 = nn.Linear(in_features=32, out_features=1)
+
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(p=0.2)
         self.max_pool3d = nn.MaxPool3d(kernel_size=(2, 2, 2), stride=2)
@@ -44,16 +47,18 @@ class Vanilla3DCNN(nn.Module):
         x = self.max_pool3d(x)
 
         # Transition block to fully connected layers
-        x = nn.AvgPool3d(kernel_size=2, stride=1)(x).cuda()
-        x = nn.MaxPool3d(kernel_size=x.shape[-1])(x).cuda()
+        x = nn.AvgPool3d(kernel_size=2, stride=1)(x)
+        x = nn.MaxPool3d(kernel_size=x.shape[-1])(x)
         x = torch.flatten(x)
         x = self.dropout(x)
 
         # Classification block (fully connected)
-        x = nn.Linear(x.shape[0], 32)(x).cuda()
+        # x = nn.Linear(x.shape[0], 32)(x)
+        x = self.fc1(x)
         x = self.relu(x)
         x = self.dropout(x)
-        x = nn.Linear(32, 1)(x).cuda()
+        # x = nn.Linear(32, 1)(x).cuda()
+        x = self.fc2(x)
         x = torch.sigmoid(x)
 
         return x
