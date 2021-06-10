@@ -15,13 +15,12 @@ class ArchitectureSelector:
 
     def select_architecture(self):
         """# TODO: Docstring"""
-        self.config.experiment_name = self.nn_architecture
 
         if self.nn_architecture not in self.architectures:
             raise ValueError(f"Chosen neural network architecture is not valid! Choose out of {self.architectures}")
 
         if self.nn_architecture == "Vanilla3DCNN":
-            self.model = Vanilla3DCNN()
+            self.model = Vanilla3DCNN(self.config)
 
         if self.nn_architecture == "ResNet":
             self.model = ResNet.generate_model(self.config.resnet_depth, self.config.resnet_pretrained)
@@ -48,21 +47,5 @@ class ArchitectureSelector:
         if self.config.optimizer == 'SGD':
             self.config.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.config.learning_rate,
                                                     momentum=self.config.momentum)
-        """
-        if self.config.device.type == 'cuda':
-
-            # Horovod: Import only if GPU is available
-            import horovod.torch as hvd
-
-            # Horovod: broadcast parameters & optimizer state.
-            hvd.broadcast_parameters(self.model.state_dict(), root_rank=0)
-            hvd.broadcast_optimizer_state(self.config.optimizer, root_rank=0)
-
-            # Horovod: wrap optimizer with DistributedOptimizer.
-            optimizer = hvd.DistributedOptimizer(self.config.optimizer,
-                                                 named_parameters=self.model.named_parameters(),
-                                                 op=hvd.Adasum if False else hvd.Average,
-                                                 gradient_predivide_factor=1.0)
-        """
 
         return self.model
