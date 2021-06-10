@@ -86,3 +86,6 @@ class ParamConfigurator:
         self.inception_version = config['InceptionNet'].getint('version')
         if self.inception_version not in [int(1), int(3)]:
             raise ValueError(f"[ERROR] InceptionNet is only available for version 1 and for version 3.")
+
+        # MLflow
+        self.mlflow_log_dir = config['MLflow']['log_dir']
