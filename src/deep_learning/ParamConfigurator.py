@@ -29,30 +29,30 @@ class ParamConfigurator:
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         if self.device.type == 'cuda':
 
-            # Horovod: Import only if GPU is available
-            import horovod.torch as hvd
-
-            # Horovod: Initialize
-            hvd.init()
-            torch.manual_seed(42)
-
-            # Horovod: Pin GPU to local rank.
-            torch.cuda.set_device(hvd.local_rank())
-            torch.cuda.manual_seed(42)
-
-            # Horovod: Limit # of CPU threads to be used per worker.
-            torch.set_num_threads(1)
-
+            # # Horovod: Import only if GPU is available
+            # import horovod.torch as hvd
+            #
+            # # Horovod: Initialize
+            # hvd.init()
+            # torch.manual_seed(42)
+            #
+            # # Horovod: Pin GPU to local rank.
+            # torch.cuda.set_device(hvd.local_rank())
+            # torch.cuda.manual_seed(42)
+            #
+            # # Horovod: Limit # of CPU threads to be used per worker.
+            # torch.set_num_threads(1)
+            #
             self.kwargs = {'num_workers': self.num_workers, 'pin_memory': True}
-
-            # When supported, use 'forkserver' to spawn dataloader workers instead of 'fork' to prevent
-            # issues with Infiniband implementations that are not fork-safe
-            if (self.kwargs.get('num_workers', 0) > 0 and hasattr(mp, '_supports_context') and
-                    mp._supports_context and 'forkserver' in mp.get_all_start_methods()):
-                self.kwargs['multiprocessing_context'] = 'forkserver'
-
-            self.hvd_size = hvd.size()
-            self.hvd_rank = hvd.rank()
+            #
+            # # When supported, use 'forkserver' to spawn dataloader workers instead of 'fork' to prevent
+            # # issues with Infiniband implementations that are not fork-safe
+            # if (self.kwargs.get('num_workers', 0) > 0 and hasattr(mp, '_supports_context') and
+            #         mp._supports_context and 'forkserver' in mp.get_all_start_methods()):
+            #     self.kwargs['multiprocessing_context'] = 'forkserver'
+            #
+            # self.hvd_size = hvd.size()
+            # self.hvd_rank = hvd.rank()
 
         else:
             self.kwargs = {'num_workers': self.num_workers}
