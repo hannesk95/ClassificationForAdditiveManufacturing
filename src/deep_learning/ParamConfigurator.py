@@ -12,20 +12,17 @@ class ParamConfigurator:
         config = configparser.ConfigParser()
         config.read('config.ini')
 
-        # architecture
+        # Architecture
         self.architecture_type = config['architecture']['architecture_type']
+        self.experiment_name = self.architecture_type
 
-        # training
+        # Training
         self.batch_size = config['training'].getint('batch_size')
-
         self.num_epochs = config['training'].getint('num_epochs')
-
         self.learning_rate = config['training'].getfloat('learning_rate')
-
         self.momentum = config['training'].getfloat('momentum')
         self.plot_frequency = config['training'].getint('plot_frequency')
         self.num_workers = config['training'].getint('num_workers')
-
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         if self.device.type == 'cuda':
 
@@ -65,14 +62,12 @@ class ParamConfigurator:
         if self.loss_function == 'BCE':
             self.loss_function = torch.nn.BCELoss()
 
-        # train_data
-        # self.train_data_size = config['train_data'].getint('train_data_size')
+        # Train Data
         self.train_data_dir = config['train_data']['train_data_dir']
         if not os.path.exists(self.train_data_dir):
             raise ValueError(f"[ERROR] Directory specified for training data does not exist!")
 
-        # validation_data
-        # self.validation_data_size = config['validation_data'].getint('validation_data_size')
+        # Validation Data
         self.validation_data_dir = config['validation_data']['validation_data_dir']
         if not os.path.exists(self.validation_data_dir):
             raise ValueError(f"[ERROR] Directory specified for validation data does not exist!")
@@ -81,6 +76,9 @@ class ParamConfigurator:
         self.resnet_depth = config['ResNet'].getint('depth')
         if self.resnet_depth not in [18, 50, 101, 152]:
             raise ValueError(f"[ERROR] ResNet is only available for depths of [18, 50, 101, 152].")
+        self.resnet_pretrained = config['ResNet'].getboolean('pretrained')
+        if not self.resnet_pretrained and self.resnet_depth == 18:
+            raise ValueError(f"[ERROR] Only ResNet18 is available with pretrained weights!")
 
         # Inception
         self.inception_version = config['InceptionNet'].getint('version')
@@ -89,3 +87,4 @@ class ParamConfigurator:
 
         # MLflow
         self.mlflow_log_dir = config['MLflow']['log_dir']
+
