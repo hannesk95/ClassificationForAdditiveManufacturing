@@ -45,7 +45,7 @@ class ArchitectureSelector:
         if self.config.optimizer == 'SGD':
             self.config.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.config.learning_rate,
                                                     momentum=self.config.momentum)
-
+        """
         if self.config.device.type == 'cuda':
 
             # Horovod: Import only if GPU is available
@@ -60,5 +60,6 @@ class ArchitectureSelector:
                                                  named_parameters=self.model.named_parameters(),
                                                  op=hvd.Adasum if False else hvd.Average,
                                                  gradient_predivide_factor=1.0)
+        """
 
         return self.model
