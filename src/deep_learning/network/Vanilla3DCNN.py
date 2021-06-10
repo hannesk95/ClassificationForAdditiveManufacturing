@@ -44,16 +44,16 @@ class Vanilla3DCNN(nn.Module):
         x = self.max_pool3d(x)
 
         # Transition block to fully connected layers
-        x = nn.AvgPool3d(kernel_size=2, stride=1)(x)
-        x = nn.MaxPool3d(kernel_size=x.shape[-1])(x)
+        x = nn.AvgPool3d(kernel_size=2, stride=1)(x).cuda()
+        x = nn.MaxPool3d(kernel_size=x.shape[-1])(x).cuda()
         x = torch.flatten(x)
         x = self.dropout(x)
 
         # Classification block (fully connected)
-        x = nn.Linear(x.shape[0], 32)(x)
+        x = nn.Linear(x.shape[0], 32)(x).cuda()
         x = self.relu(x)
         x = self.dropout(x)
-        x = nn.Linear(32, 1)(x)
+        x = nn.Linear(32, 1)(x).cuda()
         x = torch.sigmoid(x)
 
         return x
