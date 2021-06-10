@@ -1,7 +1,6 @@
 import configparser
 import torch
 import os
-import torch.multiprocessing as mp
 
 
 class ParamConfigurator:
@@ -24,33 +23,9 @@ class ParamConfigurator:
         self.plot_frequency = config['training'].getint('plot_frequency')
         self.num_workers = config['training'].getint('num_workers')
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
         if self.device.type == 'cuda':
-
-            # # Horovod: Import only if GPU is available
-            # import horovod.torch as hvd
-            #
-            # # Horovod: Initialize
-            # hvd.init()
-            # torch.manual_seed(42)
-            #
-            # # Horovod: Pin GPU to local rank.
-            # torch.cuda.set_device(hvd.local_rank())
-            # torch.cuda.manual_seed(42)
-            #
-            # # Horovod: Limit # of CPU threads to be used per worker.
-            # torch.set_num_threads(1)
-            #
             self.kwargs = {'num_workers': self.num_workers, 'pin_memory': True}
-            #
-            # # When supported, use 'forkserver' to spawn dataloader workers instead of 'fork' to prevent
-            # # issues with Infiniband implementations that are not fork-safe
-            # if (self.kwargs.get('num_workers', 0) > 0 and hasattr(mp, '_supports_context') and
-            #         mp._supports_context and 'forkserver' in mp.get_all_start_methods()):
-            #     self.kwargs['multiprocessing_context'] = 'forkserver'
-            #
-            # self.hvd_size = hvd.size()
-            # self.hvd_rank = hvd.rank()
-
         else:
             self.kwargs = {'num_workers': self.num_workers}
 
@@ -77,7 +52,7 @@ class ParamConfigurator:
         if self.resnet_depth not in [18, 50, 101, 152]:
             raise ValueError(f"[ERROR] ResNet is only available for depths of [18, 50, 101, 152].")
         self.resnet_pretrained = config['ResNet'].getboolean('pretrained')
-        if not self.resnet_pretrained and self.resnet_depth == 18:
+        if self.resnet_pretrained and self.resnet_depth != 18:
             raise ValueError(f"[ERROR] Only ResNet18 is available with pretrained weights!")
 
         # Inception
