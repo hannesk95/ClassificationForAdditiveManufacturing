@@ -31,10 +31,7 @@ def main():
     validation_dataset = AMCDataset(config.validation_data_dir, transform=transformations)
 
     # 5. Create dataloader
-    # Training
     train_data_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=False, **config.kwargs)
-
-    # Validation
     validation_data_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=False, **config.kwargs)
 
     # 7. Start MLflow logging
