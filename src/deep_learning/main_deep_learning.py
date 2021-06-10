@@ -1,31 +1,23 @@
 import sys
-import torch.utils.data
 sys.path.append(".")   #TODO Ugly - currently needed for LRZ AI System - find better solution
 sys.path.append("..")
 sys.path.append("../..")
+
 import logging
-import train
-import wandb
-import configuration
+import mlflow.pytorch
 import pytorch_lightning as pl
+
 from torchvision.transforms import transforms
 from torch.utils.data import DataLoader
-from src.deep_learning.ArchitectureSelector import ArchitectureSelector
+
 from src.deep_learning.AMCDataset import AMCDataset
 from src.deep_learning.ParamConfigurator import ParamConfigurator
-from src.deep_learning.NetworkTrainer import NetworkTrainer
-import mlflow.pytorch
+from src.deep_learning.ArchitectureSelector import ArchitectureSelector
 
 
 def main():
-
-    # 0. Define configuration parameters
+    # 1. Define configuration parameters
     config = ParamConfigurator()
-
-    # 1. Start MLflow logging
-    mlflow.set_tracking_uri(config.mlflow_log_dir)
-    mlflow.set_experiment(config.architecture_type)
-    mlflow.pytorch.autolog(log_every_n_epoch=1)
 
     # 2. Select neural network architecture and create model
     selector = ArchitectureSelector(config.architecture_type, config)
@@ -34,29 +26,23 @@ def main():
     # 3. Define transformations
     transformations = transforms.Compose([transforms.ToTensor()])
 
-    # 3. Initialize dataset
+    # 4. Initialize dataset
     train_dataset = AMCDataset(config.train_data_dir, transform=transformations)
     validation_dataset = AMCDataset(config.validation_data_dir, transform=transformations)
 
-    # 4. Create dataloader
-    if config.device.type == 'cuda':
+    # 5. Create dataloader
+    # Training
+    train_data_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=False, **config.kwargs)
 
-        # Training
-        # config.train_sampler = torch.utils.data.DistributedSampler(train_dataset)
-        train_data_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=False, **config.kwargs)
+    # Validation
+    validation_data_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=False, **config.kwargs)
 
-        # Validation
-        # config.validation_sampler = torch.utils.data.DistributedSampler(validation_dataset)
-        validation_data_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=False, **config.kwargs)
-    else:
-        train_data_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=False, **config.kwargs)
-        validation_data_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=False,
-                                            **config.kwargs)
+    # 7. Start MLflow logging
+    mlflow.set_tracking_uri(config.mlflow_log_dir)
+    mlflow.set_experiment(config.experiment_name)
+    mlflow.pytorch.autolog()
 
-    # 5. Start training
-    # trainer = NetworkTrainer(model, train_data_loader, validation_data_loader, config)
-    # trainer.start_training()
-
+    # 8. Start training
     trainer = pl.Trainer(accelerator='horovod', gpus=1)
     trainer.fit(model, train_data_loader, validation_data_loader)
 
