@@ -6,3 +6,4 @@ seaborn
 pandas
 pillow
 torchsummary
+pytorch-lightning
