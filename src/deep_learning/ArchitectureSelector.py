@@ -15,6 +15,7 @@ class ArchitectureSelector:
 
     def select_architecture(self):
         """# TODO: Docstring"""
+        self.config.experiment_name = self.nn_architecture
 
         if self.nn_architecture not in self.architectures:
             raise ValueError(f"Chosen neural network architecture is not valid! Choose out of {self.architectures}")
@@ -23,7 +24,8 @@ class ArchitectureSelector:
             self.model = Vanilla3DCNN()
 
         if self.nn_architecture == "ResNet":
-            self.model = ResNet.generate_model(self.config.resnet_depth)
+            self.model = ResNet.generate_model(self.config.resnet_depth, self.config.resnet_pretrained)
+            self.config.experiment_name = self.nn_architecture + str(self.config.resnet_depth)
 
         if self.nn_architecture == "VGGNet":
             self.model = VGGNet()
@@ -33,6 +35,7 @@ class ArchitectureSelector:
                 self.model = InceptionNet_v1()
             else:
                 self.model = InceptionNet_v3()
+            self.config.experiment_name = self.nn_architecture + str(self.config.inception_version)
 
         if self.config.device.type == 'cuda':
 
