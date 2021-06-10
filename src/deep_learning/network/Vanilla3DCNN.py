@@ -3,14 +3,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 import pytorch_lightning as pl
 from torchsummary import summary
-import numpy as np
 from sklearn.metrics import accuracy_score
 
 
 class Vanilla3DCNN(pl.LightningModule):
     """#TODO: Add docstring."""
 
-    def __init__(self):
+    def __init__(self, config: object):
         """#TODO: Add docstring."""
 
         super(Vanilla3DCNN, self).__init__()
@@ -28,6 +27,8 @@ class Vanilla3DCNN(pl.LightningModule):
         self.max_pool3d = nn.MaxPool3d(kernel_size=(2, 2, 2), stride=2)
         self.avg_pool3d = nn.AvgPool3d(kernel_size=(2, 2, 2), stride=1)
         self.global_pool3d = nn.MaxPool3d(kernel_size=(11, 11, 11))
+
+        self.config = config
 
     def forward(self, x):
         """#TODO: Add docstring."""
@@ -96,8 +97,8 @@ class Vanilla3DCNN(pl.LightningModule):
         avg_loss, avg_acc = self.general_end(outputs, "val")
         return {'val_loss': avg_loss, 'avg_acc': avg_acc}
 
-    def configure_optimizers(self): # TODO pass optimizer here
-        return torch.optim.Adam(self.parameters(), lr=0.02)
+    def configure_optimizers(self):
+        return self.config.optimizer
 
     def get_progress_bar_dict(self):
         tqdm_dict = super().get_progress_bar_dict()
