@@ -61,7 +61,7 @@ def main():
     # trainer = NetworkTrainer(model, train_data_loader, validation_data_loader, config)
     # trainer.start_training()
 
-    trainer = pl.Trainer()
+    trainer = pl.Trainer(gpus=-1)
     trainer.fit(model, train_data_loader, validation_data_loader)
 
 
