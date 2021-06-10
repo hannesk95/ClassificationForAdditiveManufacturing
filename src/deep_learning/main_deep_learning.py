@@ -19,11 +19,13 @@ import mlflow.pytorch
 
 def main():
 
-    # 0. Start MLflow logging
-    mlflow.pytorch.autolog(log_every_n_epoch=1)
-
-    # 1. Define configuration parameters
+    # 0. Define configuration parameters
     config = ParamConfigurator()
+
+    # 1. Start MLflow logging
+    mlflow.set_tracking_uri(config.mlflow_log_dir)
+    mlflow.set_experiment(config.architecture_type)
+    mlflow.pytorch.autolog(log_every_n_epoch=1)
 
     # 2. Select neural network architecture and create model
     selector = ArchitectureSelector(config.architecture_type, config)
