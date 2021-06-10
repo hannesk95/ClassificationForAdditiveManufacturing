@@ -70,7 +70,7 @@ class Vanilla3DCNN(pl.LightningModule):
         model, label = batch
         prediction = self.forward(model)
         loss = F.binary_cross_entropy(prediction, label)
-        acc = accuracy_score(label.detach().numpy(), prediction.round().detach().numpy())
+        acc = accuracy_score(label.detach().cpu().numpy(), prediction.round().detach().cpu().numpy())
 
         return loss, acc
 
