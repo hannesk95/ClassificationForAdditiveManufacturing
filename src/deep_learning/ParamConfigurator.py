@@ -23,10 +23,8 @@ class ParamConfigurator:
         self.learning_rate = config['training'].getfloat('learning_rate')
 
         self.momentum = config['training'].getfloat('momentum')
-
-        self.num_workers = config['training'].getint('num_workers')
-
         self.plot_frequency = config['training'].getint('plot_frequency')
+        self.num_workers = config['training'].getint('num_workers')
 
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         if self.device.type == 'cuda':
@@ -45,7 +43,7 @@ class ParamConfigurator:
             # Horovod: Limit # of CPU threads to be used per worker.
             torch.set_num_threads(1)
 
-            self.kwargs = {'num_workers': 1, 'pin_memory': True}
+            self.kwargs = {'num_workers': self.num_workers, 'pin_memory': True}
 
             # When supported, use 'forkserver' to spawn dataloader workers instead of 'fork' to prevent
             # issues with Infiniband implementations that are not fork-safe
@@ -57,7 +55,7 @@ class ParamConfigurator:
             self.hvd_rank = hvd.rank()
 
         else:
-            self.kwargs = {}
+            self.kwargs = {'num_workers': self.num_workers}
 
         self.optimizer = config['training']['optimizer']
         if self.optimizer not in ['Adam', 'SGD']:
