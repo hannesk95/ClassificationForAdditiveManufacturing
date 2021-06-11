@@ -40,7 +40,7 @@ def main():
     mlflow.pytorch.autolog()
 
     # 8. Start training
-    trainer = pl.Trainer(accelerator='horovod', gpus=1)
+    trainer = pl.Trainer(accelerator='horovod', gpus=-1, auto_select_gpus=True)
     trainer.fit(model, train_data_loader, validation_data_loader)
 
 
