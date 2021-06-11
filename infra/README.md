@@ -4,5 +4,5 @@ Generally, the entire project can be devided into two segments, the `data_genera
 
 |File|Purpose|
 |----|-------|
-|[`data_generation_container`](./data_generation_container)|This directory contains everything which is needed in order to set up the Docker/Enroot container for the data generation part.|
-|[`deep_learning_container`](./deep_learning_container)|This directory contains everything which is needed in order to set up the Docker/Enroot container for the deep learning part.|
+|[`data_generation_container`](data_generation)|This directory contains everything which is needed in order to set up the Docker/Enroot container for the data generation part.|
+|[`deep_learning_container`](deep_learning)|This directory contains everything which is needed in order to set up the Docker/Enroot container for the deep learning part.|
