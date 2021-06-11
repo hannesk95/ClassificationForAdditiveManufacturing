@@ -12,6 +12,7 @@ from torch.utils.data import DataLoader
 
 from src.deep_learning.AMCDataset import AMCDataset
 from src.deep_learning.ParamConfigurator import ParamConfigurator
+from src.deep_learning.ClassificationTask import ClassificationTask
 from src.deep_learning.ArchitectureSelector import ArchitectureSelector
 
 
@@ -21,7 +22,7 @@ def main():
 
     # 2. Select neural network architecture and create model
     selector = ArchitectureSelector(config.architecture_type, config)
-    model = selector.select_architecture()
+    nn_model = selector.select_architecture()
 
     # 3. Define transformations
     transformations = transforms.Compose([transforms.ToTensor()])
@@ -31,17 +32,20 @@ def main():
     validation_dataset = AMCDataset(config.validation_data_dir, transform=transformations)
 
     # 5. Create dataloader
-    train_data_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=False, **config.kwargs)
-    validation_data_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=False, **config.kwargs)
+    train_data_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=True, **config.kwargs)
+    validation_data_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=True, **config.kwargs)
 
-    # 7. Start MLflow logging
+    # 6. Start MLflow logging
     mlflow.set_tracking_uri(config.mlflow_log_dir)
     mlflow.set_experiment(config.experiment_name)
     mlflow.pytorch.autolog()
 
+    # 7. Create classifier
+    classifier = ClassificationTask(nn_model=nn_model, config=config)
+
     # 8. Start training
     trainer = pl.Trainer(accelerator='horovod', gpus=-1, auto_select_gpus=True)
-    trainer.fit(model, train_data_loader, validation_data_loader)
+    trainer.fit(classifier, train_data_loader, validation_data_loader)
 
 
 if __name__ == '__main__':
