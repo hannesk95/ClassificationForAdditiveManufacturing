@@ -35,6 +35,11 @@ class ParamConfigurator:
         self.rotation = config['Defector'].getboolean('rotation')
         self.number_of_trials = config['Defector'].getint('number_of_trials')
 
+        self.max_cylinder_diameter = config['ModelDefector'].getint('max_cylinder_diameter')
+        self.trials = config['ModelDefector'].getint('trials')
+        self.remaining_voxels = config['ModelDefector'].getint('remaining_voxels')
+        self.factor = config['ModelDefector'].getfloat('factor')
+
         self.version = config['Aligner'].getint('version')
         axis_to_align = config['Aligner']['axis_to_align']
         if axis_to_align == 'x':
