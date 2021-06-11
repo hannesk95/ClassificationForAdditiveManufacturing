@@ -4,15 +4,20 @@ from src.data_generation.VoxelModel import VoxelModel
 
 class Defector:
 
+    def __init__(self, max_cylinder_diameter = 8, trials = 20, remaining_voxels = 30, factor = 1.5):
+        self.max_cylinder_diameter = max_cylinder_diameter
+        self.trials = trials
+        self.remaining_voxels = remaining_voxels
+        self.factor = factor
+
     def __call__(self, voxel_model): 
 
         voxel_model_copy = copy.deepcopy(voxel_model)
 
-        # TODO move to config file
-        max_cylinder_diameter = 8
-        trials = 20
-        remaining_voxels = 30
-        factor = 1.5
+        max_cylinder_diameter = self.max_cylinder_diameter
+        trials = self.trials
+        remaining_voxels = self.remaining_voxels
+        factor = self.factor
 
         model = voxel_model.model
         # get the voxel grid indices out of the occupancy grid
@@ -20,8 +25,7 @@ class Defector:
 
         if voxels.shape[0] == 0:
             print("empty model")
-            model_with_defect = VoxelModel(model, np.array([0]), voxel_model.model_name + f'_no_defect')
-            return [voxel_model, model_with_defect]
+            return []
 
         # find appropriate axis and radius of the cylinder
         axis, radius = self.find_axis_and_radius_exhaustive(voxels, max_cylinder_diameter, remaining_voxels)
