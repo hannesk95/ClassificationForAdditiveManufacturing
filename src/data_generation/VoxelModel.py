@@ -2,7 +2,37 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-from src.data_generation.utils import convert_to_hull, get_layout
+from scipy.ndimage import convolve
+
+
+def convert_to_hull(model):
+    """
+    Converts a filled voxel model into a hull of voxels, i.e. removes the voxels inside the model
+    :param model: binary np.ndarray of dim 3
+    :return: binary np.ndarray of dim 3: Hull of the model
+    """
+    model_shape = model.shape
+    frame_shape = tuple(dim + 6 for dim in model_shape)
+    frame = np.zeros(frame_shape)
+    frame[3:frame_shape[0] - 3, 3:frame_shape[1] - 3, 3:frame_shape[2] - 3] = model
+    kernel = np.ones((3, 3, 3))
+    model_out = convolve(model, kernel, mode='constant')
+    model_out = np.array(model_out == 27, np.int32)
+
+    return np.array((model_out + model) == 1, np.int32)
+
+
+def get_layout(title):
+    layout = go.Layout(paper_bgcolor='rgb(1,1,1)',
+                       title_text=title, title_x=0.5,
+                       font_color='white',
+                       width=800,
+                       height=800,
+                       scene_camera=dict(eye=dict(x=1.25, y=-1.25, z=1)),
+                       scene_xaxis_visible=False,
+                       scene_yaxis_visible=False,
+                       scene_zaxis_visible=False)
+    return layout
 
 
 class VoxelModel:
