@@ -8,7 +8,7 @@ from src.data_generation.ParamConfigurator import ParamConfigurator
 from src.data_generation.ModelSelector import ModelSelector
 from src.data_generation.BatchDataProcessor import BatchDataProcessor
 from src.data_generation.transformations import Normalizer, Aligner, Cleaner, Voxelizer, VoxelizerGPU, Defector, \
-    DefectorRotation, ComposeTransformer
+    DefectorTopDownView, ComposeTransformer
 from src.data_generation import utils
 
 
@@ -29,11 +29,10 @@ def main():
         voxelizer = VoxelizerGPU(dimension=config.voxel_dimensions)
     else:
         voxelizer = Voxelizer(dimension=config.voxel_dimensions, representation=config.voxel_representation)
-    # defector = DefectorRotation(hole_radius_nonprintable=config.hole_radius_nonprintable,
+    # defector = DefectorTopDownView(hole_radius_nonprintable=config.hole_radius_nonprintable,
     #                             hole_radius_printable=config.hole_radius_printable,
     #                             border_nonprintable=config.border_nonprintable,
     #                             border_printable=config.border_printable,
-    #                             rotation=config.rotation,
     #                             number_of_trials=config.number_of_trials)
 
     defector = Defector(max_cylinder_diameter = config.max_cylinder_diameter,

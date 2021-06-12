@@ -101,23 +101,6 @@ def check_hole_feasibility(model_data: np.ndarray, radius: int, border: int, off
             return False
     return True
 
-
-def rotate_model(model_data: np.ndarray, x_rotation: int, y_rotation: int, z_rotation: int) -> np.ndarray:
-    """
-    Rotates the voxelized model
-    :param model_data: Voxelized model data
-    :param x_rotation: Degrees of rotation around the x axis
-    :param y_rotation: Degrees of rotation around the y axis
-    :param z_rotation:Degrees of rotation around the z axis
-    :return: Rotated voxelized model
-    """
-    model_data = np.around(rotate(model_data, x_rotation))
-    model_data = np.around(rotate(model_data, y_rotation, (1, 2)))
-    model_data = np.around(rotate(model_data, z_rotation, (0, 2)))
-
-    return model_data
-
-
 def _visualize_top_down_view(model_data: np.ndarray, possible_offsets_final: list):
     """
     Visulizes the top down view of a model
@@ -135,9 +118,9 @@ def _visualize_top_down_view(model_data: np.ndarray, possible_offsets_final: lis
     plt.show()
 
 
-class DefectorRotation:
+class DefectorTopDownView:
     def __init__(self, hole_radius_nonprintable: int = 5, hole_radius_printable: int = 10, border_nonprintable: int = 3,
-                 border_printable: int = 5, rotation: bool = False, number_of_trials: int = 5,
+                 border_printable: int = 5, number_of_trials: int = 5,
                  visualize_top_down_view: bool = False):
 
         self.hole_radius_nonprintable = hole_radius_nonprintable
@@ -146,7 +129,6 @@ class DefectorRotation:
         self.border_nonprintable = border_nonprintable
         self.border_printable = border_printable
 
-        self.rotation = rotation
         self.visualize_top_down_view = visualize_top_down_view
         self.number_of_trials = number_of_trials
         random.seed(42)
@@ -154,23 +136,12 @@ class DefectorRotation:
     def __call__(self, model):
         model_data = model.model
 
-        if self.rotation:
-            # Rotate model randomly
-            x_rotation = random.randrange(0, 360)
-            y_rotation = random.randrange(0, 360)
-            z_rotation = random.randrange(0, 360)
-            model_data = rotate_model(model_data, x_rotation, y_rotation, z_rotation)
-
         model_data_nonprintable_defect_middle = self._add_defect_middle(model_data, self.hole_radius_nonprintable,
                                                                         self.border_nonprintable)
         model_data_printable_defect_middle = self._add_defect_middle(model_data, self.hole_radius_printable,
                                                                      self.border_printable)
         model_data_nonprintable_defect_border = self._add_defect_border(model_data, self.hole_radius_printable,
                                                                         self.border_nonprintable)
-
-        if self.rotation:
-            # Rotate model back
-            model_data = rotate_model(model_data, 360-x_rotation, 360-y_rotation, 360-z_rotation)
 
         out = []
         if model_data_nonprintable_defect_middle is not None:
