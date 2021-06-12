@@ -20,11 +20,11 @@ class ArchitectureSelector:
             raise ValueError(f"Chosen neural network architecture is not valid! Choose out of {self.architectures}")
 
         if self.nn_architecture == "Vanilla3DCNN":
-            self.model = Vanilla3DCNN(self.config)
+            self.model = Vanilla3DCNN()
 
         if self.nn_architecture == "ResNet":
             self.model = ResNet.generate_model(self.config.resnet_depth, self.config.resnet_pretrained)
-            self.config.experiment_name = self.nn_architecture + str(self.config.resnet_depth)
+            self.config.experiment_name = self.nn_architecture + str(self.config.resnet_depth) + "_pretrained_" + str(self.config.resnet_pretrained)
 
         if self.nn_architecture == "VGGNet":
             self.model = VGGNet()
