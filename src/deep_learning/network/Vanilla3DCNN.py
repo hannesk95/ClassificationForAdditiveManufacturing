@@ -12,7 +12,7 @@ class Vanilla3DCNN(pl.LightningModule):
 
         super(Vanilla3DCNN, self).__init__()
 
-        self.conv1 = nn.Conv3d(in_channels=1, out_channels=32, kernel_size=(7, 7, 7))
+        self.conv1 = nn.Conv3d(in_channels=1, out_channels=32, kernel_size=(9, 9, 9))
         self.conv2 = nn.Conv3d(in_channels=32, out_channels=64, kernel_size=(7, 7, 7))
         self.conv3 = nn.Conv3d(in_channels=64, out_channels=96, kernel_size=(5, 5, 5))
         self.conv4 = nn.Conv3d(in_channels=96, out_channels=128, kernel_size=(3, 3, 3))
