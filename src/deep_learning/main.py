@@ -44,7 +44,7 @@ def main():
     classifier = ClassificationTask(nn_model=nn_model, config=config)
 
     # 8. Start training
-    trainer = pl.Trainer(max_epochs=config.num_epochs, accelerator='horovod', gpus=-1, auto_select_gpus=True)
+    trainer = pl.Trainer(max_epochs=config.num_epochs, accelerator='horovod', gpus=1, auto_select_gpus=True)
     # trainer = pl.Trainer(max_epochs=config.num_epochs)
     trainer.fit(classifier, train_data_loader, validation_data_loader)
 
