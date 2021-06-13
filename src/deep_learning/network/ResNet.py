@@ -14,8 +14,8 @@ def conv3x3x3(in_planes, out_planes, stride=1):
                      padding=(1, 1, 1), bias=False)
 
 
-def conv1x1x1(in_planes, out_planes, stride=1):
-    return nn.Conv3d(in_planes, out_planes, kernel_size=(1, 1, 1), stride=(stride, stride, stride), bias=False)
+def conv1x1x1(in_planes, out, stride=1):
+    return nn.Conv3d(in_planes, out, kernel_size=(1, 1, 1), stride=(stride, stride, stride), bias=False)
 
 
 class BasicBlock(nn.Module):
