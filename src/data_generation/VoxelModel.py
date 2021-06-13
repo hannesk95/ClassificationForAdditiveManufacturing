@@ -1,3 +1,7 @@
+import sys
+sys.path.append(".")   #TODO Ugly - currently needed for LRZ AI System - find better solution
+sys.path.append("..")
+sys.path.append("../..")
 import os
 import numpy as np
 import matplotlib.pyplot as plt
