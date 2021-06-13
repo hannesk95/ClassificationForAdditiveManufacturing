@@ -67,8 +67,10 @@ class Vanilla3DCNN(pl.LightningModule):
 # For testing purposes
 if __name__ == '__main__':
     model = Vanilla3DCNN()
-
+    summary(model,(1,128,128,128))
+    """
     if torch.cuda.device_count() > 0:
         summary(model.cuda(), (1, 128, 128, 128))
     else:
         summary(model, (1, 128, 128, 128))
+    """
