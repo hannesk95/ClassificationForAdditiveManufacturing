@@ -1,6 +1,7 @@
 import os
 import configparser
 import numpy as np
+from shutil import copyfile
 
 
 class ParamConfigurator:
@@ -50,3 +51,6 @@ class ParamConfigurator:
             self.axis_to_align = np.array([0., 1., 0.])
         elif axis_to_align == 'z':
             self.axis_to_align = np.array([0., 0., 1.])
+
+        copyfile(os.path.abspath(os.path.join(os.path.dirname(__file__), config_path)),
+                 os.path.join(self.target_path, 'used_config.ini'))
