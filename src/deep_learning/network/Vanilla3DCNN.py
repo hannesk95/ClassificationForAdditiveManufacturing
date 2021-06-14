@@ -4,6 +4,7 @@ import pytorch_lightning as pl
 from torchsummary import summary
 
 
+
 class Vanilla3DCNN(pl.LightningModule):
     """#TODO: Add docstring."""
 
@@ -25,6 +26,13 @@ class Vanilla3DCNN(pl.LightningModule):
         self.max_pool3d = nn.MaxPool3d(kernel_size=(2, 2, 2), stride=2)
         self.avg_pool3d = nn.AvgPool3d(kernel_size=(2, 2, 2), stride=1)
         self.global_pool3d = nn.MaxPool3d(kernel_size=(11, 11, 11))
+
+        for m in self.modules():
+            if isinstance(m, nn.Conv3d):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+            elif isinstance(m, nn.BatchNorm3d):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
 
     def forward(self, x):
         """#TODO: Add docstring."""
@@ -64,13 +72,15 @@ class Vanilla3DCNN(pl.LightningModule):
         return x
 
 
+
+
 # For testing purposes
 if __name__ == '__main__':
     model = Vanilla3DCNN()
-    summary(model,(1,128,128,128))
-    """
+   
+    
     if torch.cuda.device_count() > 0:
         summary(model.cuda(), (1, 128, 128, 128))
     else:
         summary(model, (1, 128, 128, 128))
-    """
+    
