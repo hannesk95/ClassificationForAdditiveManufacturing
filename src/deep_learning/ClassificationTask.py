@@ -1,7 +1,9 @@
 import pytorch_lightning as pl
+import torch
 import torch.nn.functional as F
 import torchmetrics
 import mlflow
+import numpy as np
 
 
 class ClassificationTask(pl.LightningModule):
@@ -10,34 +12,42 @@ class ClassificationTask(pl.LightningModule):
         super().__init__()
         self.nn_model = nn_model
         self.config = config
+        self.train_acc = torchmetrics.Accuracy()
+        self.val_acc = torchmetrics.Accuracy()
 
     def training_step(self, batch, batch_idx) -> dict:
         model, label = batch
         pred = self.nn_model(model)
         loss = F.binary_cross_entropy(pred, label)
-        acc = torchmetrics.functional.accuracy(pred.round(), label)
-        self.log('train_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
-        self.log('train_acc', acc, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.train_acc(pred.round().int(), label.int())
+        # acc = torchmetrics.functional.accuracy(pred.round().int(), label.int())
 
-        return {'train_loss': loss, 'train_accuracy': acc}
+        self.log('train_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.log('train_acc', self.train_acc, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+
+        return loss
 
     def training_epoch_end(self, training_step_outputs) -> None:
-        mlflow.log_metric(list(training_step_outputs)[0], training_step_outputs[list(training_step_outputs)[0]])
-        mlflow.log_metric(list(training_step_outputs)[1], training_step_outputs[list(training_step_outputs)[1]])
+        pass
+        # mlflow.log_metric("loss", 0.1)
 
     def validation_step(self, batch, batch_idx) -> dict:
         model, label = batch
         pred = self.nn_model(model)
         val_loss = F.binary_cross_entropy(pred, label)
-        val_acc = torchmetrics.functional.accuracy(pred.round(), label)
-        self.log('val_loss', val_loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
-        self.log('val_acc', val_acc, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.val_acc(pred.round().int(), label.int())
+        # val_acc = torchmetrics.functional.accuracy(pred.round(), label)
 
-        return {'val_loss': val_loss, 'val_accuracy': val_acc}
+        self.log('val_loss', val_loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.log('val_acc', self.val_acc, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+
+        return val_loss
 
     def validation_epoch_end(self, validation_step_outputs) -> None:
-        mlflow.log_metric(list(validation_step_outputs)[0], validation_step_outputs[list(validation_step_outputs)[0]])
-        mlflow.log_metric(list(validation_step_outputs)[1], validation_step_outputs[list(validation_step_outputs)[1]])
+        pass
+        # mlflow.log_metric("val_loss", 0.1)
+        # mlflow.log_metric(list(validation_step_outputs)[0], validation_step_outputs[list(validation_step_outputs)[0]])
+        # mlflow.log_metric(list(validation_step_outputs)[1], validation_step_outputs[list(validation_step_outputs)[1]])
 
     def configure_optimizers(self) -> object:
         return self.config.optimizer

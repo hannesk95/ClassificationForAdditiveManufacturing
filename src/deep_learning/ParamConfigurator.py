@@ -25,6 +25,7 @@ class ParamConfigurator:
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
         if self.device.type == 'cuda':
+            torch.cuda.empty_cache()
             self.kwargs = {'num_workers': self.num_workers, 'pin_memory': True}
         else:
             self.kwargs = {'num_workers': self.num_workers}

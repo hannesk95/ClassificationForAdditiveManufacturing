@@ -33,7 +33,7 @@ def main():
 
     # 5. Create dataloader
     train_data_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=True, **config.kwargs)
-    validation_data_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=True, **config.kwargs)
+    validation_data_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=False, **config.kwargs)
 
     # 6. Start MLflow logging
     mlflow.set_tracking_uri(config.mlflow_log_dir)
@@ -44,7 +44,8 @@ def main():
     classifier = ClassificationTask(nn_model=nn_model, config=config)
 
     # 8. Start training
-    trainer = pl.Trainer(accelerator='horovod', gpus=-1, auto_select_gpus=True)
+    trainer = pl.Trainer(max_epochs=config.num_epochs, accelerator='horovod', gpus=1, auto_select_gpus=True)
+    # trainer = pl.Trainer(max_epochs=config.num_epochs)
     trainer.fit(classifier, train_data_loader, validation_data_loader)
 
 

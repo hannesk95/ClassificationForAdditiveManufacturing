@@ -139,3 +139,4 @@ data
 PyMesh/
 # *.ipynb
 src/deep_learning/lightning_logs
+src/deep_learning/mlruns

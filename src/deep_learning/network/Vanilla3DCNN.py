@@ -1,15 +1,13 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import pytorch_lightning as pl
 from torchsummary import summary
-from sklearn.metrics import accuracy_score
 
 
 class Vanilla3DCNN(pl.LightningModule):
     """#TODO: Add docstring."""
 
-    def __init__(self, config: object):
+    def __init__(self):
         """#TODO: Add docstring."""
 
         super(Vanilla3DCNN, self).__init__()
@@ -27,8 +25,6 @@ class Vanilla3DCNN(pl.LightningModule):
         self.max_pool3d = nn.MaxPool3d(kernel_size=(2, 2, 2), stride=2)
         self.avg_pool3d = nn.AvgPool3d(kernel_size=(2, 2, 2), stride=1)
         self.global_pool3d = nn.MaxPool3d(kernel_size=(11, 11, 11))
-
-        self.config = config
 
     def forward(self, x):
         """#TODO: Add docstring."""
@@ -67,51 +63,14 @@ class Vanilla3DCNN(pl.LightningModule):
 
         return x
 
-    def general_step(self, batch, batch_idx, mode):
-        model, label = batch
-        prediction = self.forward(model)
-        loss = F.binary_cross_entropy(prediction, label)
-        acc = accuracy_score(label.detach().cpu().numpy(), prediction.round().detach().cpu().numpy())
-
-        return loss, acc
-
-    def general_end(self, outputs, mode):
-        # average over all batches aggregated during one epoch
-        avg_loss = torch.stack([x[mode + '_loss'] for x in outputs]).mean()
-        avg_acc = torch.stack([x[mode + '_acc'] for x in outputs]).mean()
-        return avg_loss, avg_acc
-
-    def training_step(self, batch, batch_idx):
-        loss, acc = self.general_step(batch, batch_idx, "train")
-        self.log('train_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
-        self.log('train_acc', acc, on_step=True, on_epoch=True, prog_bar=True, logger=True)
-        return {'loss': loss, 'acc': acc}
-
-    def validation_step(self, batch, batch_idx):
-        loss, acc = self.general_step(batch, batch_idx, "val")
-        self.log('val_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
-        self.log('val_acc', acc, on_step=True, on_epoch=True, prog_bar=True, logger=True)
-        return {'val_loss': loss, 'val_acc': acc}
-
-    def validation_end(self, outputs):
-        avg_loss, avg_acc = self.general_end(outputs, "val")
-        return {'val_loss': avg_loss, 'avg_acc': avg_acc}
-
-    def configure_optimizers(self):
-        return self.config.optimizer
-
-    def get_progress_bar_dict(self):
-        tqdm_dict = super().get_progress_bar_dict()
-        if 'v_num' in tqdm_dict:
-            del tqdm_dict['v_num']
-        return tqdm_dict
-
 
 # For testing purposes
 if __name__ == '__main__':
     model = Vanilla3DCNN()
-
+    summary(model,(1,128,128,128))
+    """
     if torch.cuda.device_count() > 0:
         summary(model.cuda(), (1, 128, 128, 128))
     else:
         summary(model, (1, 128, 128, 128))
+    """

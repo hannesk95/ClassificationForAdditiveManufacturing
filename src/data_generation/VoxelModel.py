@@ -102,11 +102,9 @@ class VoxelModel:
                 showscale=False
             )
             mesh3d_list.append(mesh3d)
-
         title = f"STL Model {self.model_name}"
         layout = get_layout(title)
         fig = go.Figure(data=mesh3d_list, layout=layout)
-
         if save:
             if format == 'html':
                 target_path = os.path.join(self.target_dir, self.model_name + '.html')
