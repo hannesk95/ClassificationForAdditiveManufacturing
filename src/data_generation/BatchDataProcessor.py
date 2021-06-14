@@ -42,7 +42,8 @@ class BatchDataProcessor:
 
     def process(self):
         """# TODO"""
-        for batch in self._load_data_batch():
+        for batch in tqdm(self._load_data_batch(), total=int(np.floor(len(self.filepaths) / self.batch_size))+1,
+                          desc="INFO - Batch: "):
             for model in tqdm(batch, desc="INFO - Running models through the pipeline"):
                 if self.transformer is not None:
                     models = self.transformer(model)
