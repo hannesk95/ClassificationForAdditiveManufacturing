@@ -29,16 +29,20 @@ def main():
         voxelizer = VoxelizerGPU(dimension=config.voxel_dimensions)
     else:
         voxelizer = Voxelizer(dimension=config.voxel_dimensions, representation=config.voxel_representation)
-    # defector = DefectorTopDownView(hole_radius_nonprintable=config.hole_radius_nonprintable,
-    #                             hole_radius_printable=config.hole_radius_printable,
-    #                             border_nonprintable=config.border_nonprintable,
-    #                             border_printable=config.border_printable,
-    #                             number_of_trials=config.number_of_trials)
 
-    defector = Defector(max_cylinder_diameter = config.max_cylinder_diameter,
-                        trials = config.trials,
-                        remaining_voxels = config.remaining_voxels,
-                        factor = config.factor)
+    if config.defector_type == 'DefectorTopDownView':
+        defector = DefectorTopDownView(hole_radius_nonprintable=config.hole_radius_nonprintable,
+                                    hole_radius_printable=config.hole_radius_printable,
+                                    border_nonprintable=config.border_nonprintable,
+                                    border_printable=config.border_printable,
+                                    number_of_trials=config.number_of_trials)
+    elif config.defector_type == 'DefectorExhaustive':
+        defector = Defector(max_cylinder_diameter = config.max_cylinder_diameter,
+                            trials = config.trials,
+                            remaining_voxels = config.remaining_voxels,
+                            factor = config.factor)
+    elif config.defector_type == 'DefectorRotation':
+        pass  # TODO add Defector Rotation here
 
     # 4. Compose transformations
     composer = ComposeTransformer([cleaner, normalizer, aligner, voxelizer, defector])

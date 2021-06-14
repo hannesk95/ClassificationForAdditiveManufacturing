@@ -28,12 +28,14 @@ class ParamConfigurator:
         self.voxel_dimensions = config['Voxelization'].getint('voxel_dimensions')
         self.voxel_representation = config['Voxelization']['voxel_representation']
 
-        self.hole_radius_nonprintable = config['Defector'].getint('hole_radius_nonprintable')
-        self.hole_radius_printable = config['Defector'].getint('hole_radius_printable')
-        self.border_nonprintable = config['Defector'].getint('border_nonprintable')
-        self.border_printable = config['Defector'].getint('border_printable')
-        self.rotation = config['Defector'].getboolean('rotation')
-        self.number_of_trials = config['Defector'].getint('number_of_trials')
+        self.defector_type = config['Defector']['defector_type']
+
+        self.hole_radius_nonprintable = config['DefectorTopDownView'].getint('hole_radius_nonprintable')
+        self.hole_radius_printable = config['DefectorTopDownView'].getint('hole_radius_printable')
+        self.border_nonprintable = config['DefectorTopDownView'].getint('border_nonprintable')
+        self.border_printable = config['DefectorTopDownView'].getint('border_printable')
+        self.rotation = config['DefectorTopDownView'].getboolean('rotation')
+        self.number_of_trials = config['DefectorTopDownView'].getint('number_of_trials')
 
         self.max_cylinder_diameter = config['ModelDefector'].getint('max_cylinder_diameter')
         self.trials = config['ModelDefector'].getint('trials')
