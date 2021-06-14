@@ -5,9 +5,9 @@ import numpy as np
 
 class ParamConfigurator:
 
-    def __init__(self):
+    def __init__(self, config_path: str='config.ini'):
         config = configparser.ConfigParser()
-        config.read('config.ini')
+        config.read(config_path)
 
         self.model_path = config['filepaths']['model_path']
         if self.model_path == 'None':
