@@ -3,7 +3,8 @@ import os
 from stl import mesh
 import open3d as o3d
 import plotly.graph_objects as go
-from src.data_generation.utils import extract_file_name, get_layout
+from src.data_generation.utils import extract_file_name
+from src.data_generation.VoxelModel import get_layout
 
 
 def _convert_to_o3d_mesh(vertices, faces):
