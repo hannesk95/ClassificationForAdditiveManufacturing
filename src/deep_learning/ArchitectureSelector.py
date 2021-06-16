@@ -36,10 +36,10 @@ class ArchitectureSelector:
                 self.model = InceptionNet_v3()
             self.config.experiment_name = self.nn_architecture + str(self.config.inception_version)
 
-        if self.config.device.type == 'cuda':
+        # if self.config.device.type == 'cuda':
 
             # Send network to GPU if available
-            self.model.cuda()
+            # self.model.cuda()
 
         # Define optimizer
         if self.config.optimizer == 'Adam':
