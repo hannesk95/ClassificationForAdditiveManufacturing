@@ -25,7 +25,7 @@ class AMCDataset(Dataset):
         models = [elem for elem in models if elem.endswith('.npz')]
         if self.config.cutoff is not 0:
             models = models[:self.config.cutoff]
-        models = [os.path.join(self.data_dir, model_path) for model_path in models]
+        models = [os.path.join(self.config.data_dir, model_path) for model_path in models]
         return models
 
     def __getitem__(self, idx):
