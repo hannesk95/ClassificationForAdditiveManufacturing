@@ -18,7 +18,8 @@ class ClassificationTask(pl.LightningModule):
     def training_step(self, batch, batch_idx) -> dict:
         model, label = batch
         pred = self.nn_model(model)
-        loss = F.binary_cross_entropy(pred, label)
+        # loss = F.binary_cross_entropy(pred, label)
+        loss = F.binary_cross_entropy_with_logits(pred, label)
         self.train_acc(pred.round().int(), label.int())
         # acc = torchmetrics.functional.accuracy(pred.round().int(), label.int())
 
@@ -34,7 +35,8 @@ class ClassificationTask(pl.LightningModule):
     def validation_step(self, batch, batch_idx) -> dict:
         model, label = batch
         pred = self.nn_model(model)
-        val_loss = F.binary_cross_entropy(pred, label)
+        # val_loss = F.binary_cross_entropy(pred, label)
+        val_loss = F.binary_cross_entropy_with_logits(pred, label)
         self.val_acc(pred.round().int(), label.int())
         # val_acc = torchmetrics.functional.accuracy(pred.round(), label)
 
