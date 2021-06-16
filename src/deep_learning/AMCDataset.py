@@ -7,12 +7,10 @@ from torch.utils.data import Dataset
 class AMCDataset(Dataset):
     """Additive Manufacturing Classification (AMC) dataset."""
 
-    def __init__(self, config: object, transform=None, cutoff: int = None):
+    def __init__(self, config: object, transform=None):
         """# TODO: Docstring"""
         super(AMCDataset, self).__init__()
         self.config = config
-        self.data_dir = self.config.data_dir
-        self.cutoff = cutoff
         self.models = self._load_model_paths()
         self.transform = transform
 
@@ -22,12 +20,13 @@ class AMCDataset(Dataset):
 
     def _load_model_paths(self) -> list:
         """# TODO: Docstring"""
-        models = os.listdir(self.data_dir)
+        models = os.listdir(self.config.data_dir)
         self.config.data_len = len(models)
         models = [elem for elem in models if elem.endswith('.npz')]
-        if self.cutoff is not None:
-            models = models[:self.cutoff]
-        models = [os.path.join(self.data_dir, model_path) for model_path in models]
+        if self.config.cutoff is not 0:
+            self.config.data_len = self.config.cutoff
+            models = models[:self.config.cutoff]
+        models = [os.path.join(self.config.data_dir, model_path) for model_path in models]
         return models
 
     def __getitem__(self, idx):

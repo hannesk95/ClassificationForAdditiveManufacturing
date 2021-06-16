@@ -23,8 +23,8 @@ class ClassificationTask(pl.LightningModule):
         self.train_acc(pred.round().int(), label.int())
         # acc = torchmetrics.functional.accuracy(pred.round().int(), label.int())
 
-        self.log('train_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
-        self.log('train_acc', self.train_acc, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.log('train_loss', loss, on_step=False, on_epoch=True, prog_bar=True, logger=False)
+        self.log('train_acc', self.train_acc, on_step=False, on_epoch=True, prog_bar=True, logger=False)
 
         return loss
 
@@ -40,8 +40,8 @@ class ClassificationTask(pl.LightningModule):
         self.val_acc(pred.round().int(), label.int())
         # val_acc = torchmetrics.functional.accuracy(pred.round(), label)
 
-        self.log('val_loss', val_loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
-        self.log('val_acc', self.val_acc, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.log('val_loss', val_loss, on_step=False, on_epoch=True, prog_bar=True, logger=False)
+        self.log('val_acc', self.val_acc, on_step=False, on_epoch=True, prog_bar=True, logger=False)
 
         return val_loss
 

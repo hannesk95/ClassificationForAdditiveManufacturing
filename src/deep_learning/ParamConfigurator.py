@@ -40,20 +40,13 @@ class ParamConfigurator:
 
         # Dataset
         self.data_dir = config['dataset']['data_dir']
+        if not os.path.exists(self.data_dir):
+            raise ValueError(f"[ERROR] Data directory specified does not exist!")
         self.train_val_ratio = config['dataset']['train_val_ratio']
         self.train_split = int(self.train_val_ratio.split("/")[0])/100
         self.val_split = int(self.train_val_ratio.split("/")[-1])/100
         self.data_len = None
-
-        # Train Data
-        self.train_data_dir = config['train_data']['train_data_dir']
-        if not os.path.exists(self.train_data_dir):
-            raise ValueError(f"[ERROR] Directory specified for training data does not exist!")
-
-        # Validation Data
-        self.validation_data_dir = config['validation_data']['validation_data_dir']
-        if not os.path.exists(self.validation_data_dir):
-            raise ValueError(f"[ERROR] Directory specified for validation data does not exist!")
+        self.cutoff = config['dataset'].getint('cutoff')
 
         # ResNet
         self.resnet_depth = config['ResNet'].getint('depth')
