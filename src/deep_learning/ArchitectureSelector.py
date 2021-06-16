@@ -5,12 +5,12 @@ from src.deep_learning.network import Vanilla3DCNN, ResNet, VGGNet, InceptionNet
 class ArchitectureSelector:
     """# TODO: Docstring"""
 
-    def __init__(self, nn_architecture: str, config):
+    def __init__(self, config: object):
         """# TODO: Docstring"""
 
-        self.nn_architecture = nn_architecture
-        self.architectures = ["Vanilla3DCNN", "ResNet", "VGGNet", "InceptionNet"]
         self.config = config
+        self.nn_architecture = self.config.architecture_type
+        self.architectures = ["Vanilla3DCNN", "ResNet", "VGGNet", "InceptionNet"]
         self.model = None
 
     def select_architecture(self):

@@ -24,7 +24,7 @@ def main():
     config = ParamConfigurator()
 
     # 2. Select neural network architecture and create model
-    selector = ArchitectureSelector(config.architecture_type, config)
+    selector = ArchitectureSelector(config)
     nn_model = selector.select_architecture()
 
     # 3. Define transformations
