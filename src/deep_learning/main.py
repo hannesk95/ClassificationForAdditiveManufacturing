@@ -5,10 +5,11 @@ sys.path.append("../..")
 
 import logging
 import mlflow.pytorch
+import torch
 import pytorch_lightning as pl
 
 from torchvision.transforms import transforms
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, random_split
 
 from src.deep_learning.AMCDataset import AMCDataset
 from src.deep_learning.ParamConfigurator import ParamConfigurator
@@ -28,8 +29,11 @@ def main():
     transformations = transforms.Compose([transforms.ToTensor()])
 
     # 4. Initialize dataset
-    train_dataset = AMCDataset(config.train_data_dir, transform=transformations)
-    validation_dataset = AMCDataset(config.validation_data_dir, transform=transformations)
+    dataset = AMCDataset(config.train_data_dir, transform=transformations)
+    num_train = int(len(dataset) * config.fraction_train)
+    num_val = int(len(dataset) * config.fraction_val)
+    train_dataset, validation_dataset = random_split(dataset, [num_train, num_val],
+                                                     generator=torch.Generator().manual_seed(42))
 
     # 5. Create dataloader
     train_data_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=True, **config.kwargs)

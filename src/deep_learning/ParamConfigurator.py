@@ -16,6 +16,8 @@ class ParamConfigurator:
         self.experiment_name = self.architecture_type
 
         # Training
+        self.fraction_train = config['training'].getfloat('fraction_train')
+        self.fraction_val = config['training'].getfloat('fraction_val')
         self.batch_size = config['training'].getint('batch_size')
         self.num_epochs = config['training'].getint('num_epochs')
         self.learning_rate = config['training'].getfloat('learning_rate')
