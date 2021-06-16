@@ -48,6 +48,7 @@ class ParamConfigurator:
         self.train_split = int(self.train_val_ratio.split("/")[0])/100
         self.val_split = int(self.train_val_ratio.split("/")[-1])/100
         self.data_len = None
+        self.cutoff = config['dataset'].getint('cutoff')
 
         # ResNet
         self.resnet_depth = config['ResNet'].getint('depth')

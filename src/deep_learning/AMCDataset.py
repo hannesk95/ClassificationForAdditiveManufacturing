@@ -12,7 +12,7 @@ class AMCDataset(Dataset):
         super(AMCDataset, self).__init__()
         self.config = config
         self.data_dir = self.config.data_dir
-        self.cutoff = cutoff
+        self.cutoff = self.config.cutoff
         self.models = self._load_model_paths()
         self.transform = transform
 
@@ -25,7 +25,7 @@ class AMCDataset(Dataset):
         models = os.listdir(self.data_dir)
         self.config.data_len = len(models)
         models = [elem for elem in models if elem.endswith('.npz')]
-        if self.cutoff is not None:
+        if self.cutoff is not 0:
             models = models[:self.cutoff]
         models = [os.path.join(self.data_dir, model_path) for model_path in models]
         return models
