@@ -31,15 +31,14 @@ def main():
     transformations = transforms.Compose([transforms.ToTensor()])
 
     # 4. Initialize dataset
-    # train_dataset = AMCDataset(config.train_data_dir, transform=transformations)
-    # validation_dataset = AMCDataset(config.validation_data_dir, transform=transformations)
     dataset = AMCDataset(config, transform=transformations)
 
     # 5 Split dataset into train and val set
-    torch.manual_seed(42)
     train_dataset, validation_dataset = random_split(dataset,
                                                      [int(config.data_len*config.train_split),
-                                                      config.data_len - int(config.data_len*config.train_split)])
+                                                      config.data_len - int(config.data_len*config.train_split)],
+                                                     generator=torch.Generator().manual_seed(42)
+                                                     )
 
     # 5. Create dataloader
     train_data_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=True, **config.kwargs)
