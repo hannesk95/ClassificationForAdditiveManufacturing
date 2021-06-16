@@ -13,8 +13,8 @@ class Vanilla3DCNN(pl.LightningModule):
         super(Vanilla3DCNN, self).__init__()
 
         self.conv1 = nn.Conv3d(in_channels=1, out_channels=16, kernel_size=(9, 9, 9))
-        self.conv2 = nn.Conv3d(in_channels=16, out_channels=32, kernel_size=(7, 7, 7))
-        self.conv3 = nn.Conv3d(in_channels=32, out_channels=32, kernel_size=(5, 5, 5))
+        # self.conv2 = nn.Conv3d(in_channels=16, out_channels=32, kernel_size=(7, 7, 7))
+        self.conv3 = nn.Conv3d(in_channels=16, out_channels=32, kernel_size=(5, 5, 5))
         self.conv4 = nn.Conv3d(in_channels=32, out_channels=32, kernel_size=(3, 3, 3))
 
         self.fc1 = nn.Linear(in_features=32, out_features=16)
@@ -23,8 +23,8 @@ class Vanilla3DCNN(pl.LightningModule):
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(p=0.2)
         self.max_pool3d = nn.MaxPool3d(kernel_size=(2, 2, 2), stride=2)
-        self.avg_pool3d = nn.AvgPool3d(kernel_size=(2, 2, 2), stride=1)
-        self.global_pool3d = nn.MaxPool3d(kernel_size=(11, 11, 11))
+        self.avg_pool3d = nn.AvgPool3d(kernel_size=(3, 3, 3), stride=2)
+        self.global_pool3d = nn.MaxPool3d(kernel_size=(13, 13, 13))
 
         for m in self.modules():
             if isinstance(m, nn.Conv3d):
@@ -41,9 +41,9 @@ class Vanilla3DCNN(pl.LightningModule):
         x = self.relu(x)
 
         # Convolution block 2
-        x = self.conv2(x)
-        x = self.relu(x)
-        x = self.max_pool3d(x)
+        # x = self.conv2(x)
+        # x = self.relu(x)
+        # x = self.max_pool3d(x)
 
         # Convolution block 3
         x = self.conv3(x)
