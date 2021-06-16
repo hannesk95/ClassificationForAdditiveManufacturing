@@ -2,8 +2,10 @@ import torch
 import torch.nn as nn
 from torchsummary import summary
 
-def conv_3x3x3(in_planes, out_planes,kernel_size=3, stride = 1):
-    return nn.Conv3d(in_planes, out_planes, kernel_size=kernel_size, stride=stride, padding=0,bias=False)
+
+def conv_3x3x3(in_planes, out_planes, kernel_size=3, stride=1):
+    return nn.Conv3d(in_planes, out_planes, kernel_size=kernel_size, stride=stride, padding=0, bias=False)
+
 
 class VGGNet(nn.Module):
     def __init__(self, in_channels=1):
@@ -16,15 +18,14 @@ class VGGNet(nn.Module):
         self.batchnorm2 = nn. BatchNorm3d(64)
         self.conv3 = conv_3x3x3(in_planes=64, out_planes=128,stride=2)
         self.batchnorm3 = nn. BatchNorm3d(128)
-       
 
         self.relu = nn.ReLU()
         self.fc1 = nn.Linear(128, 32)
-        self.fc2 = nn.Linear(32,1)
+        self.fc2 = nn.Linear(32, 1)
         self.sigmoid = nn.Sigmoid()
         self.dropout = nn.Dropout3d(p = 0.4)
         
-    def forward(self,x):
+    def forward(self, x):
         
         x = self.conv1(x)
         x = self.batchnorm1(x)
@@ -42,7 +43,7 @@ class VGGNet(nn.Module):
         x = self.relu(x)
         x = self.maxpool2(x)
     
-        x = x.view(x.size(0),-1)
+        x = x.view(x.size(0), -1)
 
         x = self.relu(self.fc1(x))
         x = self.sigmoid(self.fc2(x))
@@ -50,7 +51,7 @@ class VGGNet(nn.Module):
         return x
 
 
-#Testing 
+# Testing
 if __name__ == "__main__":
     net = VGGNet()
-    summary(net,(1,128,128,128))
+    summary(net, (1, 128, 128, 128))
