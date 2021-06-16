@@ -1,4 +1,7 @@
 import sys
+
+import torch
+
 sys.path.append(".")   #TODO Ugly - currently needed for LRZ AI System - find better solution
 sys.path.append("..")
 sys.path.append("../..")
@@ -8,7 +11,7 @@ import mlflow.pytorch
 import pytorch_lightning as pl
 
 from torchvision.transforms import transforms
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, random_split
 
 from src.deep_learning.AMCDataset import AMCDataset
 from src.deep_learning.ParamConfigurator import ParamConfigurator
@@ -28,8 +31,15 @@ def main():
     transformations = transforms.Compose([transforms.ToTensor()])
 
     # 4. Initialize dataset
-    train_dataset = AMCDataset(config.train_data_dir, transform=transformations)
-    validation_dataset = AMCDataset(config.validation_data_dir, transform=transformations)
+    # train_dataset = AMCDataset(config.train_data_dir, transform=transformations)
+    # validation_dataset = AMCDataset(config.validation_data_dir, transform=transformations)
+    dataset = AMCDataset(config, transform=transformations)
+
+    # 5 Split dataset into train and val set
+    torch.manual_seed(42)
+    train_dataset, validation_dataset = random_split(dataset,
+                                                     [int(config.data_len*config.train_split),
+                                                      config.data_len - int(config.data_len*config.train_split)])
 
     # 5. Create dataloader
     train_data_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=True, **config.kwargs)

@@ -38,6 +38,13 @@ class ParamConfigurator:
         if self.loss_function == 'BCE':
             self.loss_function = torch.nn.BCELoss()
 
+        # Dataset
+        self.data_dir = config['dataset']['data_dir']
+        self.train_val_ratio = config['dataset']['train_val_ratio']
+        self.train_split = int(self.train_val_ratio.split("/")[0])/100
+        self.val_split = int(self.train_val_ratio.split("/")[-1])/100
+        self.data_len = None
+
         # Train Data
         self.train_data_dir = config['train_data']['train_data_dir']
         if not os.path.exists(self.train_data_dir):
