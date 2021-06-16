@@ -4,7 +4,6 @@ import pytorch_lightning as pl
 from torchsummary import summary
 
 
-
 class Vanilla3DCNN(pl.LightningModule):
     """#TODO: Add docstring."""
 
@@ -13,13 +12,13 @@ class Vanilla3DCNN(pl.LightningModule):
 
         super(Vanilla3DCNN, self).__init__()
 
-        self.conv1 = nn.Conv3d(in_channels=1, out_channels=32, kernel_size=(9, 9, 9))
-        self.conv2 = nn.Conv3d(in_channels=32, out_channels=64, kernel_size=(7, 7, 7))
-        self.conv3 = nn.Conv3d(in_channels=64, out_channels=96, kernel_size=(5, 5, 5))
-        self.conv4 = nn.Conv3d(in_channels=96, out_channels=128, kernel_size=(3, 3, 3))
+        self.conv1 = nn.Conv3d(in_channels=1, out_channels=16, kernel_size=(9, 9, 9))
+        self.conv2 = nn.Conv3d(in_channels=16, out_channels=32, kernel_size=(7, 7, 7))
+        self.conv3 = nn.Conv3d(in_channels=32, out_channels=32, kernel_size=(5, 5, 5))
+        self.conv4 = nn.Conv3d(in_channels=32, out_channels=32, kernel_size=(3, 3, 3))
 
-        self.fc1 = nn.Linear(in_features=128, out_features=32)
-        self.fc2 = nn.Linear(in_features=32, out_features=1)
+        self.fc1 = nn.Linear(in_features=32, out_features=16)
+        self.fc2 = nn.Linear(in_features=16, out_features=1)
 
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(p=0.2)
@@ -72,15 +71,11 @@ class Vanilla3DCNN(pl.LightningModule):
         return x
 
 
-
-
 # For testing purposes
 if __name__ == '__main__':
     model = Vanilla3DCNN()
-   
-    
+
     if torch.cuda.device_count() > 0:
         summary(model.cuda(), (1, 128, 128, 128))
     else:
         summary(model, (1, 128, 128, 128))
-    
