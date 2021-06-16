@@ -20,6 +20,7 @@ from src.deep_learning.ArchitectureSelector import ArchitectureSelector
 
 
 def main():
+
     # 1. Define configuration parameters
     config = ParamConfigurator()
 
@@ -31,29 +32,27 @@ def main():
     transformations = transforms.Compose([transforms.ToTensor()])
 
     # 4. Initialize dataset
-    # train_dataset = AMCDataset(config.train_data_dir, transform=transformations)
-    # validation_dataset = AMCDataset(config.validation_data_dir, transform=transformations)
     dataset = AMCDataset(config, transform=transformations)
 
-    # 5 Split dataset into train and val set
-    torch.manual_seed(42)
-    train_dataset, validation_dataset = random_split(dataset,
-                                                     [int(config.data_len*config.train_split),
-                                                      config.data_len - int(config.data_len*config.train_split)])
+    # 5. Split dataset into train and val set
+    train_data, val_data = random_split(dataset,
+                                        [int(config.data_len*config.train_split),
+                                         config.data_len - int(config.data_len*config.train_split)],
+                                        generator=torch.Generator().manual_seed(42))
 
-    # 5. Create dataloader
-    train_data_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=True, **config.kwargs)
-    validation_data_loader = DataLoader(validation_dataset, batch_size=config.batch_size, shuffle=False, **config.kwargs)
+    # 6. Create dataloader
+    train_data_loader = DataLoader(train_data, batch_size=config.batch_size, shuffle=True, **config.kwargs)
+    validation_data_loader = DataLoader(val_data, batch_size=config.batch_size, shuffle=False, **config.kwargs)
 
-    # 6. Start MLflow logging
+    # 7. Start MLflow logging
     mlflow.set_tracking_uri(config.mlflow_log_dir)
     mlflow.set_experiment(config.experiment_name)
     mlflow.pytorch.autolog()
 
-    # 7. Create classifier
+    # 8. Create classifier
     classifier = ClassificationTask(nn_model=nn_model, config=config)
 
-    # 8. Start training
+    # 9. Start training
     trainer = pl.Trainer(max_epochs=config.num_epochs, accelerator='horovod', gpus=1,
                          precision=16)  # , accumulate_grad_batches=10)
     # trainer = pl.Trainer(max_epochs=config.num_epochs)
@@ -61,6 +60,7 @@ def main():
 
 
 if __name__ == '__main__':
+
     logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=logging.DEBUG)
     logging.info('Started main_deep_learning')
 
