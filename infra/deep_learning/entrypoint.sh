@@ -6,5 +6,9 @@ cd /workspace/TUM-DI-LAB
 git checkout dev
 cd /workspace
 
+cd /workspace/mount_dir/
+mlflow ui -h 0.0.0.0 -p 5000 &
+cd /workspace
+
 # Start bash
 /bin/bash
