@@ -29,6 +29,9 @@ RUN HOROVOD_GPU_OPERATIONS=NCCL pip install horovod
 # Install screen
 RUN apt -y install screen
 
+# Install net-tools
+RUN apt install net-tools
+
 # Expose port
 EXPOSE 5000
 EXPOSE 8888
