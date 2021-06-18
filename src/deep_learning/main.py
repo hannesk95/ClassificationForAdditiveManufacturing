@@ -17,6 +17,7 @@ from src.deep_learning.AMCDataset import AMCDataset
 from src.deep_learning.ParamConfigurator import ParamConfigurator
 from src.deep_learning.ClassificationTask import ClassificationTask
 from src.deep_learning.ArchitectureSelector import ArchitectureSelector
+from src.deep_learning.FailureAnalyst import FailureAnalyst
 
 
 def main():
@@ -53,10 +54,12 @@ def main():
     classifier = ClassificationTask(nn_model=nn_model, config=config)
 
     # 9. Start training
-    trainer = pl.Trainer(max_epochs=config.num_epochs, accelerator='horovod', gpus=1,
-                         precision=16)  # , accumulate_grad_batches=10)
-    # trainer = pl.Trainer(max_epochs=config.num_epochs)
+    trainer = pl.Trainer(max_epochs=config.num_epochs, deterministic=True, accelerator='horovod', gpus=1, precision=16)
     trainer.fit(classifier, train_data_loader, validation_data_loader)
+
+    # 10. Failure Analysis
+    analyst = FailureAnalyst(config, trainer, validation_data_loader, val_data)
+    analyst.start_failure_analysis()
 
 
 if __name__ == '__main__':
