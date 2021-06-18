@@ -57,8 +57,8 @@ def main():
     trainer = pl.Trainer(max_epochs=config.num_epochs, deterministic=True, accelerator='horovod', gpus=1, precision=16)
     trainer.fit(classifier, train_data_loader, validation_data_loader)
 
-    # 10. Failure Analysis
-    analyst = FailureAnalyst(config, trainer, validation_data_loader, val_data)
+    # 10. Perform failure analysis
+    analyst = FailureAnalyst(config, trainer, val_data)
     analyst.start_failure_analysis()
 
 
