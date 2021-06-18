@@ -26,7 +26,7 @@ def main():
     config = ParamConfigurator()
 
     # 2. Select neural network architecture and create model
-    selector = ArchitectureSelector(config)
+    selector = ArchitectureSelector(config=config)
     nn_model = selector.select_architecture()
 
     # 3. Define transformations
@@ -58,7 +58,7 @@ def main():
     trainer.fit(classifier, train_data_loader, validation_data_loader)
 
     # 10. Perform failure analysis
-    analyst = FailureAnalyst(config, trainer, val_data)
+    analyst = FailureAnalyst(config=config, trainer=trainer, val_data=val_data)
     analyst.start_failure_analysis()
 
 
