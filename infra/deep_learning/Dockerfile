@@ -29,6 +29,10 @@ RUN HOROVOD_GPU_OPERATIONS=NCCL pip install horovod
 # Install screen
 RUN apt -y install screen
 
+# Expose port
+EXPOSE 5000
+EXPOSE 8888
+
 # Copy .sbatch script into container
 COPY script.sbatch script.sbatch
 
