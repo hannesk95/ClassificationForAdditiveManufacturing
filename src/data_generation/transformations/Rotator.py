@@ -20,7 +20,7 @@ def rotate_model(model_data: np.ndarray, x_rotation: int, y_rotation: int, z_rot
 
 class Rotator:
     def __init__(self, x_rotation,y_rotation,z_rotation):
-        self.x_roation = x_rotation
+        self.x_rotation = x_rotation
         self.y_rotation = y_rotation
         self.z_rotation = z_rotation
         random.seed(42)
@@ -47,6 +47,7 @@ class Rotator:
                                     
             #Voxel_model rotated                        
             model_rotated = VoxelModel(model_data_tmp, np.array([1]), model.model_name + f'_rotated{self.x_rotation}_{self.y_rotation}_{self.z_rotation}')
+            return [model, model_rotated]
                 
                 
                
