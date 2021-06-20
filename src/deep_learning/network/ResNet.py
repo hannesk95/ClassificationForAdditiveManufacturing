@@ -144,7 +144,7 @@ class ResNet(nn.Module):
         return x
 
     def generate_model(model_depth, pretrained: bool = False, **kwargs):
-        assert model_depth in [18, 50, 101, 152]
+        assert model_depth in [10,18, 50, 101, 152]
 
         if model_depth == 18:
             if pretrained:
