@@ -24,6 +24,7 @@ from src.deep_learning.ArchitectureSelector import ArchitectureSelector
 from src.deep_learning.FailureAnalyst import FailureAnalyst
 
 def metric_average(val, name):
+    tensor = val.clone().detach()
     tensor = torch.tensor(val)
     avg_tensor = hvd.allreduce(tensor, name=name)
     return avg_tensor.item()
@@ -38,10 +39,10 @@ def test(model, test_sampler, test_loader):
 
     for data, target in test_loader:
         data, target = data.to(device), target.to(device)
-        output = model(data)
+        output = model(data).clone().detach().cpu()
         # sum up batch loss
-        test_loss += F.binary_cross_entropy_with_logits(output.cpu(), target.cpu()).item()
-        test_accuracy += torchmetrics.Accuracy()(output.cpu().round().int(), target.cpu().int())
+        test_loss += F.binary_cross_entropy_with_logits(output, target.clone().detach().cpu()).item()
+        test_accuracy += torchmetrics.Accuracy()(output.round().int(), target.clone().detach().cpu().int())
 
     # Horovod: use test_sampler to determine the number of examples in
     # this worker's partition.
