@@ -29,18 +29,19 @@ def metric_average(val, name):
     return avg_tensor.item()
 
 def test(model, test_sampler, test_loader):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = model.to(device)
+
     model.eval()
     test_loss = 0.
     test_accuracy = 0.
-
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     for data, target in test_loader:
         data, target = data.to(device), target.to(device)
         output = model(data)
         # sum up batch loss
-        test_loss += F.binary_cross_entropy_with_logits(output, target).item()
-        test_accuracy += torchmetrics.Accuracy()(output.round().int(), target.int())
+        test_loss += F.binary_cross_entropy_with_logits(output.cpu(), target.cpu()).item()
+        test_accuracy += torchmetrics.Accuracy()(output.cpu().round().int(), target.cpu().int())
 
     # Horovod: use test_sampler to determine the number of examples in
     # this worker's partition.
@@ -57,6 +58,8 @@ def test(model, test_sampler, test_loader):
             test_loss, 100. * test_accuracy))
 
 def main():
+
+    hvd.init()
 
     # 1. Define configuration parameters
     config = ParamConfigurator()
