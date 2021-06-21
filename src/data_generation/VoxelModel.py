@@ -66,10 +66,11 @@ class VoxelModel:
         ax.set_xlabel('x (0)')
         ax.set_ylabel('y (1)')
         ax.set_zlabel('z (2)')
+        plt.tight_layout()
         if target_path is None:
             plt.show()
         else:
-            plt.savefig(os.path.join(target_path, self.model_name))
+            plt.savefig(os.path.join(target_path, self.model_name), bbox_inches='tight', pad_inches=0)
             plt.close(fig)
 
     def plot_voxel(self, save=True, format='html'):

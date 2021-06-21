@@ -115,7 +115,10 @@ def _visualize_top_down_view(model_data: np.ndarray, possible_offsets_final: lis
         idy = indices[1]
         basis[idx, idy] = 1
     sns.heatmap(basis + (top_down_view > 0))
-    plt.show()
+    name = str(np.random.randint(1000, size=1))
+    plt.tight_layout()
+    plt.savefig(name + '.png', bbox_inches='tight', pad_inches=0)
+    plt.close()
 
 
 class DefectorTopDownView:
