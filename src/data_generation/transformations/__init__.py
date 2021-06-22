@@ -7,3 +7,4 @@ from .VoxelizerGPU import VoxelizerGPU
 from .DefectorTopDownView import DefectorTopDownView
 from .Cleaner import Cleaner
 from .DefectorRotation2 import DefectorRotation2
+from .Rotator import Rotator
