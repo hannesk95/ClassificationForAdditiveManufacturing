@@ -96,7 +96,7 @@ class ClassificationTask(pl.LightningModule):
         orig_stdout = sys.stdout
         f = open('model_summary.txt', 'w')
         sys.stdout = f
-        summary(self.nn_model, (1, 128, 128, 128))
+        summary(self.nn_model.cuda(), (1, 128, 128, 128))
         sys.stdout = orig_stdout
         f.close()
         mlflow.log_artifact("model_summary.txt", artifact_path="model_summary")
