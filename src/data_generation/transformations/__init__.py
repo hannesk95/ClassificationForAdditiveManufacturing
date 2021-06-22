@@ -6,5 +6,5 @@ from .ComposeTransformer import ComposeTransformer
 from .VoxelizerGPU import VoxelizerGPU
 from .DefectorTopDownView import DefectorTopDownView
 from .Cleaner import Cleaner
-from .DefectorRotation2 import DefectorRotation2
+from .DefectorRotation import DefectorRotation
 from .Rotator import Rotator
