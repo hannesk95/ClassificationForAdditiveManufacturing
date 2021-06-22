@@ -23,7 +23,7 @@ class AMCDataset(Dataset):
         models = os.listdir(self.config.data_dir)
         self.config.data_len = len(models)
         models = [elem for elem in models if elem.endswith('.npz')]
-        if self.config.cutoff is not 0:
+        if self.config.cutoff != 0:
             self.config.data_len = self.config.cutoff
             models = models[:self.config.cutoff]
         models = [os.path.join(self.config.data_dir, model_path) for model_path in models]
