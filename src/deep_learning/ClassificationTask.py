@@ -1,62 +1,112 @@
-import pytorch_lightning as pl
-import torch
-import torch.nn.functional as F
-import torchmetrics
-import mlflow
 import numpy as np
+import pytorch_lightning as pl
+import torch.nn.functional as F
+from torchmetrics import Accuracy
+import mlflow
+from torchsummary import summary
+import sys
+import os
 
 
 class ClassificationTask(pl.LightningModule):
+    """#TODO: Docstring"""
 
     def __init__(self, nn_model: object, config: object):
+        """#TODO: Docstring"""
         super().__init__()
         self.nn_model = nn_model
         self.config = config
-        self.train_acc = torchmetrics.Accuracy()
-        self.val_acc = torchmetrics.Accuracy()
+        self.accuracy = Accuracy()
+        self.train_acc = None
+        self.val_acc = None
+        self.train_loss = None
+        self.val_loss = None
+        self.epoch_count = 0
+        # self.save_mlflow_params()
 
     def training_step(self, batch, batch_idx) -> dict:
+        """#TODO: Docstring"""
         model, label = batch
         pred = self.nn_model(model)
-        # loss = F.binary_cross_entropy(pred, label)
-        loss = F.binary_cross_entropy_with_logits(pred, label)
-        self.train_acc(pred.round().int(), label.int())
-        # acc = torchmetrics.functional.accuracy(pred.round().int(), label.int())
+        self.train_loss = F.binary_cross_entropy_with_logits(pred, label)
+        self.train_acc = self.accuracy(pred.round().int(), label.int())
 
-        self.log('train_loss', loss, on_step=False, on_epoch=True, prog_bar=True, logger=False)
+        # mlflow.log_metric("train_loss_step", self.tensor2float(self.train_loss))
+        # mlflow.log_metric("train_acc_step", self.tensor2float(self.train_acc))
+
+        self.log('train_loss', self.train_loss, on_step=False, on_epoch=True, prog_bar=True, logger=False)
         self.log('train_acc', self.train_acc, on_step=False, on_epoch=True, prog_bar=True, logger=False)
 
-        return loss
+        return self.train_loss
 
     def training_epoch_end(self, training_step_outputs) -> None:
-        pass
-        # mlflow.log_metric("loss", 0.1)
+        """#TODO: Docstring"""
+        self.epoch_count += 1
+
+        # mlflow.log_metric("train_loss_epoch", self.tensor2float(self.train_loss))
+        # mlflow.log_metric("train_acc_epoch", self.tensor2float(self.train_acc))
+
+        if self.epoch_count % 10:
+            print(f"Saving model every 10 epochs...")
 
     def validation_step(self, batch, batch_idx) -> dict:
+        """#TODO: Docstring"""
         model, label = batch
         pred = self.nn_model(model)
-        # val_loss = F.binary_cross_entropy(pred, label)
-        val_loss = F.binary_cross_entropy_with_logits(pred, label)
-        self.val_acc(pred.round().int(), label.int())
-        # val_acc = torchmetrics.functional.accuracy(pred.round(), label)
+        self.val_loss = F.binary_cross_entropy_with_logits(pred, label)
+        self.val_acc = self.accuracy(pred.round().int(), label.int())
 
-        self.log('val_loss', val_loss, on_step=False, on_epoch=True, prog_bar=True, logger=False)
+        # mlflow.log_metric("val_loss_step", self.tensor2float(self.val_loss))
+        # mlflow.log_metric("val_acc_step", self.tensor2float(self.val_acc))
+
+        self.log('val_loss', self.val_loss, on_step=False, on_epoch=True, prog_bar=True, logger=False)
         self.log('val_acc', self.val_acc, on_step=False, on_epoch=True, prog_bar=True, logger=False)
 
-        return val_loss
+        return self.val_loss
 
     def validation_epoch_end(self, validation_step_outputs) -> None:
-        pass
-        # mlflow.log_metric("val_loss", 0.1)
-        # mlflow.log_metric(list(validation_step_outputs)[0], validation_step_outputs[list(validation_step_outputs)[0]])
-        # mlflow.log_metric(list(validation_step_outputs)[1], validation_step_outputs[list(validation_step_outputs)[1]])
+        """#TODO: Docstring"""
+        # mlflow.log_metric("val_loss_epoch", self.tensor2float(self.val_loss))
+        # mlflow.log_metric("val_acc_epoch", self.tensor2float(self.val_acc))
 
     def configure_optimizers(self) -> object:
+        """#TODO: Docstring"""
         return self.config.optimizer
 
     def get_progress_bar_dict(self) -> dict:
+        """#TODO: Docstring"""
         tqdm_dict = super().get_progress_bar_dict()
         if 'v_num' in tqdm_dict:
             del tqdm_dict['v_num']
         return tqdm_dict
+
+    def save_mlflow_params(self):
+        """#TODO: Docstring"""
+        # Save optimizer
+        mlflow.log_param("optimizer", self.config.optimizer)
+
+        # Save learning rate
+        mlflow.log_param("learning_rate", self.config.learning_rate)
+
+        # Save number of epochs
+        mlflow.log_param("epochs", self.config.num_epochs)
+
+        # Save model summary
+        orig_stdout = sys.stdout
+        f = open('model_summary.txt', 'w')
+        sys.stdout = f
+        summary(self.nn_model, (1, 128, 128, 128))
+        sys.stdout = orig_stdout
+        f.close()
+        mlflow.log_artifact("model_summary.txt")
+        os.remove("model_summary.txt")
+
+    @staticmethod
+    def tensor2float(self, tensor) -> float:
+        """Convert PyTorch tensor to float"""
+        return np.float(tensor.detach().numpy())
+
+
+
+
 
