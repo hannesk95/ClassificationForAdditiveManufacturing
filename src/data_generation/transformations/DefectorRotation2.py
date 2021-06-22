@@ -120,21 +120,26 @@ def Rz(theta):
                       [0, 0, 1]])
 
 
-def rotate_voxels(voxels, angle, axis):
+def rotate_voxels(voxels, angle_x,angle_y,angle_z,axes):
     """
     Rotates the voxels of the model
     :param voxels: Voxels of the model data
-    :param angle: angle of rotation in axis
-    :param axis: if 0 axis x, 1 axis y, 2 axis z
+    :param angle_x: angle of rotation in axis x
+    :param angle_y: angle of rotation in axis y
+    :param angle_z: angle of rotation in axis z
+    :param axes: a list of axes to consider rotation in (if 0 axis x, 1 axis y, 2 axis z)
     :return: Rotated voxels
     """
-    if axis == 0:
-        voxels = voxels.dot(Rx(angle))
-    elif axis == 1:
-        voxels = voxels.dot(Ry(angle))
-    elif axis == 2:
-        voxels = voxels.dot(Rz(angle))
-    return np.asarray(voxels)
+    for axis in axes: 
+        if axis == 0:
+            voxels = voxels.dot(Rx(angle_x))
+        elif axis == 1:
+            voxels = voxels.dot(Ry(angle_y))
+        elif axis == 2:
+            voxels = voxels.dot(Rz(angle_z))
+    voxels_rotated =  np.asarray(voxels)
+    rounded_voxels = np.round(voxels_rotated).astype(int)
+    return rounded_voxels, voxels_rotated
 
 
 def voxel_to_occupancy(voxels):
@@ -143,31 +148,35 @@ def voxel_to_occupancy(voxels):
     :param voxels: Voxels of the model data
     :return: Occupancy grid
     """
-    N = voxels.max()
+    '''
+    if abs(voxels.max())> abs(voxels.min()):
+        N = voxels.max()
+    else:
+        N = abs(voxels.min())
+    '''
+    min_x = voxels[:,0].min() 
+    min_y =  voxels[:,1].min() 
+    min_z = voxels[:,2].min()
+    voxels_abs = abs(voxels)
+    N = voxels_abs.max()
+    #N = voxels.max()
     voxels_occ_grid = np.zeros((N, N, N))
     for coord in voxels:
         # val = coord[0]
-
+        
         x = coord[0]
         y = coord[1]
         z = coord[2]
+        if x < 0:
+            x = x + 1 
+        elif y < 0:
+            y = y + 1 
+        elif z < 0:
+            z = z + 1 
+        voxels_occ_grid[x -1][y -1][z -1] = 1
 
-        voxels_occ_grid[x - 1][y - 1][z - 1] = 1
     return voxels_occ_grid
 
-
-def rotate_voxels_round(voxels, angle, axis):
-    """
-    rotates voxels indices and gives rounded voxels indices
-    :param voxels: Voxels of the model data
-    :param angle: angle of rotation in axis
-    :param axis: if 0 axis x, 1 axis y, 2 axis z
-    :return: rotated voxels rounded, rotated voxels
-    """
-    voxels_rotated = rotate_voxels(voxels, angle, axis)
-    rounded_voxels = np.round(voxels_rotated).astype(int)
-
-    return rounded_voxels, voxels_rotated
 
 def voxels_in_cylinder(offset, height, radius,voxels):
     #center = np.round(voxels.mean(axis = 0))
@@ -180,6 +189,9 @@ def voxels_in_cylinder(offset, height, radius,voxels):
     inside_circle = np.linalg.norm(voxels[:,:2] - offset ,axis = 1 )<=radius
     return inside_high & inside_low & inside_circle
 
+
+
+
 def rotate_model(model_data: np.ndarray, x_rotation: int, y_rotation: int, z_rotation: int) -> np.ndarray:
     """
     Rotates the voxelized model
@@ -189,12 +201,27 @@ def rotate_model(model_data: np.ndarray, x_rotation: int, y_rotation: int, z_rot
     :param z_rotation:Degrees of rotation around the z axis
     :return: Rotated voxelized model
     """
-    model_data = np.around(rotate(model_data, x_rotation))
-    model_data = np.around(rotate(model_data, y_rotation, (1, 2)))
-    model_data = np.around(rotate(model_data, z_rotation, (0, 2)))
-
+   
+    model_data = np.around(rotate(model_data, x_rotation,(1,2),reshape = False))
+    model_data = np.around(rotate(model_data, y_rotation, (0, 2),reshape = False))
+    model_data = np.around(rotate(model_data, z_rotation, (0, 1),reshape = False))
+    
     return model_data
 
+def rotate_back(model_data: np.ndarray, x_rotation: int, y_rotation: int, z_rotation: int) -> np.ndarray:
+    """
+    Rotates the voxelized model
+    :param model_data: Voxelized model data
+    :param x_rotation: Degrees of rotation around the x axis
+    :param y_rotation: Degrees of rotation around the y axis
+    :param z_rotation:Degrees of rotation around the z axis
+    :return: Rotated voxelized model
+    """
+    model_data = np.around(rotate(model_data, z_rotation, (0, 1),reshape = False))
+    model_data = np.around(rotate(model_data, y_rotation, (0, 2),reshape = False))
+    model_data = np.around(rotate(model_data, x_rotation,(1,2),reshape = False))
+    
+    return model_data
 
 def _visualize_top_down_view(model_data: np.ndarray, possible_offsets_final: list):
     """
@@ -204,21 +231,13 @@ def _visualize_top_down_view(model_data: np.ndarray, possible_offsets_final: lis
     :return:
     """
     top_down_view = np.sum(model_data, axis=2)
-    '''
-    basis = np.zeros_like(top_down_view)
-    for indices in possible_offsets_final:
-        idx = indices[0]
-        idy = indices[1]
-        basis[idx, idy] = 1
-    '''
     #sns.heatmap(basis + (top_down_view > 0))
     sns.heatmap((top_down_view > 0))
 
-
+    
 class DefectorRotation2:
-    def __init__(self, radius=2, border=5, rotation=False, number_of_trials=5, visualize_top_down_view=False):
+    def __init__(self, radius=2, border=5, rotation=False,number_of_trials=5, visualize_top_down_view=False):
         self.radius = radius
-
         self.border = border
         self.rotation = rotation
         self.visualize_top_down_view = visualize_top_down_view
@@ -226,44 +245,57 @@ class DefectorRotation2:
         random.seed(42)
 
     def __call__(self, model):
+        
         model_data = model.model
+        #model_data_original = deepcopy(model_data)
         model_data_tmp = deepcopy(model_data)
-        # First rotation
-        if self.rotation:
-            # Rotate model randomly  random.randrange(0, 360)
-            x_rotation = 45
-            y_rotation = 0
-            z_rotation = 0
-            model_data_tmp = rotate_model(model_data_tmp, x_rotation, y_rotation, z_rotation)
-
-        offset, possible_offsets_final = self._find_feasible_offset(model_data_tmp)
-        if offset is None:
-            logging.warning(f"Could not find a feasable offset for model: {model.model_name}")
+        #Get the voxels
+        voxels = np.argwhere(model_data_tmp == 1)
+        
+        if voxels.size == 0:
+            logging.warning(f"Model empty")
             return None
+        
+        else: 
+            if self.rotation:
+                # Rotate model randomly  random.randrange(0, 360)
+                x_rotation = random.randrange(0, 360)
+                y_rotation = random.randrange(0, 360)
+                z_rotation = random.randrange(0, 360)
+                
+                #pad the model
+                padding = int(model_data.shape[0]/2)
+                model_data_tmp = np.pad(model_data_tmp, ((padding,padding), (padding,padding), (padding, padding)), 'constant')   
+                
+                #Rotate the model and preserve the shape
+                model_data_tmp = rotate_model(model_data_tmp, x_rotation, y_rotation, z_rotation)
+                
+                
+            #find the offset using model or rotated model
+            
+            offset, possible_offsets_final = self._find_feasible_offset(model_data_tmp)
 
-        # Define and add the rotated hole
-        if self.rotation:
-            # Rotate model back
-            #model_data = rotate_model(model_data, 360-x_rotation, 360-y_rotation, 360-z_rotation)
-            voxels_rotated = np.argwhere(model_data_tmp == 1)
-            # find voxels to remove in rotated model
-            height = model_data_tmp.shape[2]+1000
-            idx = voxels_in_cylinder(offset,height,self.radius, voxels_rotated)
-            to_be_removed = voxels_rotated[idx]
-            # cylinder in rotated model rotated back
-            voxels_removed_rotated_r, voxels_removed_rotated = rotate_voxels_round(to_be_removed, radians(360 - x_rotation),0)
-            # remove from object
-            for v in voxels_removed_rotated_r:
-                shape = model_data.shape
-                if v[0]< shape[0] and v[1]< shape[1] and v[2] < shape[2]:
-                    model_data[v[0], v[1], v[2]] = 0
-        else:
-            model_data = add_vertical_hole(model_data_tmp, self.radius, offset)
+            if offset is None:
+                logging.warning(f"Could not find a feasable offset for model: {model.model_name}")
+                return None
+            else: 
+                # Define and add the rotated hole
+                if self.rotation:
+                    # Add a vertical hole in the desired offset
+                    model_data_final = add_vertical_hole(model_data_tmp, self.radius, offset)
+                    model_data_final = rotate_back(model_data_final,  360- x_rotation, 360- y_rotation, 360- z_rotation)
+                    
+
+
+
+
+                else:
+                    model_data_final = add_vertical_hole(model_data_tmp, self.radius, offset)
 
         if self.visualize_top_down_view:
             _visualize_top_down_view(model_data, possible_offsets_final)
 
-        model_with_defect = VoxelModel(model_data, np.array([0]), model.model_name + f'_defect_radius{self.radius}')
+        model_with_defect = VoxelModel(model_data_final, np.array([0]), model.model_name + f'_defect_radius{self.radius}')
 
         return [model, model_with_defect]
 
