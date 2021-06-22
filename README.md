@@ -129,7 +129,7 @@ For elaborate information about the infrastruture and how to use it, please cons
 
 ### 5.1 General User Instructions
 
-- Request only the number of GPUs you are using (e.g., do not allocate more than 1 GPU if you are not performing parallel training using horovod) 
+- Request only the number of GPUs you are using (i.e. do not allocate more than 1 GPU if you are not performing parallel training using horovod) 
 
 - If your training has not mix precision enabled, please select only these resources with P100 cards 
 
@@ -137,7 +137,7 @@ For elaborate information about the infrastruture and how to use it, please cons
 
 ### 5.2 Login
 
-First, make sure that you've established a VPN tunnel to the LRZ. This can be done using any VPN client (e.g. Cisco AnyConnect) and providing the domain `https://asa-cluster.lrz.de/` if you're ask for that. Afterwards, use your TUM credentials to login. <br>
+First, make sure that you've established a VPN tunnel to the LRZ. This can be done using any VPN client (e.g. Cisco AnyConnect) and providing the domain `https://asa-cluster.lrz.de/` once you're asked for that. Afterwards, use your TUM credentials to login. <br>
 
 Once the VPN connection is established successfully, use SSH in order to login to the AI-System. 
 
