@@ -41,14 +41,13 @@ class ClassificationTask(pl.LightningModule):
 
     def training_epoch_end(self, training_step_outputs) -> None:
         """#TODO: Docstring"""
-        pass
-        self.epoch_count += 1
+        # self.epoch_count += 1
 
         # mlflow.log_metric("train_loss_epoch", self.tensor2float(self.train_loss))
         # mlflow.log_metric("train_acc_epoch", self.tensor2float(self.train_acc))
 
-        if self.epoch_count % 10:
-            print(f"Saving model every 10 epochs...")
+        # if self.epoch_count % 10:
+            # print(f"Saving model every 10 epochs...")
 
     def validation_step(self, batch, batch_idx) -> dict:
         """#TODO: Docstring"""
@@ -96,7 +95,10 @@ class ClassificationTask(pl.LightningModule):
         orig_stdout = sys.stdout
         f = open('model_summary.txt', 'w')
         sys.stdout = f
-        summary(self.nn_model.cuda(), (1, 128, 128, 128))
+        if self.config.device.type == 'cuda':
+            summary(self.nn_model.cuda(), (1, 128, 128, 128))
+        else:
+            summary(self.nn_model, (1, 128, 128, 128))
         sys.stdout = orig_stdout
         f.close()
         mlflow.log_artifact("model_summary.txt", artifact_path="model_summary")
