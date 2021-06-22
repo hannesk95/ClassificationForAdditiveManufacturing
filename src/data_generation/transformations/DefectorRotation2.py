@@ -235,7 +235,7 @@ def _visualize_top_down_view(model_data: np.ndarray, possible_offsets_final: lis
     sns.heatmap((top_down_view > 0))
 
     
-class DefectorRotation2:
+class DefectorRotation:
     def __init__(self, radius=2, border=5, rotation=False,number_of_trials=5, visualize_top_down_view=False):
         self.radius = radius
         self.border = border
