@@ -45,5 +45,5 @@ class FailureAnalyst:
             print(failed_models[i])
         sys.stdout = orig_stdout
         f.close()
-        mlflow.log_artifact("failed_models.txt")
+        mlflow.log_artifact("failed_models.txt", artifact_path="failed_models")
         os.remove("failed_models.txt")
