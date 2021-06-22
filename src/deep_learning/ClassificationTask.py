@@ -22,7 +22,7 @@ class ClassificationTask(pl.LightningModule):
         self.train_loss = None
         self.val_loss = None
         self.epoch_count = 0
-        # self.save_mlflow_params()
+        self.save_mlflow_params()
 
     def training_step(self, batch, batch_idx) -> dict:
         """#TODO: Docstring"""
@@ -41,6 +41,7 @@ class ClassificationTask(pl.LightningModule):
 
     def training_epoch_end(self, training_step_outputs) -> None:
         """#TODO: Docstring"""
+        pass
         self.epoch_count += 1
 
         # mlflow.log_metric("train_loss_epoch", self.tensor2float(self.train_loss))
