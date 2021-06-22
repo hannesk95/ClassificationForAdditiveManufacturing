@@ -1,35 +1,32 @@
 import numpy as np
 import mlflow
-from torch.utils.data import DataLoader
+import torch
 
 
 class FailureAnalyst:
     """# TODO: Docstring"""
 
-    def __init__(self, config: object, trainer: object, val_data: object):
+    def __init__(self, config: object, val_data: object, nn_model: object):
         """# TODO: Docstring"""
         self.config = config
-        self.trainer = trainer
         self.val_data = val_data
-        self.val_dataloader = None
+        self.nn_model = nn_model
 
     def start_failure_analysis(self):
         """# TODO: Docstring"""
 
-        # Get true labels
+        # Get true labels & predicted labels
         true_labels = []
-        self.val_dataloader = DataLoader(self.val_data, batch_size=len(self.val_data), **self.config.kwargs)
-        for idx, label in enumerate(self.val_dataloader):
-            true_labels.append(label)
-
-        # Get predicted labels
-        pred_labels = self.trainer.validate(val_dataloaders=self.val_dataloader)
+        pred_labels = []
+        for i in range(len(self.val_data)):
+            true_labels.append(self.val_data[i][1])
+            pred_labels.append(torch.round(self.nn_model(torch.unsqueeze(self.val_data[i][0], 0))))
 
         # Compare true labels and predicted labels
-        result = np.equal(np.array(true_labels), np.array(pred_labels))
+        result = np.equal(np.array(true_labels, dtype=int), np.array(pred_labels, dtype=int))
 
         # Get indices of failed predictions and store respective model path
-        failure_idx = np.where(result == False)
+        failure_idx = list(np.where(result == False)[0])
         failed_models = []
         for i in failure_idx:
             failed_models.append(self.val_data.dataset.models[i])
