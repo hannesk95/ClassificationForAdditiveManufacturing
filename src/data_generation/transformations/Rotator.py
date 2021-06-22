@@ -39,7 +39,7 @@ class Rotator:
             
             #pad the model
             padding = model_data.shape[0]/2
-            model_data_tmp = np.pad(model_data_tmp, ((padding,padding (padding,padding), (padding, padding)), 'constant')
+            model_data_tmp = np.pad(model_data_tmp, ((padding,padding), (padding,padding), (padding, padding)), 'constant')
 
             
             #Rotate the model and preserve the shape
