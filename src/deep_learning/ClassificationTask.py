@@ -98,7 +98,7 @@ class ClassificationTask(pl.LightningModule):
         summary(self.nn_model, (1, 128, 128, 128))
         sys.stdout = orig_stdout
         f.close()
-        mlflow.log_artifact("model_summary.txt")
+        mlflow.log_artifact("model_summary.txt", artifact_path="model_summary")
         os.remove("model_summary.txt")
 
     @staticmethod
