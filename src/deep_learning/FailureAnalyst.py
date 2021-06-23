@@ -39,6 +39,7 @@ class FailureAnalyst:
             # val_models.append(self.val_data[i][0])
             pred_labels.append(torch.round(self.nn_model(torch.unsqueeze(self.val_data[i][0], 0))))
 
+        pred_labels = torch.Tensor(pred_labels).numpy()
         # models = torch.stack(val_models, dim=0)
         # models = models
 
@@ -51,7 +52,7 @@ class FailureAnalyst:
 
         # Compare true labels and predicted labels
         # result = np.equal(np.array(true_labels, dtype=int), pred_labels.detach().numpy().flatten())
-        result = np.equal(np.array(true_labels, dtype=int), pred_labels.numpy().flatten())
+        result = np.equal(np.array(true_labels, dtype=int), pred_labels)
 
         # Get indices of failed predictions and store respective model path
         failure_idx = list(np.where(result == False)[0])
