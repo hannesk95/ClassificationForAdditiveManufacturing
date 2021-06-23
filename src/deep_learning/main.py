@@ -104,7 +104,7 @@ def main():
     trainer.fit(classifier, train_data_loader, validation_data_loader)
 
     # 10. Perform failure analysis
-    analyst = FailureAnalyst(config=config, val_data=val_data, nn_model=nn_model)
+    analyst = FailureAnalyst(config=config, val_data=val_data, nn_model=nn_model, trainer=trainer)
     analyst.start_failure_analysis()
 
     # 11. Testing

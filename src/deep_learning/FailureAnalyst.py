@@ -9,16 +9,26 @@ from tqdm import tqdm
 class FailureAnalyst:
     """# TODO: Docstring"""
 
-    def __init__(self, config: object, val_data: object, nn_model: object):
+    def __init__(self, config: object, val_data: object, nn_model: object, trainer: object, val_dataloader: object):
         """# TODO: Docstring"""
         self.config = config
         self.val_data = val_data
         self.nn_model = nn_model.eval()
+        self.trainer = trainer
+        self.val_dataloader = val_dataloader
 
     def start_failure_analysis(self):
         """# TODO: Docstring"""
 
         logging.info('Start failure analysis')
+
+        predictions = self.trainer.predict(self.nn_model, self.val_dataloader)
+
+        print("#######################################")
+        print("Start new prediction")
+        print(predictions)
+        print("End new prediction")
+        print("#######################################")
 
         # Get true labels & predicted labels
         true_labels = []
