@@ -28,7 +28,10 @@ class FailureAnalyst:
             true_labels.append(self.val_data[i][1])
             val_models.append(self.val_data[i][0])
 
+        logging.info("Start prediction")
         pred_labels = torch.round(self.nn_model(torch.stack(val_models, dim=0)))
+        logging.info("End prediction")
+
 
         # pred_labels.append(torch.round(self.nn_model(torch.unsqueeze(self.val_data[i][0], 0))))
 
