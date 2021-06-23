@@ -13,7 +13,9 @@ class InceptionNet_v1(nn.Module):
         super(InceptionNet_v1,self).__init__()
         self.conv1 = conv_block(in_channels=in_channels,out_channels=64,kernel_size=(5,5,5),stride=(1,1,1),padding=(2,2,2))
         self.maxpool = nn.MaxPool3d(kernel_size=2,stride=2)
-        self.conv2 = conv_block(in_channels=64,out_channels=192,kernel_size=(3,3,3),stride=(1,1,1),padding=(1,1,1))
+        self.conv2 = conv_block(in_channels=64,out_channels=64,kernel_size=(5,5,5),stride=(1,1,1),padding=(2,2,2))
+        self.maxpool = nn.MaxPool3d(kernel_size=2,stride=2)
+        self.conv3 = conv_block(in_channels=64,out_channels=192,kernel_size=(3,3,3),stride=(1,1,1),padding=(1,1,1))
         
         #Inception block
         self.inception3 = Inception_Block(in_channels=192,out_1x1x1=64,red_3x3x3=96,out_3x3x3=128,red_5x5x5=16,out_5x5x5=32,out_1x1x1_pool=32)
@@ -37,6 +39,8 @@ class InceptionNet_v1(nn.Module):
        x = self.maxpool(x)
        x = self.conv2(x)
        x = self.maxpool(x)
+       x = self.conv3(x)
+       x = self.maxpool(x)
        
        
        x = self.inception3(x)
@@ -47,7 +51,7 @@ class InceptionNet_v1(nn.Module):
        x = self.maxpool(x)
        x = self.inception6(x)
        x = self.avgpool(x)
-
+       
        x = x.view(x.size(0),-1)
        
        x = self.dropout(x)
@@ -102,6 +106,7 @@ class InceptionNet_v3(nn.Module):
     def forward(self,x):
        x = self.conv1(x)
        x = self.maxpool(x)
+       
        x = self.conv2(x)
        x = self.maxpool(x)
        
@@ -113,7 +118,7 @@ class InceptionNet_v3(nn.Module):
        x = self.maxpool(x)
        x = self.inception6(x)
        x = self.avgpool(x)
-
+       print(x.shape)
        x = x.view(x.size(0),-1)
        
        x = self.dropout(x)
@@ -150,7 +155,7 @@ class conv_block(nn.Module):
 
 #Testing only
 if __name__ == '__main__':
-    net = InceptionNet_v3()
+    net = InceptionNet_v1()
     if torch.cuda.device_count() > 0:
         summary(net.cuda(),(1,128,128,128))
     else:
