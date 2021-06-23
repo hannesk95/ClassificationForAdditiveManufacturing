@@ -18,7 +18,9 @@ class FailureAnalyst:
     def start_failure_analysis(self):
         """# TODO: Docstring"""
 
+        torch.cuda.empty_cache()
         logging.info('Start failure analysis')
+
 
 
         # Get true labels & predicted labels
