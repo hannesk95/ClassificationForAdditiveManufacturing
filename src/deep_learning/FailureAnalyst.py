@@ -51,7 +51,7 @@ class FailureAnalyst:
 
         # Compare true labels and predicted labels
         # result = np.equal(np.array(true_labels, dtype=int), pred_labels.detach().numpy().flatten())
-        result = np.equal(np.array(true_labels, dtype=int), pred_labels.detach().numpy().flatten())
+        result = np.equal(np.array(true_labels, dtype=int), pred_labels.numpy().flatten())
 
         # Get indices of failed predictions and store respective model path
         failure_idx = list(np.where(result == False)[0])
