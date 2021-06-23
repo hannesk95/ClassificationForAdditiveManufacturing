@@ -3,7 +3,8 @@ import mlflow
 import torch
 import sys
 import os
-
+import logging
+from tqdm import tqdm
 
 class FailureAnalyst:
     """# TODO: Docstring"""
@@ -17,14 +18,17 @@ class FailureAnalyst:
     def start_failure_analysis(self):
         """# TODO: Docstring"""
 
+        logging.info('Start failure analysis')
+
+
         # Get true labels & predicted labels
         true_labels = []
         val_models = []
-        for i in range(len(self.val_data)):
+        for i in tqdm(range(len(self.val_data)), desc="Getting inference data"):
             true_labels.append(self.val_data[i][1])
-            val_models.append(self.val_data[i][0].numpy())
+            val_models.append(self.val_data[i][0])
 
-        pred_labels = torch.round(self.nn_model(torch.Tensor(val_models)))
+        pred_labels = torch.round(self.nn_model(torch.stack(val_models, dim=0)))
 
         # pred_labels.append(torch.round(self.nn_model(torch.unsqueeze(self.val_data[i][0], 0))))
 
