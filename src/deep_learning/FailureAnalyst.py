@@ -28,8 +28,12 @@ class FailureAnalyst:
             true_labels.append(self.val_data[i][1])
             val_models.append(self.val_data[i][0])
 
+        models = torch.stack(val_models, dim=0)
+        models = models.cuda()
+        self.nn_model = self.nn_model.cuda()
+
         logging.info("Start prediction")
-        pred_labels = torch.round(self.nn_model(torch.stack(val_models, dim=0)))
+        pred_labels = torch.round(self.nn_model(models))
         logging.info("End prediction")
 
 
