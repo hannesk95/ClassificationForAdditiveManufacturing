@@ -245,7 +245,7 @@ python script.py --epochs 55 --batch-size 512
 
 ### 5.8 MLflow UI on local Browser
 
-Once the deep learning container has been started on the LRZ AI system, you'll get a similar output to the one which is presented right below:
+Once the deep learning container has been started on the LRZ AI system, you'll get a similar output to the one which is presented right below (please be patient, this might take some seconds):
 
 ```console
 Cloning into 'TUM-DI-LAB'...
