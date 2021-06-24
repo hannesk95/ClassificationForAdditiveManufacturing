@@ -1,5 +1,5 @@
 import torch
-from src.deep_learning.network import Vanilla3DCNN, ResNet, VGGNet, InceptionNet_v1, InceptionNet_v3, Vanilla3DCNN_large
+from src.deep_learning.network import Vanilla3DCNN, ResNet, VGGNet, InceptionNet_v1, InceptionNet_v3, Vanilla3DCNN_large,Resnet_small
 
 
 class ArchitectureSelector:
@@ -10,7 +10,7 @@ class ArchitectureSelector:
 
         self.config = config
         self.nn_architecture = self.config.architecture_type
-        self.architectures = ["Vanilla3DCNN", "ResNet", "VGGNet", "InceptionNet", "Vanilla3DCNN_large"]
+        self.architectures = ["Vanilla3DCNN", "ResNet", "VGGNet", "InceptionNet", "Vanilla3DCNN_large", "Resnet_small"]
         self.model = None
 
     def select_architecture(self):
@@ -28,6 +28,9 @@ class ArchitectureSelector:
         if self.nn_architecture == "ResNet":
             self.model = ResNet.generate_model(self.config.resnet_depth, self.config.resnet_pretrained)
             self.config.experiment_name = self.nn_architecture + str(self.config.resnet_depth) + "_pretrained_" + str(self.config.resnet_pretrained)
+        
+        if self.nn_architecture == "Resnet_small":
+            self.model = Resnet_small()
 
         if self.nn_architecture == "VGGNet":
             self.model = VGGNet()
