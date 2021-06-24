@@ -30,7 +30,7 @@ class ArchitectureSelector:
             self.config.experiment_name = self.nn_architecture + str(self.config.resnet_depth) + "_pretrained_" + str(self.config.resnet_pretrained)
         
         if self.nn_architecture == "Resnet_small":
-            self.model = Resnet_small()
+            self.model = Resnet_small.generate_model()
 
         if self.nn_architecture == "VGGNet":
             self.model = VGGNet()
