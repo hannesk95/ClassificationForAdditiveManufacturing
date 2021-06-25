@@ -6,6 +6,7 @@ import mlflow
 from torchsummary import summary
 import sys
 import os
+import horovod.torch as hvd
 
 
 class ClassificationTask(pl.LightningModule):
@@ -36,6 +37,7 @@ class ClassificationTask(pl.LightningModule):
 
         self.log('train_loss', self.train_loss, on_step=False, on_epoch=True, prog_bar=True, logger=False)
         self.log('train_acc', self.train_acc, on_step=False, on_epoch=True, prog_bar=True, logger=False)
+        print(hvd.rank())
 
         return self.train_loss
 

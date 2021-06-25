@@ -15,7 +15,7 @@ from torch.utils.data import DataLoader, random_split
 import torch.nn.functional as F
 import torchmetrics
 
-# import horovod.torch as hvd
+import horovod.torch as hvd
 
 from src.deep_learning.AMCDataset import AMCDataset
 from src.deep_learning.ParamConfigurator import ParamConfigurator
@@ -60,7 +60,7 @@ from src.deep_learning.FailureAnalyst import FailureAnalyst
 
 def main():
 
-    # hvd.init()
+    hvd.init()
 
     # 1. Define configuration parameters
     config = ParamConfigurator()
