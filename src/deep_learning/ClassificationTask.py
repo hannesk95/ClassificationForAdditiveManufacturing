@@ -23,7 +23,7 @@ class ClassificationTask(pl.LightningModule):
         self.train_loss = None
         self.val_loss = None
         self.epoch_count = 0
-        self.save_mlflow_params()
+        # self.save_mlflow_params()
 
     def metric_average(self, val, name):
         tensor = val.detach().clone()
