@@ -5,6 +5,7 @@ import sys
 import os
 import logging
 from tqdm import tqdm
+import horovod.torch as hvd
 
 class FailureAnalyst:
     """# TODO: Docstring"""
@@ -51,13 +52,14 @@ class FailureAnalyst:
         for i in failure_idx:
             failed_models.append(self.val_data.dataset.models[i])
 
-        # Store paths/names of failed models using MLflow
-        orig_stdout = sys.stdout
-        f = open('failed_models.txt', 'w')
-        sys.stdout = f
-        for i in range(len(failed_models)):
-            print(failed_models[i])
-        sys.stdout = orig_stdout
-        f.close()
-        mlflow.log_artifact("failed_models.txt", artifact_path="failed_models")
-        os.remove("failed_models.txt")
+        if hvd.rank() == 0:
+            # Store paths/names of failed models using MLflow
+            orig_stdout = sys.stdout
+            f = open('failed_models.txt', 'w')
+            sys.stdout = f
+            for i in range(len(failed_models)):
+                print(failed_models[i])
+            sys.stdout = orig_stdout
+            f.close()
+            mlflow.log_artifact("failed_models.txt", artifact_path="failed_models")
+            os.remove("failed_models.txt")

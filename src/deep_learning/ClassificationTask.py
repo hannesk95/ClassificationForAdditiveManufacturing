@@ -25,29 +25,19 @@ class ClassificationTask(pl.LightningModule):
         self.epoch_count = 0
         # self.save_mlflow_params()
 
-    # def metric_average(self, val, name):
-    #     tensor = val.detach().clone()
-    #     avg_tensor = hvd.allreduce(tensor, name=name)
-    #     return avg_tensor.item()
-
     def training_step(self, batch, batch_idx) -> dict:
         """#TODO: Docstring"""
         model, label = batch
         pred = self.nn_model(model)
         self.train_loss = F.binary_cross_entropy_with_logits(pred, label)
         self.train_acc = self.accuracy(pred.round().int(), label.int())
-
-        # mlflow.log_metric("train_loss_step", self.tensor2float(self.train_loss))
-        # mlflow.log_metric("train_acc_step", self.tensor2float(self.train_acc))
-
-        # # Horovod: average metric values across workers.
-        # train_loss = self.metric_average(self.train_loss, 'avg_loss')
-        # train_acc= self.metric_average(self.train_acc, 'avg_accuracy')
-    
-        # Horovod: print output only on first rank.
+        
         if hvd.rank() == 0:
-            self.log('train_loss', self.train_loss, on_step=False, on_epoch=True, prog_bar=True, logger=False)
-            self.log('train_acc', self.train_acc, on_step=False, on_epoch=True, prog_bar=True, logger=False)
+            mlflow.log_metric("train_loss_step", self.tensor2float(self.train_loss))
+            mlflow.log_metric("train_acc_step", self.tensor2float(self.train_acc))
+
+        self.log('train_loss', self.train_loss, on_step=False, on_epoch=True, prog_bar=True, logger=False)
+        self.log('train_acc', self.train_acc, on_step=False, on_epoch=True, prog_bar=True, logger=False)
 
         return self.train_loss
 
@@ -68,17 +58,12 @@ class ClassificationTask(pl.LightningModule):
         self.val_loss = F.binary_cross_entropy_with_logits(pred, label)
         self.val_acc = self.accuracy(pred.round().int(), label.int())
 
-        # mlflow.log_metric("val_loss_step", self.tensor2float(self.val_loss))
-        # mlflow.log_metric("val_acc_step", self.tensor2float(self.val_acc))
-
-        # Horovod: average metric values across workers.
-        # val_loss = self.metric_average(self.val_loss, 'avg_loss')
-        # val_acc = self.metric_average(self.val_acc, 'avg_accuracy')
-
-        # Horovod: print output only on first rank.
         if hvd.rank() == 0:
-            self.log('val_loss', self.val_loss, on_step=False, on_epoch=True, prog_bar=True, logger=False)
-            self.log('val_acc', self.val_acc, on_step=False, on_epoch=True, prog_bar=True, logger=False)
+            mlflow.log_metric("val_loss_step", self.tensor2float(self.val_loss))
+            mlflow.log_metric("val_acc_step", self.tensor2float(self.val_acc))
+
+        self.log('val_loss', self.val_loss, on_step=False, on_epoch=True, prog_bar=True, logger=False)
+        self.log('val_acc', self.val_acc, on_step=False, on_epoch=True, prog_bar=True, logger=False)
 
         return self.val_loss
 
@@ -122,7 +107,6 @@ class ClassificationTask(pl.LightningModule):
         mlflow.log_artifact("model_summary.txt", artifact_path="model_summary")
         os.remove("model_summary.txt")
 
-    @staticmethod
     def tensor2float(self, tensor) -> float:
         """Convert PyTorch tensor to float"""
         return np.float(tensor.detach().numpy())

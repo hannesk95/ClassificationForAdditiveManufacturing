@@ -93,7 +93,7 @@ def main():
     # 7. Start MLflow logging
     mlflow.set_tracking_uri(config.mlflow_log_dir)
     mlflow.set_experiment(config.experiment_name)
-    mlflow.pytorch.autolog()
+    # mlflow.pytorch.autolog()
 
     # 8. Create classifier
     classifier = ClassificationTask(nn_model=nn_model, config=config)
