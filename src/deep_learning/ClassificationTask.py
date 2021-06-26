@@ -109,7 +109,7 @@ class ClassificationTask(pl.LightningModule):
 
     def tensor2float(self, tensor) -> float:
         """Convert PyTorch tensor to float"""
-        return np.float(tensor.detach().numpy())
+        return np.float(tensor.cpu().detach().numpy())
 
 
 
