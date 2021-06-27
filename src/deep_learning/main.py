@@ -15,7 +15,7 @@ from torch.utils.data import DataLoader, random_split
 import torch.nn.functional as F
 import torchmetrics
 
-# import horovod.torch as hvd
+import horovod.torch as hvd
 
 from src.deep_learning.AMCDataset import AMCDataset
 from src.deep_learning.ParamConfigurator import ParamConfigurator
@@ -60,7 +60,7 @@ from src.deep_learning.FailureAnalyst import FailureAnalyst
 
 def main():
 
-    # hvd.init()
+    hvd.init()
 
     # 1. Define configuration parameters
     config = ParamConfigurator()
@@ -93,7 +93,7 @@ def main():
     # 7. Start MLflow logging
     mlflow.set_tracking_uri(config.mlflow_log_dir)
     mlflow.set_experiment(config.experiment_name)
-    mlflow.pytorch.autolog()
+    # mlflow.pytorch.autolog()
 
     # 8. Create classifier
     classifier = ClassificationTask(nn_model=nn_model, config=config)
