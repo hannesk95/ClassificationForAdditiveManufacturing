@@ -102,6 +102,7 @@ def check_hole_feasibility(model_data: np.ndarray, radius: int, border: int, off
             return False
     return True
 
+
 def Rx(theta):
     return np.matrix([[1, 0, 0],
                       [0, cos(theta), -sin(theta)],
@@ -120,7 +121,7 @@ def Rz(theta):
                       [0, 0, 1]])
 
 
-def rotate_voxels(voxels, angle_x,angle_y,angle_z,axes):
+def rotate_voxels(voxels, angle_x, angle_y, angle_z, axes):
     """
     Rotates the voxels of the model
     :param voxels: Voxels of the model data
@@ -130,14 +131,14 @@ def rotate_voxels(voxels, angle_x,angle_y,angle_z,axes):
     :param axes: a list of axes to consider rotation in (if 0 axis x, 1 axis y, 2 axis z)
     :return: Rotated voxels
     """
-    for axis in axes: 
+    for axis in axes:
         if axis == 0:
             voxels = voxels.dot(Rx(angle_x))
         elif axis == 1:
             voxels = voxels.dot(Ry(angle_y))
         elif axis == 2:
             voxels = voxels.dot(Rz(angle_z))
-    voxels_rotated =  np.asarray(voxels)
+    voxels_rotated = np.asarray(voxels)
     rounded_voxels = np.round(voxels_rotated).astype(int)
     return rounded_voxels, voxels_rotated
 
@@ -154,42 +155,40 @@ def voxel_to_occupancy(voxels):
     else:
         N = abs(voxels.min())
     '''
-    min_x = voxels[:,0].min() 
-    min_y =  voxels[:,1].min() 
-    min_z = voxels[:,2].min()
+    min_x = voxels[:, 0].min()
+    min_y = voxels[:, 1].min()
+    min_z = voxels[:, 2].min()
     voxels_abs = abs(voxels)
     N = voxels_abs.max()
-    #N = voxels.max()
+    # N = voxels.max()
     voxels_occ_grid = np.zeros((N, N, N))
     for coord in voxels:
         # val = coord[0]
-        
+
         x = coord[0]
         y = coord[1]
         z = coord[2]
         if x < 0:
-            x = x + 1 
+            x = x + 1
         elif y < 0:
-            y = y + 1 
+            y = y + 1
         elif z < 0:
-            z = z + 1 
-        voxels_occ_grid[x -1][y -1][z -1] = 1
+            z = z + 1
+        voxels_occ_grid[x - 1][y - 1][z - 1] = 1
 
     return voxels_occ_grid
 
 
-def voxels_in_cylinder(offset, height, radius,voxels):
-    #center = np.round(voxels.mean(axis = 0))
-    #substruct the center from coordinates
+def voxels_in_cylinder(offset, height, radius, voxels):
+    # center = np.round(voxels.mean(axis = 0))
+    # substruct the center from coordinates
     voxels = voxels
-    #voxels inside
-    inside_high = voxels[:,2] <= (0.5*height)
-    inside_low = voxels[:,2] >= (-0.5*height)
-    #projection of x
-    inside_circle = np.linalg.norm(voxels[:,:2] - offset ,axis = 1 )<=radius
+    # voxels inside
+    inside_high = voxels[:, 2] <= (0.5 * height)
+    inside_low = voxels[:, 2] >= (-0.5 * height)
+    # projection of x
+    inside_circle = np.linalg.norm(voxels[:, :2] - offset, axis=1) <= radius
     return inside_high & inside_low & inside_circle
-
-
 
 
 def rotate_model(model_data: np.ndarray, x_rotation: int, y_rotation: int, z_rotation: int) -> np.ndarray:
@@ -201,12 +200,13 @@ def rotate_model(model_data: np.ndarray, x_rotation: int, y_rotation: int, z_rot
     :param z_rotation:Degrees of rotation around the z axis
     :return: Rotated voxelized model
     """
-   
-    model_data = np.around(rotate(model_data, x_rotation,(1,2),reshape = False))
-    model_data = np.around(rotate(model_data, y_rotation, (0, 2),reshape = False))
-    model_data = np.around(rotate(model_data, z_rotation, (0, 1),reshape = False))
-    
+
+    model_data = np.around(rotate(model_data, x_rotation, (1, 2), reshape=False))
+    model_data = np.around(rotate(model_data, y_rotation, (0, 2), reshape=False))
+    model_data = np.around(rotate(model_data, z_rotation, (0, 1), reshape=False))
+
     return model_data
+
 
 def rotate_back(model_data: np.ndarray, x_rotation: int, y_rotation: int, z_rotation: int) -> np.ndarray:
     """
@@ -217,11 +217,12 @@ def rotate_back(model_data: np.ndarray, x_rotation: int, y_rotation: int, z_rota
     :param z_rotation:Degrees of rotation around the z axis
     :return: Rotated voxelized model
     """
-    model_data = np.around(rotate(model_data, z_rotation, (0, 1),reshape = False))
-    model_data = np.around(rotate(model_data, y_rotation, (0, 2),reshape = False))
-    model_data = np.around(rotate(model_data, x_rotation,(1,2),reshape = False))
-    
+    model_data = np.around(rotate(model_data, z_rotation, (0, 1), reshape=False))
+    model_data = np.around(rotate(model_data, y_rotation, (0, 2), reshape=False))
+    model_data = np.around(rotate(model_data, x_rotation, (1, 2), reshape=False))
+
     return model_data
+
 
 def _visualize_top_down_view(model_data: np.ndarray, possible_offsets_final: list):
     """
@@ -231,75 +232,93 @@ def _visualize_top_down_view(model_data: np.ndarray, possible_offsets_final: lis
     :return:
     """
     top_down_view = np.sum(model_data, axis=2)
-    #sns.heatmap(basis + (top_down_view > 0))
+    # sns.heatmap(basis + (top_down_view > 0))
     sns.heatmap((top_down_view > 0))
 
-    
+
 class DefectorRotation:
-    def __init__(self, radius=5, border=5, rotation=False,number_of_trials=5, visualize_top_down_view=False):
-        self.radius = radius
-        self.border = border
-        self.rotation = rotation
-        self.visualize_top_down_view = visualize_top_down_view
+    def __init__(self, hole_radius_nonprintable=5, hole_radius_printable=10, border_nonprintable=3, border_printable=5,
+                 number_of_trials=5):
+        self.hole_radius_nonprintable = hole_radius_nonprintable
+        self.hole_radius_printable = hole_radius_printable
+
+        self.border_nonprintable = border_nonprintable
+        self.border_printable = border_printable
+
         self.number_of_trials = number_of_trials
         random.seed(42)
 
     def __call__(self, model):
-        
+
         model_data = model.model
-        #model_data_original = deepcopy(model_data)
+        # model_data_original = deepcopy(model_data)
         model_data_tmp = deepcopy(model_data)
-        #Get the voxels
+
+        # Get the voxels
         voxels = np.argwhere(model_data_tmp == 1)
-        
+
+        # Rotate model randomly  random.randrange(0, 360)
+        x_rotation = random.randrange(0, 360)
+        y_rotation = random.randrange(0, 360)
+        z_rotation = random.randrange(0, 360)
+
+        # pad the model
+        padding = int(model_data.shape[0] / 2)
+        model_data_tmp = np.pad(model_data_tmp, ((padding, padding), (padding, padding), (padding, padding)),
+                                'constant')
+
+        # Rotate the model and preserve the shape
+        model_data_tmp = rotate_model(model_data_tmp, x_rotation, y_rotation, z_rotation)
+
         if voxels.size == 0:
             logging.warning(f"Model empty")
             return None
-        
-        else: 
-            if self.rotation:
-                # Rotate model randomly  random.randrange(0, 360)
-                x_rotation = random.randrange(0, 360)
-                y_rotation = random.randrange(0, 360)
-                z_rotation = random.randrange(0, 360)
-                
-                #pad the model
-                padding = int(model_data.shape[0]/2)
-                model_data_tmp = np.pad(model_data_tmp, ((padding,padding), (padding,padding), (padding, padding)), 'constant')   
-                
-                #Rotate the model and preserve the shape
-                model_data_tmp = rotate_model(model_data_tmp, x_rotation, y_rotation, z_rotation)
-                
-                
-            #find the offset using model or rotated model
-            
-            offset, possible_offsets_final = self._find_feasible_offset(model_data_tmp)
 
-            if offset is None:
-                logging.warning(f"Could not find a feasable offset for model: {model.model_name}")
-                return None
-            else: 
-                # Define and add the rotated hole
-                if self.rotation:
-                    # Add a vertical hole in the desired offset
-                    model_data_final = add_vertical_hole(model_data_tmp, self.radius, offset)
-                    model_data_final = rotate_back(model_data_final,  360- x_rotation, 360- y_rotation, 360- z_rotation)
-                    
+        model_data_nonprintable_defect_middle = self._add_defect_middle(model_data_tmp, self.hole_radius_nonprintable,
+                                                                        self.border_nonprintable)
+        model_data_printable_defect_middle = self._add_defect_middle(model_data_tmp, self.hole_radius_printable,
+                                                                     self.border_printable)
+        model_data_nonprintable_defect_border = self._add_defect_border(model_data_tmp, self.hole_radius_printable,
+                                                                        self.border_nonprintable)
+
+        out = []
+        if model_data_nonprintable_defect_middle is not None:
+            out.append(model)
+            model_data_nonprintable_defect_middle = rotate_back(model_data_nonprintable_defect_middle, 360 - x_rotation,
+                                                                360 - y_rotation, 360 - z_rotation)
+            model_nonprintable_defect_middle = VoxelModel(model_data_nonprintable_defect_middle, np.array([0]),
+                                                          model.model_name +
+                                                          f'_nonprintable_defect_middle{self.hole_radius_nonprintable}')
+            out.append(model_nonprintable_defect_middle)
+
+        if model_data_printable_defect_middle is not None and model_data_nonprintable_defect_border is not None:
+            model_data_printable_defect_middle = rotate_back(model_data_printable_defect_middle, 360 - x_rotation,
+                                                             360 - y_rotation, 360 - z_rotation)
+            model_printable_defect_middle = VoxelModel(model_data_printable_defect_middle, np.array([1]),
+                                                       model.model_name +
+                                                       f'_printable_defect_middle{self.hole_radius_printable}')
+
+            model_data_nonprintable_defect_border = rotate_back(model_data_nonprintable_defect_border, 360 - x_rotation,
+                                                                360 - y_rotation, 360 - z_rotation)
+            model_nonprintable_defect_border = VoxelModel(model_data_nonprintable_defect_border, np.array([0]),
+                                                          model.model_name +
+                                                          f'_nonprintable_defect_border{self.border_nonprintable}')
+            out.append(model_printable_defect_middle)
+            out.append(model_nonprintable_defect_border)
+
+        return out
+
+    def _add_defect_middle(self, model_data, radius, border):
+        offset = self._find_feasible_offset_middle(model_data, radius, border)
+        if offset is None:
+            # logging.warning(f"Could not find a feasable offset for model: {model.model_name}")
+            return None
+        model_data = add_vertical_hole(model_data, radius, offset)
 
 
+        return model_data
 
-
-                else:
-                    model_data_final = add_vertical_hole(model_data_tmp, self.radius, offset)
-
-        if self.visualize_top_down_view:
-            _visualize_top_down_view(model_data, possible_offsets_final)
-
-        model_with_defect = VoxelModel(model_data_final, np.array([0]), model.model_name + f'_defect_radius{self.radius}')
-
-        return [model, model_with_defect]
-
-    def _find_feasible_offset(self, model_data):
+    def _find_feasible_offset_middle(self, model_data, radius, border):
         """
         Finds a feasible offset where to put randomly hole. It analyses the top down view of a model and samples a
         offset from a adapted subsample of offsets, that guarantee that the hole fully goes through the model
@@ -311,35 +330,88 @@ class DefectorRotation:
         possible_offsets = np.array(np.where(top_down_view > 0)).T
 
         if len(possible_offsets) == 0:
-            return None, None
+            return None
 
-        to_remove = []
-        # Define horizontal elements to be removed
-        to_remove += determine_first_unique_horizontal_elements(possible_offsets[:, 0], self.border)
-        to_remove += determine_last_unique_horizontal_elements(possible_offsets[:, 0], self.border)
-        # Define vertical elements to be removed
-        for value in list(set(possible_offsets[:, 1])):
-            values = np.where(possible_offsets[:, 1] == value)[0]
-            to_remove += values[:self.border].tolist()
-            to_remove += values[len(values) - self.border:len(values)].tolist()
+        to_remove = self._determine_indices_to_remove(possible_offsets, border)
 
         # Remove elements at the border
         try:  # TODO Find problem here
-            possible_offsets_final = np.delete(possible_offsets, list(set(to_remove)), axis=0)
+            possible_offsets_final = np.delete(possible_offsets, to_remove, axis=0)
         except:
-            return None, None
+            return None
 
         if len(possible_offsets_final) == 0:
-            return None, None
+            return None
 
         # Check if the hole has a large enough boarder around it
         for trial in range(self.number_of_trials):
             offset = possible_offsets_final[random.randrange(0, len(possible_offsets_final))]
             offset.astype(int)
-            if check_hole_feasibility(model_data, self.radius, self.border, offset):
+            if check_hole_feasibility(model_data, radius, border, offset):
                 break
 
         if (trial + 1) == self.number_of_trials:
-            return None, None
+            return None
 
-        return offset, possible_offsets_final
+
+
+        return offset
+
+    def _add_defect_border(self, model_data, radius, border):
+        offset = self._find_feasible_offset_border(model_data, radius, border)
+        if offset is None:
+            # logging.warning(f"Could not find a feasable offset for model: {model.model_name}")
+            return None
+        model_data = add_vertical_hole(model_data, radius, offset)
+
+
+        return model_data
+
+    def _determine_indices_to_remove(self, possible_offsets, border):
+        to_remove = []
+        # Define horizontal elements to be removed
+        to_remove += determine_first_unique_horizontal_elements(possible_offsets[:, 0], border)
+        to_remove += determine_last_unique_horizontal_elements(possible_offsets[:, 0], border)
+        # Define vertical elements to be removed
+        for value in list(set(possible_offsets[:, 1])):
+            values = np.where(possible_offsets[:, 1] == value)[0]
+            to_remove += values[:border].tolist()
+            to_remove += values[len(values) - border:len(values)].tolist()
+
+        return list(set(to_remove))
+
+    def _find_feasible_offset_border(self, model_data, radius, border):
+        top_down_view = np.sum(model_data, axis=2)
+        possible_offsets = np.array(np.where(top_down_view > 0)).T
+
+        to_remove = self._determine_indices_to_remove(possible_offsets, border + radius + 1)
+
+        try:  # TODO Find problem here
+            possible_offsets_final = possible_offsets[list(set(to_remove))]
+        except:
+            return None
+
+        to_remove = self._determine_indices_to_remove(possible_offsets_final, radius)
+
+        if len(possible_offsets_final) == 0:
+            return None
+
+        try:  # TODO Find problem here
+            possible_offsets_final = np.delete(possible_offsets_final, to_remove, axis=0)
+        except:
+            return None
+
+        if len(possible_offsets_final) == 0:
+            return None
+
+        for trial in range(self.number_of_trials):
+            offset = possible_offsets_final[random.randrange(0, len(possible_offsets_final))]
+            offset.astype(int)
+            if check_hole_feasibility(model_data, radius, 1, offset):
+                break
+
+        if (trial + 1) == self.number_of_trials:
+            return None
+
+        
+        return offset
