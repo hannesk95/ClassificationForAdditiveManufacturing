@@ -413,5 +413,5 @@ class DefectorRotation:
         if (trial + 1) == self.number_of_trials:
             return None
 
-        
+
         return offset
