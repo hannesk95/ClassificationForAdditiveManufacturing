@@ -1,4 +1,4 @@
-
+import numpy as np
 def rotate_model(model_data: np.ndarray, x_rotation: int, y_rotation: int, z_rotation: int) -> np.ndarray:
     """
     Rotates the voxelized model
