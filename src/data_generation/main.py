@@ -8,7 +8,7 @@ from src.data_generation.ParamConfigurator import ParamConfigurator
 from src.data_generation.ModelSelector import ModelSelector
 from src.data_generation.BatchDataProcessor import BatchDataProcessor
 from src.data_generation.transformations import Normalizer, Aligner, Cleaner, Voxelizer, VoxelizerGPU, Defector, \
-    DefectorTopDownView, ComposeTransformer
+    DefectorTopDownView, DefectorRotation, ComposeTransformer
 from src.data_generation import utils
 
 
@@ -42,6 +42,7 @@ def main():
                             remaining_voxels = config.remaining_voxels,
                             factor = config.factor)
     elif config.defector_type == 'DefectorRotation':
+        defector = DefectorRotation( radius=5, border=5, rotation=True,number_of_trials=config.trials, visualize_top_down_view=False)
         pass  # TODO add Defector Rotation here
 
     # 4. Compose transformations
