@@ -31,11 +31,12 @@ class ClassificationTask(pl.LightningModule):
         pred = self.nn_model(model)
         self.train_loss = F.binary_cross_entropy_with_logits(pred, label)
         self.train_acc = self.accuracy(pred.round().int(), label.int())
+
+        train_loss_red = self.metric_average(self.tensor2float(self.train_loss), 'avg_loss')
+        train_acc_red = self.metric_average(self.tensor2float(self.train_acc), 'avg_acc')
         
         if hvd.rank() == 0:
-            train_loss_red = self.metric_average(self.tensor2float(self.train_loss), 'avg_loss')
             mlflow.log_metric("train_loss_step", train_loss_red)
-            train_acc_red = self.metric_average(self.tensor2float(self.train_acc), 'avg_acc')
             mlflow.log_metric("train_acc_step", train_acc_red)
 
         self.log('train_loss', self.train_loss, on_step=False, on_epoch=True, prog_bar=True, logger=False)
@@ -60,10 +61,11 @@ class ClassificationTask(pl.LightningModule):
         self.val_loss = F.binary_cross_entropy_with_logits(pred, label)
         self.val_acc = self.accuracy(pred.round().int(), label.int())
 
+        val_loss_red = self.metric_average(self.tensor2float(self.val_loss), 'avg_val_loss')
+        val_acc_red = self.metric_average(self.tensor2float(self.val_acc), 'avg_val_acc')
+
         if hvd.rank() == 0:
-            val_loss_red = self.metric_average(self.tensor2float(self.val_loss), 'avg_val_loss')
             mlflow.log_metric("val_loss_step", val_loss_red)
-            val_acc_red = self.metric_average(self.tensor2float(self.val_acc), 'avg_val_acc')
             mlflow.log_metric("val_acc_step", val_acc_red)
 
         self.log('val_loss', self.val_loss, on_step=False, on_epoch=True, prog_bar=True, logger=False)
@@ -119,8 +121,3 @@ class ClassificationTask(pl.LightningModule):
         tensor = val.detach().clone()
         avg_tensor = hvd.allreduce(tensor, name=name)
         return avg_tensor.item()
-
-
-
-
-
