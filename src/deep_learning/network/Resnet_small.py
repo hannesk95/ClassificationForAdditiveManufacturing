@@ -13,6 +13,8 @@ def get_inplanes():
 def conv3x3x3(in_planes, out_planes, stride=1):
     return nn.Conv3d(in_planes,out_planes,kernel_size=3,stride=stride,padding=1,bias=False)
 
+def conv5x5x5(in_planes,out_planes,stride=1):
+    return nn.Conv3d(in_planes,out_planes,kernel_size=5,stride=stride,padding=2,bias=False)
 
 def conv1x1x1(in_planes, out_planes, stride=1):
     return nn.Conv3d(in_planes,out_planes,kernel_size=1,stride=stride,bias=False)
@@ -24,7 +26,7 @@ class BasicBlock(nn.Module):
     def __init__(self, in_planes, planes, stride=1, downsample=None):
         super().__init__()
 
-        self.conv1 = conv3x3x3(in_planes, planes, stride)
+        self.conv1 = conv5x5x5(in_planes, planes, stride)
         self.bn1 = nn.BatchNorm3d(planes)
         self.dropout1 = nn.Dropout3d(0.5)
         self.relu = nn.ReLU(inplace=True)
@@ -56,7 +58,7 @@ class BasicBlock(nn.Module):
         return out
 
 
-class ResNet(nn.Module):
+class Resnet_small(nn.Module):
 
     def __init__(self,block,layer,block_inplanes,n_input_channels=1,conv1_t_size=7,conv1_t_stride=1,no_max_pool=False,shortcut_type='B',widen_factor=1.0,n_classes=512):
         super().__init__()
@@ -128,6 +130,7 @@ class ResNet(nn.Module):
             x = self.maxpool(x)
 
         x = self.layer1(x)
+        
         x = self.layer2(x)
         x = self.layer3(x)
         
@@ -145,7 +148,7 @@ class ResNet(nn.Module):
 
 
 def generate_model(**kwargs):
-    model = ResNet(BasicBlock, [2, 2, 2], get_inplanes(), **kwargs)
+    model = Resnet_small(BasicBlock, [2, 2, 2], get_inplanes(), **kwargs)
     return model
 
 
