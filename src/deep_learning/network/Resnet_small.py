@@ -84,13 +84,14 @@ class Resnet_small(nn.Module):
         self.fc4 = nn.Linear(64, 1)
         self.sigmoid = nn.Sigmoid()
         
+        """
         for m in self.modules():
             if isinstance(m, nn.Conv3d):
                 nn.init.kaiming_normal_(m.weight,mode='fan_out',nonlinearity='relu')
             elif isinstance(m, nn.BatchNorm3d):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
-
+        """
     def _downsample_basic_block(self, x, planes, stride):
         out = F.avg_pool3d(x, kernel_size=1, stride=stride)
         zero_pads = torch.zeros(out.size(0), planes - out.size(1), out.size(2),out.size(3), out.size(4))
