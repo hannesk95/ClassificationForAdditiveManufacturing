@@ -283,7 +283,7 @@ class DefectorRotation:
 
         out = []
         if model_data_nonprintable_defect_middle is not None:
-            out.append(model)
+            out.append(model_data_tmp)
             model_data_nonprintable_defect_middle = rotate_back(model_data_nonprintable_defect_middle, 360 - x_rotation,
                                                                 360 - y_rotation, 360 - z_rotation)
             model_nonprintable_defect_middle = VoxelModel(model_data_nonprintable_defect_middle, np.array([0]),
