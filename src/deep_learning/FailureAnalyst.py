@@ -7,6 +7,7 @@ import logging
 from tqdm import tqdm
 import horovod.torch as hvd
 
+
 class FailureAnalyst:
     """# TODO: Docstring"""
 
@@ -14,7 +15,7 @@ class FailureAnalyst:
         """# TODO: Docstring"""
         self.config = config
         self.val_data = val_data
-        self.nn_model = nn_model.eval()
+        self.nn_model = nn_model.nn_model.eval()
         self.trainer = trainer
         self.val_dataloader = val_dataloader
 
