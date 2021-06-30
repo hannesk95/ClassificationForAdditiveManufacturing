@@ -266,7 +266,9 @@ class DefectorRotation:
         padding = int(model_data.shape[0] / 2)
         model_data_tmp = np.pad(model_data_tmp, ((padding, padding), (padding, padding), (padding, padding)),
                                 'constant')
-
+        model_original_padded = VoxelModel(model_data_tmp, np.array([1]),
+                                                          model.model_name +
+                                                          f'_nonprintable_defect_border{self.border_nonprintable}')
         # Rotate the model and preserve the shape
         model_data_tmp = rotate_model(model_data_tmp, x_rotation, y_rotation, z_rotation)
 
@@ -283,7 +285,7 @@ class DefectorRotation:
 
         out = []
         if model_data_nonprintable_defect_middle is not None:
-            out.append(model_data_tmp)
+            out.append(model_original_padded)
             model_data_nonprintable_defect_middle = rotate_back(model_data_nonprintable_defect_middle, 360 - x_rotation,
                                                                 360 - y_rotation, 360 - z_rotation)
             model_nonprintable_defect_middle = VoxelModel(model_data_nonprintable_defect_middle, np.array([0]),
