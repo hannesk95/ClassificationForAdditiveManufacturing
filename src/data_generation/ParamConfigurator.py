@@ -6,7 +6,7 @@ from shutil import copyfile
 
 class ParamConfigurator:
 
-    def __init__(self, config_path: str='../infra/data_generation/config.ini'):
+    def __init__(self, config_path: str='../../infra/data_generation/config.ini'):
         config = configparser.ConfigParser()
         config.read(config_path)
 
