@@ -267,11 +267,10 @@ class DefectorRotation:
         model_data_tmp = np.pad(model_data_tmp, ((padding, padding), (padding, padding), (padding, padding)),
                                 'constant')
         model_original_padded = VoxelModel(model_data_tmp, np.array([1]),
-                                                          model.model_name +
-                                                          f'_nonprintable_defect_border{self.border_nonprintable}')
+                                                          model.model_name+"padded")
         # Rotate the model and preserve the shape
         model_data_tmp = rotate_model(model_data_tmp, x_rotation, y_rotation, z_rotation)
-
+           
         if voxels.size == 0:
             logging.warning(f"Model empty")
             return None
