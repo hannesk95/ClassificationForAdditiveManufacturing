@@ -42,12 +42,12 @@ def main():
                             remaining_voxels = config.remaining_voxels,
                             factor = config.factor)
     elif config.defector_type == 'DefectorRotation':
-        defector = DefectorRotation(hole_radius_nonprintable=config.hole_radius_nonprintable,
-                                       hole_radius_printable=config.hole_radius_printable,
-                                       border_nonprintable=config.border_nonprintable,
-                                       border_printable=config.border_printable,
-                                       number_of_trials=config.number_of_trials)
-        pass  # TODO add Defector Rotation here
+        defector = DefectorRotation(hole_radius_nonprintable=config.hole_radius_nonprintable_rot,
+                                       hole_radius_printable=config.hole_radius_printable_rot,
+                                       border_nonprintable=config.border_nonprintable_rot,
+                                       border_printable=config.border_printable_rot,
+                                       number_of_trials=config.number_of_trials_rot)
+        pass 
 
     # 4. Compose transformations
     composer = ComposeTransformer([cleaner, normalizer, aligner, voxelizer, defector])
