@@ -28,11 +28,11 @@ class BasicBlock(nn.Module):
 
         self.conv1 = conv5x5x5(in_planes, planes, stride)
         self.bn1 = nn.BatchNorm3d(planes)
-        self.dropout1 = nn.Dropout3d(0.5)
+        self.dropout1 = nn.Dropout3d(0.3)
         self.relu = nn.ReLU(inplace=True)
         self.conv2 = conv3x3x3(planes, planes)
         self.bn2 = nn.BatchNorm3d(planes)
-        self.dropout2 = nn.Dropout3d(0.5)
+        self.dropout2 = nn.Dropout3d(0.3)
         self.downsample = downsample
         self.stride = stride
 
