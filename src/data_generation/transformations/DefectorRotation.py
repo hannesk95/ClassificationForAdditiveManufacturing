@@ -271,10 +271,7 @@ class DefectorRotation:
         # Rotate the model and preserve the shape
         model_data_tmp = rotate_model(model_data_tmp, x_rotation, y_rotation, z_rotation)
            
-        if voxels.size == 0:
-            logging.warning(f"Model empty")
-            return None
-
+      
         model_data_nonprintable_defect_middle = self._add_defect_middle(model_data_tmp, self.hole_radius_nonprintable,
                                                                         self.border_nonprintable)
         model_data_printable_defect_middle = self._add_defect_middle(model_data_tmp, self.hole_radius_printable,
