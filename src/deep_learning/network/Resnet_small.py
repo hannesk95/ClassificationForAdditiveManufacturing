@@ -26,7 +26,7 @@ class BasicBlock(nn.Module):
     def __init__(self, in_planes, planes, stride=1, downsample=None):
         super().__init__()
 
-        self.conv1 = conv5x5x5(in_planes, planes, stride)
+        self.conv1 = conv3x3x3(in_planes, planes, stride)
         self.bn1 = nn.BatchNorm3d(planes)
         self.dropout1 = nn.Dropout3d(0.3)
         self.relu = nn.ReLU(inplace=True)
