@@ -59,8 +59,13 @@ class Defector:
             # remove selected voxels from the occupancy grid
             for v in to_be_removed:
                 model[v[0], v[1], v[2]] = 0
+
+            if voxels.shape[0] == to_be_removed.shape[0]:
+                print("empty model after hole creation")
+                return []
         else:
             print("hole creation not possible")
+            return [voxel_model_copy]
 
         model_with_defect = VoxelModel(model, np.array([0]), voxel_model.model_name + f'_defect_radius{radius}')
 
