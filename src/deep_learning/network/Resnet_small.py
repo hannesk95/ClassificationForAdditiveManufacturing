@@ -13,6 +13,8 @@ def get_inplanes():
 def conv3x3x3(in_planes, out_planes, stride=1):
     return nn.Conv3d(in_planes,out_planes,kernel_size=3,stride=stride,padding=1,bias=False)
 
+def conv5x5x5(in_planes,out_planes,stride=1):
+    return nn.Conv3d(in_planes,out_planes,kernel_size=5,stride=stride,padding=2,bias=False)
 
 def conv1x1x1(in_planes, out_planes, stride=1):
     return nn.Conv3d(in_planes,out_planes,kernel_size=1,stride=stride,bias=False)
@@ -26,11 +28,11 @@ class BasicBlock(nn.Module):
 
         self.conv1 = conv3x3x3(in_planes, planes, stride)
         self.bn1 = nn.BatchNorm3d(planes)
-        self.dropout1 = nn.Dropout3d(0.5)
+        self.dropout1 = nn.Dropout3d(0.3)
         self.relu = nn.ReLU(inplace=True)
         self.conv2 = conv3x3x3(planes, planes)
         self.bn2 = nn.BatchNorm3d(planes)
-        self.dropout2 = nn.Dropout3d(0.5)
+        self.dropout2 = nn.Dropout3d(0.3)
         self.downsample = downsample
         self.stride = stride
 
@@ -56,7 +58,7 @@ class BasicBlock(nn.Module):
         return out
 
 
-class ResNet(nn.Module):
+class Resnet_small(nn.Module):
 
     def __init__(self,block,layer,block_inplanes,n_input_channels=1,conv1_t_size=7,conv1_t_stride=1,no_max_pool=False,shortcut_type='B',widen_factor=1.0,n_classes=512):
         super().__init__()
@@ -82,13 +84,14 @@ class ResNet(nn.Module):
         self.fc4 = nn.Linear(64, 1)
         self.sigmoid = nn.Sigmoid()
         
+        """
         for m in self.modules():
             if isinstance(m, nn.Conv3d):
                 nn.init.kaiming_normal_(m.weight,mode='fan_out',nonlinearity='relu')
             elif isinstance(m, nn.BatchNorm3d):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
-
+        """
     def _downsample_basic_block(self, x, planes, stride):
         out = F.avg_pool3d(x, kernel_size=1, stride=stride)
         zero_pads = torch.zeros(out.size(0), planes - out.size(1), out.size(2),out.size(3), out.size(4))
@@ -145,7 +148,7 @@ class ResNet(nn.Module):
 
 
 def generate_model(**kwargs):
-    model = ResNet(BasicBlock, [2, 2, 2], get_inplanes(), **kwargs)
+    model = Resnet_small(BasicBlock, [2, 2, 2], get_inplanes(), **kwargs)
     return model
 
 

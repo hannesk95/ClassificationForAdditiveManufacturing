@@ -6,7 +6,7 @@ from shutil import copyfile
 
 class ParamConfigurator:
 
-    def __init__(self, config_path: str='config.ini'):
+    def __init__(self, config_path: str='../../infra/data_generation/config.ini'):
         config = configparser.ConfigParser()
         config.read(config_path)
 
@@ -42,7 +42,17 @@ class ParamConfigurator:
         self.trials = config['ModelDefector'].getint('trials')
         self.remaining_voxels = config['ModelDefector'].getint('remaining_voxels')
         self.factor = config['ModelDefector'].getfloat('factor')
-
+        
+        self.hole_radius_nonprintable_rot = config['DefectorRotation'].getint('hole_radius_nonprintable_rot')
+        self.hole_radius_printable_rot = config['DefectorRotation'].getint('hole_radius_printable_rot')
+        self.border_nonprintable_rot = config['DefectorRotation'].getint('border_nonprintable_rot')
+        self.border_printable_rot = config['DefectorRotation'].getint('border_printable_rot')
+        self.number_of_trials_rot = config['DefectorRotation'].getint('number_of_trials_rot')
+        
+        
+        
+        
+        
         self.version = config['Aligner'].getint('version')
         axis_to_align = config['Aligner']['axis_to_align']
         if axis_to_align == 'x':

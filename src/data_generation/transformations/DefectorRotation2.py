@@ -237,13 +237,13 @@ def _visualize_top_down_view(model_data: np.ndarray, possible_offsets_final: lis
 
 
 class DefectorRotation:
-    def __init__(self, hole_radius_nonprintable=5, hole_radius_printable=10, border_nonprintable=3, border_printable=5,
-                 number_of_trials=5):
+    def __init__(self, hole_radius_nonprintable=2, hole_radius_printable=5, border_nonprintable=3, border_printable=5,
+                 number_of_trials=8):
         self.hole_radius_nonprintable = hole_radius_nonprintable
         self.hole_radius_printable = hole_radius_printable
-
         self.border_nonprintable = border_nonprintable
         self.border_printable = border_printable
+
 
         self.number_of_trials = number_of_trials
         random.seed(42)
@@ -267,17 +267,17 @@ class DefectorRotation:
         model_data_tmp = np.pad(model_data_tmp, ((padding, padding), (padding, padding), (padding, padding)),
                                 'constant')
         model_original_padded = VoxelModel(model_data_tmp, np.array([1]),
-                                                          model.model_name+"padded")
+                                           model.model_name + "padded")
         # Rotate the model and preserve the shape
         model_data_tmp = rotate_model(model_data_tmp, x_rotation, y_rotation, z_rotation)
-           
-      
+
+
+
         model_data_nonprintable_defect_middle = self._add_defect_middle(model_data_tmp, self.hole_radius_nonprintable,
                                                                         self.border_nonprintable)
         model_data_printable_defect_middle = self._add_defect_middle(model_data_tmp, self.hole_radius_printable,
                                                                      self.border_printable)
-        model_data_nonprintable_defect_border = self._add_defect_border(model_data_tmp, self.hole_radius_printable,
-                                                                        self.border_nonprintable)
+
 
         out = []
         if model_data_nonprintable_defect_middle is not None:
@@ -289,20 +289,15 @@ class DefectorRotation:
                                                           f'_nonprintable_defect_middle{self.hole_radius_nonprintable}')
             out.append(model_nonprintable_defect_middle)
 
-        if model_data_printable_defect_middle is not None and model_data_nonprintable_defect_border is not None:
+        if model_data_printable_defect_middle is not None:
             model_data_printable_defect_middle = rotate_back(model_data_printable_defect_middle, 360 - x_rotation,
                                                              360 - y_rotation, 360 - z_rotation)
             model_printable_defect_middle = VoxelModel(model_data_printable_defect_middle, np.array([1]),
                                                        model.model_name +
                                                        f'_printable_defect_middle{self.hole_radius_printable}')
 
-            model_data_nonprintable_defect_border = rotate_back(model_data_nonprintable_defect_border, 360 - x_rotation,
-                                                                360 - y_rotation, 360 - z_rotation)
-            model_nonprintable_defect_border = VoxelModel(model_data_nonprintable_defect_border, np.array([0]),
-                                                          model.model_name +
-                                                          f'_nonprintable_defect_border{self.border_nonprintable}')
             out.append(model_printable_defect_middle)
-            out.append(model_nonprintable_defect_border)
+
 
         return out
 
