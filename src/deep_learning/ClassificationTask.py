@@ -1,6 +1,7 @@
 import numpy as np
 import pytorch_lightning as pl
 import torch.nn.functional as F
+import torch
 from torchmetrics import Accuracy
 import mlflow
 from torchsummary import summary
@@ -42,6 +43,8 @@ class ClassificationTask(pl.LightningModule):
         self.log('train_loss', self.train_loss, on_step=False, on_epoch=True, prog_bar=True, logger=False)
         self.log('train_acc', self.train_acc, on_step=False, on_epoch=True, prog_bar=True, logger=False)
 
+        self.save_model()
+        
         return self.train_loss
 
     def training_epoch_end(self, training_step_outputs) -> None:
@@ -112,6 +115,8 @@ class ClassificationTask(pl.LightningModule):
         f.close()
         mlflow.log_artifact("model_summary.txt", artifact_path="model_summary")
         os.remove("model_summary.txt")
+ 
+        
 
     def tensor2float(self, tensor) -> float:
         """Convert PyTorch tensor to float"""
@@ -121,3 +126,7 @@ class ClassificationTask(pl.LightningModule):
         tensor = val.detach().clone()
         avg_tensor = hvd.allreduce(tensor, name=name)
         return avg_tensor.item()
+
+    def save_model(self):
+        PATH = "/workspace/mount_dir/model/model.pt"
+        torch.save({'epoch':self.epoch_count,'model_state_dict':self.nn_model.state_dict(),'optimizer_state_dict':self.config.optimizer.state_dict()})
