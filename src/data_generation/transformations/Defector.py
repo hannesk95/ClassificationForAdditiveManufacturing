@@ -196,16 +196,17 @@ class Defector:
             
             # append possible centers
             centers.append((center_3d, selected_voxels.shape[0]))
-        
-        # pick the center with the most voxels
-        centers.sort(key=lambda x: x[1])  
-        center_3d = centers[-1][0]
-        
-        # hole has to be full
-        min_voxels_num = np.ceil(np.pi * (radius)**2 * factor) 
-        if selected_voxels.shape[0] >= min_voxels_num:
-            return center_3d
+
+        if centers != []:
+            # pick the center with the most voxels
+            centers.sort(key=lambda x: x[1])  
+            center_3d = centers[-1][0]
             
-        return np.array([])        
+            # hole has to be full
+            min_voxels_num = np.ceil(np.pi * (radius)**2 * factor) 
+            if selected_voxels.shape[0] >= min_voxels_num:
+                return center_3d
+            
+        return np.array([])
 
     
