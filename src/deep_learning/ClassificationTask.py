@@ -24,7 +24,7 @@ class ClassificationTask(pl.LightningModule):
         self.train_loss = None
         self.val_loss = None
         self.epoch_count = 0
-        # self.save_mlflow_params()
+        self.save_mlflow_params()
 
     def training_step(self, batch, batch_idx) -> dict:
         """#TODO: Docstring"""
