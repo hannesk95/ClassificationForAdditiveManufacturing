@@ -107,10 +107,10 @@ class ClassificationTask(pl.LightningModule):
         mlflow.log_param("dataset", self.config.data_dir)
 
         # Save num data samples of dataset
-        mlflow.log_param("total_data_samaples", self.config.data_len)
+        mlflow.log_param("dataset_total_samples", self.config.data_len)
 
         # Save train/val ratio
-        mlflow.log_param("train_val_ratio", self.config.train_val_ratio)
+        mlflow.log_param("dataset_train_val_ratio", self.config.train_val_ratio)
 
         # Save model summary
         orig_stdout = sys.stdout
