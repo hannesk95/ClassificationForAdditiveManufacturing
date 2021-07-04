@@ -62,7 +62,7 @@ class FailureAnalyst:
             fpr, tpr, _ = roc_curve(np.array(true_labels, dtype=int), torch.Tensor(prob_labels).numpy())
             roc_auc = auc(fpr, tpr)
             mlflow.log_param("false_positive_rate", str(fpr))
-            # mlflow.log_artifact("true_positive_rate", tpr)
+            mlflow.log_metric("true_positive_rate", tpr)
             mlflow.log_param("area_under_curve", roc_auc)
 
             # models = torch.stack(val_models, dim=0)
