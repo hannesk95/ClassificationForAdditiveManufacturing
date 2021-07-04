@@ -43,7 +43,7 @@ class ClassificationTask(pl.LightningModule):
         self.log('train_loss', self.train_loss, on_step=False, on_epoch=True, prog_bar=True, logger=False)
         self.log('train_acc', self.train_acc, on_step=False, on_epoch=True, prog_bar=True, logger=False)
 
-        self.save_model()
+        # self.save_model()
         
         return self.train_loss
 
