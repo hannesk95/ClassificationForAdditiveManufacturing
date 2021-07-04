@@ -113,15 +113,7 @@ class ClassificationTask(pl.LightningModule):
         mlflow.log_param("dataset_train_val_ratio", self.config.train_val_ratio)
 
         # Save model summary
-        orig_stdout = sys.stdout
-        f = open('model_summary.txt', 'w')
-        sys.stdout = f
-        if self.config.device.type == 'cuda':
-            summary(self.nn_model.cuda(), (1, 128, 128, 128))
-        else:
-            summary(self.nn_model, (1, 128, 128, 128))
-        sys.stdout = orig_stdout
-        f.close()
+        self.save_model_summary()
         mlflow.log_artifact("model_summary.txt", artifact_path="model_summary")
         os.remove("model_summary.txt")
 
@@ -133,6 +125,17 @@ class ClassificationTask(pl.LightningModule):
         tensor = val.detach().clone()
         avg_tensor = hvd.allreduce(tensor, name=name)
         return avg_tensor.item()
+
+    def save_model_summary(self):
+        orig_stdout = sys.stdout
+        f = open('model_summary.txt', 'w')
+        sys.stdout = f
+        if self.config.device.type == 'cuda':
+            summary(self.nn_model.cuda(), (1, 128, 128, 128))
+        else:
+            summary(self.nn_model, (1, 128, 128, 128))
+        sys.stdout = orig_stdout
+        f.close()
 
     def save_model(self):
         PATH = "/workspace/mount_dir/model/model.pt"
