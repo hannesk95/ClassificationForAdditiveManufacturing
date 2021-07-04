@@ -14,7 +14,7 @@ from src.deep_learning.AMCDataset import AMCDataset
 from src.deep_learning.ParamConfigurator import ParamConfigurator
 from src.deep_learning.ClassificationTask import ClassificationTask
 from src.deep_learning.ArchitectureSelector import ArchitectureSelector
-from src.deep_learning.FailureAnalyst import FailureAnalyst
+from src.deep_learning.PerformanceAnalyst import PerformanceAnalyst
 
 
 def suggest_hyperparameters(trial):

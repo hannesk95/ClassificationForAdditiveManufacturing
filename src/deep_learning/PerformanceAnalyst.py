@@ -9,7 +9,7 @@ import horovod.torch as hvd
 from sklearn.metrics import confusion_matrix, roc_curve, auc, f1_score, accuracy_score
 
 
-class FailureAnalyst:
+class PerformanceAnalyst:
     """# TODO: Docstring"""
 
     def __init__(self, config: object, val_data: object, nn_model: object, trainer: object, val_dataloader: object):

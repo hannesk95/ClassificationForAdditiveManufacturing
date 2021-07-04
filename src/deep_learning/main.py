@@ -21,7 +21,7 @@ from src.deep_learning.AMCDataset import AMCDataset
 from src.deep_learning.ParamConfigurator import ParamConfigurator
 from src.deep_learning.ClassificationTask import ClassificationTask
 from src.deep_learning.ArchitectureSelector import ArchitectureSelector
-from src.deep_learning.FailureAnalyst import FailureAnalyst
+from src.deep_learning.PerformanceAnalyst import PerformanceAnalyst
 
 # def metric_average(val, name):
 #     tensor = val.detach().clone()
@@ -104,8 +104,8 @@ def main():
     trainer.fit(classifier, train_data_loader, validation_data_loader)
 
     # 10. Perform failure analysis
-    analyst = FailureAnalyst(config=config, val_data=val_data, nn_model=classifier, trainer=trainer,
-                             val_dataloader=validation_data_loader)
+    analyst = PerformanceAnalyst(config=config, val_data=val_data, nn_model=classifier, trainer=trainer,
+                                 val_dataloader=validation_data_loader)
     analyst.start_failure_analysis()
 
     # 11. Testing
