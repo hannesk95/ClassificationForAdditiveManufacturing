@@ -128,12 +128,10 @@ class ClassificationTask(pl.LightningModule):
         mlflow.log_artifact("model_summary.txt", artifact_path="model_summary")
         os.remove("model_summary.txt")
 
-    @staticmethod
     def tensor2float(self, tensor) -> float:
         """Convert PyTorch tensor to float"""
         return np.float(tensor.cpu().detach().numpy())
 
-    @staticmethod
     def metric_average(self, val, name):
         tensor = val.detach().clone()
         avg_tensor = hvd.allreduce(tensor, name=name)
