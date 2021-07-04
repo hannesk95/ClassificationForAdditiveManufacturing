@@ -20,12 +20,12 @@ class PerformanceAnalyst:
         self.trainer = trainer
         self.val_dataloader = val_dataloader
 
-    def start_failure_analysis(self):
+    def start_performance_analysis(self):
         """# TODO: Docstring"""
 
         with torch.no_grad():
 
-            logging.info('Start failure analysis')
+            logging.info('Start performance analysis')
 
             self.nn_model.eval()
 
@@ -42,7 +42,7 @@ class PerformanceAnalyst:
             val_models = []
             pred_labels = []
             prob_labels = []
-            for i in tqdm(range(len(self.val_data)), desc="Performing failure analysis"):
+            for i in tqdm(range(len(self.val_data)), desc="Performing performance analysis"):
                 true_labels.append(self.val_data[i][1])
                 # val_models.append(self.val_data[i][0])
 

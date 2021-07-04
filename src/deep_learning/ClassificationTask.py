@@ -123,11 +123,13 @@ class ClassificationTask(pl.LightningModule):
         return np.float(tensor.cpu().detach().numpy())
 
     def metric_average(self, val, name):
+        """#TODO: Docstring"""
         tensor = val.detach().clone()
         avg_tensor = hvd.allreduce(tensor, name=name)
         return avg_tensor.item()
 
     def save_model_summary(self):
+        """#TODO: Docstring"""
         orig_stdout = sys.stdout
         f = open('model_summary.txt', 'w')
         sys.stdout = f
@@ -139,6 +141,7 @@ class ClassificationTask(pl.LightningModule):
         f.close()
 
     # def save_model(self):
+    #     """#TODO: Docstring"""
     #     PATH = "/workspace/mount_dir/model/model.pt"
     #     torch.save({'epoch': self.epoch_count, 'model_state_dict': self.nn_model.state_dict(),
     #                 'optimizer_state_dict': self.config.optimizer.state_dict()})
