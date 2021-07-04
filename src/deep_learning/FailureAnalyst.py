@@ -61,9 +61,9 @@ class FailureAnalyst:
             # Compute ROC/AUC and store results using MLflow
             fpr, tpr, _ = roc_curve(np.array(true_labels, dtype=int), torch.Tensor(prob_labels).numpy())
             roc_auc = auc(fpr, tpr)
-            mlflow.log_artifact("false_positive_rate", fpr)
-            mlflow.log_artifact("true_positive_rate", tpr)
-            mlflow.log_artifact("area_under_curve", roc_auc)
+            # mlflow.log_artifact("false_positive_rate", fpr)
+            # mlflow.log_artifact("true_positive_rate", tpr)
+            mlflow.log_param("area_under_curve", roc_auc)
 
             # models = torch.stack(val_models, dim=0)
 
