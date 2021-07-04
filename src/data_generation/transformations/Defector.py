@@ -62,7 +62,7 @@ class Defector:
 
             if voxels.shape[0] == to_be_removed.shape[0]:
                 print("empty model after hole creation")
-                return []
+                return [voxel_model_copy]
         else:
             print("hole creation not possible")
             return [voxel_model_copy]
