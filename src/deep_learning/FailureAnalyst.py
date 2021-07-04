@@ -6,7 +6,7 @@ import os
 import logging
 from tqdm import tqdm
 import horovod.torch as hvd
-from sklearn.metrics import confusion_matrix, roc_curve, auc, f1_score
+from sklearn.metrics import confusion_matrix, roc_curve, auc, f1_score, accuracy_score
 
 
 class FailureAnalyst:
@@ -51,11 +51,17 @@ class FailureAnalyst:
                 pred_labels.append(torch.round(score))
                 # pred_labels.append(torch.round(self.nn_model(torch.unsqueeze(self.val_data[i][0], 0))))
 
+            # Compute accuracy score and store result using MLflow
+            mlflow.log_param("val_accuracy_score", accuracy_score(np.array(true_labels, dtype=int),
+                                                                  torch.Tensor(pred_labels).numpy()))
+
             # Compute F1 score and store result using MLflow
-            mlflow.log_param("val_f1_score", f1_score(np.array(true_labels, dtype=int), torch.Tensor(pred_labels).numpy()))
+            mlflow.log_param("val_f1_score", f1_score(np.array(true_labels, dtype=int),
+                                                      torch.Tensor(pred_labels).numpy()))
 
             # Compute confusion matrix and store results using MLflow
-            tn, fp, fn, tp = confusion_matrix(np.array(true_labels, dtype=int), torch.Tensor(pred_labels).numpy()).ravel()
+            tn, fp, fn, tp = confusion_matrix(np.array(true_labels, dtype=int),
+                                              torch.Tensor(pred_labels).numpy()).ravel()
             mlflow.log_param("confusion_mat_true_negative", tn)
             mlflow.log_param("confusion_mat_false_positive", fp)
             mlflow.log_param("confusion_mat_false_negative", fn)
