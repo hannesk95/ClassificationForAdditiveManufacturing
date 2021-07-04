@@ -103,6 +103,18 @@ class ClassificationTask(pl.LightningModule):
         # Save number of epochs
         mlflow.log_param("epochs", self.config.num_epochs)
 
+        # Save dataset path
+        mlflow.log_param("dataset", self.config.data_dir)
+
+        # Save cutoff parameter
+        mlflow.log_param("cutoff", self.config.cutoff)
+
+        # Save num data samples of dataset
+        mlflow.log_param("total_data_samaples", self.config.data_len)
+
+        # Save train/val ratio
+        mlflow.log_param("train_val_ratio", self.config.train_val_ratio)
+
         # Save model summary
         orig_stdout = sys.stdout
         f = open('model_summary.txt', 'w')
@@ -115,13 +127,13 @@ class ClassificationTask(pl.LightningModule):
         f.close()
         mlflow.log_artifact("model_summary.txt", artifact_path="model_summary")
         os.remove("model_summary.txt")
- 
-        
 
+    @staticmethod
     def tensor2float(self, tensor) -> float:
         """Convert PyTorch tensor to float"""
         return np.float(tensor.cpu().detach().numpy())
 
+    @staticmethod
     def metric_average(self, val, name):
         tensor = val.detach().clone()
         avg_tensor = hvd.allreduce(tensor, name=name)
@@ -129,4 +141,5 @@ class ClassificationTask(pl.LightningModule):
 
     def save_model(self):
         PATH = "/workspace/mount_dir/model/model.pt"
-        torch.save({'epoch':self.epoch_count,'model_state_dict':self.nn_model.state_dict(),'optimizer_state_dict':self.config.optimizer.state_dict()})
+        torch.save({'epoch': self.epoch_count, 'model_state_dict': self.nn_model.state_dict(),
+                    'optimizer_state_dict': self.config.optimizer.state_dict()})
