@@ -6,6 +6,7 @@ import os
 import logging
 from tqdm import tqdm
 import horovod.torch as hvd
+from sklearn.metrics import confusion_matrix, roc_curve, auc
 
 
 class FailureAnalyst:
@@ -40,10 +41,29 @@ class FailureAnalyst:
             true_labels = []
             val_models = []
             pred_labels = []
+            prob_labels = []
             for i in tqdm(range(len(self.val_data)), desc="Performing failure analysis"):
                 true_labels.append(self.val_data[i][1])
                 # val_models.append(self.val_data[i][0])
-                pred_labels.append(torch.round(self.nn_model(torch.unsqueeze(self.val_data[i][0], 0))))
+
+                score = self.nn_model(torch.unsqueeze(self.val_data[i][0], 0))
+                prob_labels.append(score)
+                pred_labels.append(torch.round(score))
+                # pred_labels.append(torch.round(self.nn_model(torch.unsqueeze(self.val_data[i][0], 0))))
+
+            # Compute confusion matrix and store results using MLflow
+            tn, fp, fn, tp = confusion_matrix(true_labels, pred_labels).ravel()
+            mlflow.log_param("true_negative", tn)
+            mlflow.log_param("false_positive", fp)
+            mlflow.log_param("false_negative", fn)
+            mlflow.log_param("true_positive", tp)
+
+            # Compute ROC/AUC and store results using MLflow
+            fpr, tpr, _ = roc_curve(true_labels, prob_labels)
+            roc_auc = auc(fpr, tpr)
+            mlflow.log_artifact("false_positive_rate", fpr)
+            mlflow.log_artifact("true_positive_rate", tpr)
+            mlflow.log_artifact("area_under_curve", roc_auc)
 
             # models = torch.stack(val_models, dim=0)
 
