@@ -106,9 +106,6 @@ class ClassificationTask(pl.LightningModule):
         # Save dataset path
         mlflow.log_param("dataset", self.config.data_dir)
 
-        # Save cutoff parameter
-        mlflow.log_param("cutoff", self.config.cutoff)
-
         # Save num data samples of dataset
         mlflow.log_param("total_data_samaples", self.config.data_len)
 
