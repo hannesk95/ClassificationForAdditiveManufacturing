@@ -52,14 +52,14 @@ class FailureAnalyst:
                 # pred_labels.append(torch.round(self.nn_model(torch.unsqueeze(self.val_data[i][0], 0))))
 
             # Compute confusion matrix and store results using MLflow
-            tn, fp, fn, tp = confusion_matrix(true_labels, pred_labels).ravel()
+            tn, fp, fn, tp = confusion_matrix(np.array(true_labels, dtype=int), torch.Tensor(pred_labels).numpy()).ravel()
             mlflow.log_param("true_negative", tn)
             mlflow.log_param("false_positive", fp)
             mlflow.log_param("false_negative", fn)
             mlflow.log_param("true_positive", tp)
 
             # Compute ROC/AUC and store results using MLflow
-            fpr, tpr, _ = roc_curve(true_labels, prob_labels)
+            fpr, tpr, _ = roc_curve(np.array(true_labels, dtype=int), torch.Tensor(prob_labels).numpy())
             roc_auc = auc(fpr, tpr)
             mlflow.log_artifact("false_positive_rate", fpr)
             mlflow.log_artifact("true_positive_rate", tpr)
