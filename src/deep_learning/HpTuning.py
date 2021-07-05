@@ -13,7 +13,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from torchvision import datasets, transforms
+from torchvision.transforms import transforms
+from torch.utils.data import DataLoader, random_split
+import torchmetrics
 from torch.optim.lr_scheduler import StepLR
 from mlflow import pytorch
 from pprint import pformat
