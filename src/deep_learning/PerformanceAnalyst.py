@@ -27,6 +27,7 @@ class PerformanceAnalyst:
 
             logging.info('Start performance analysis')
 
+            self.nn_model = self.nn_model.cpu()
             self.nn_model.eval()
 
             # predictions = self.trainer.predict(self.nn_model, self.val_dataloader)
