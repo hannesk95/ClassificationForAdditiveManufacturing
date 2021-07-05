@@ -34,17 +34,15 @@ class ClassificationTask(pl.LightningModule):
         self.train_loss = F.binary_cross_entropy_with_logits(pred, label)
         self.train_acc = self.accuracy(pred.round().int(), label.int())
 
-        train_loss_red = self.metric_average(self.train_loss, 'avg_loss')
-        train_acc_red = self.metric_average(self.train_acc, 'avg_acc')
-        
-        if hvd.rank() == 0:
-            mlflow.log_metric("train_loss_step", train_loss_red)
-            mlflow.log_metric("train_acc_step", train_acc_red)
+        # train_loss_red = self.metric_average(self.train_loss, 'avg_loss')
+        # train_acc_red = self.metric_average(self.train_acc, 'avg_acc')
+        #
+        # if hvd.rank() == 0:
+        #     mlflow.log_metric("train_loss_step", train_loss_red)
+        #     mlflow.log_metric("train_acc_step", train_acc_red)
 
         self.log('train_loss', self.train_loss, on_step=False, on_epoch=True, prog_bar=True, logger=False)
         self.log('train_acc', self.train_acc, on_step=False, on_epoch=True, prog_bar=True, logger=False)
-
-        # self.save_model()
         
         return self.train_loss
 
@@ -60,12 +58,12 @@ class ClassificationTask(pl.LightningModule):
         self.val_loss = F.binary_cross_entropy_with_logits(pred, label)
         self.val_acc = self.accuracy(pred.round().int(), label.int())
 
-        val_loss_red = self.metric_average(self.val_loss, 'avg_val_loss')
-        val_acc_red = self.metric_average(self.val_acc, 'avg_val_acc')
-
-        if hvd.rank() == 0:
-            mlflow.log_metric("val_loss_step", val_loss_red)
-            mlflow.log_metric("val_acc_step", val_acc_red)
+        # val_loss_red = self.metric_average(self.val_loss, 'avg_val_loss')
+        # val_acc_red = self.metric_average(self.val_acc, 'avg_val_acc')
+        #
+        # if hvd.rank() == 0:
+        #     mlflow.log_metric("val_loss_step", val_loss_red)
+        #     mlflow.log_metric("val_acc_step", val_acc_red)
 
         self.log('val_loss', self.val_loss, on_step=False, on_epoch=True, prog_bar=True, logger=False)
         self.log('val_acc', self.val_acc, on_step=False, on_epoch=True, prog_bar=True, logger=False)
