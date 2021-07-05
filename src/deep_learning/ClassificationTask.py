@@ -75,10 +75,10 @@ class ClassificationTask(pl.LightningModule):
         mlflow.log_metric("val_loss_epoch", self.tensor2float(self.val_loss))
         mlflow.log_metric("val_acc_epoch", self.tensor2float(self.val_acc))
 
-        if self.val_acc > self.best_accuracy:
-            torch.save(self.nn_model.state_dict(), 'model_parameters.pt')
-            mlflow.log_artifact('model_parameters.pt', artifact_path="best_model_params")
-            self.best_accuracy = self.val_acc
+        # if self.val_acc > self.best_accuracy:
+        #     torch.save(self.nn_model.state_dict(), 'model_parameters.pt')
+        #     mlflow.log_artifact('model_parameters.pt', artifact_path="best_model_params")
+        #     self.best_accuracy = self.val_acc
 
     def configure_optimizers(self) -> object:
         """#TODO: Docstring"""

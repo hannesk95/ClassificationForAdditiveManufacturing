@@ -9,6 +9,7 @@ sys.path.append("../..")
 import logging
 import mlflow.pytorch
 import pytorch_lightning as pl
+from pytorch_lightning.callbacks import ModelCheckpoint
 
 from torchvision.transforms import transforms
 from torch.utils.data import DataLoader, random_split
@@ -99,9 +100,20 @@ def main():
     classifier = ClassificationTask(nn_model=nn_model, config=config)
 
     # 9. Start training
-    trainer = pl.Trainer(max_epochs=config.num_epochs, deterministic=True, accelerator='horovod', gpus=1, precision=16)
+    checkpoint_callback = ModelCheckpoint(
+        monitor='val_loss',
+        dirpath='',
+        filename='model_parameters-{epoch:02d}-{val_loss:.2f}',
+        save_top_k=3,
+        mode='min',
+    )
+
+    trainer = pl.Trainer(max_epochs=config.num_epochs, deterministic=True, accelerator='horovod', gpus=1, precision=16, callbacks=[checkpoint_callback])
     # trainer = pl.Trainer(max_epochs=config.num_epochs, deterministic=True)
     trainer.fit(classifier, train_data_loader, validation_data_loader)
+
+    mlflow.log_artifact('checkpoint_callback.best_model_path', artifact_path="best_model_params")
+    classifier = classifier.load_from_checkpoint(checkpoint_path=checkpoint_callback.best_model_path)
 
     # 10. Perform failure analysis
     analyst = PerformanceAnalyst(config=config, val_data=val_data, nn_model=classifier, trainer=trainer,
