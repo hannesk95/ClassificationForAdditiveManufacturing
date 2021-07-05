@@ -106,7 +106,7 @@ def main():
     # 10. Perform failure analysis
     analyst = PerformanceAnalyst(config=config, val_data=val_data, nn_model=classifier, trainer=trainer,
                                  val_dataloader=validation_data_loader)
-    analyst.start_failure_analysis()
+    analyst.start_performance_analysis()
 
     # 11. Testing
     # test(nn_model, test_sampler, test_loader)
