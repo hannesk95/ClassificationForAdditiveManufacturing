@@ -24,7 +24,6 @@ from src.deep_learning.ParamConfigurator import ParamConfigurator
 from src.deep_learning.ClassificationTask import ClassificationTask
 from src.deep_learning.ArchitectureSelector import ArchitectureSelector
 from src.deep_learning.PerformanceAnalyst import PerformanceAnalyst
-from src.deep_learning.network
 from src.deep_learning.network import Vanilla3DCNN, ResNet, VGGNet, InceptionNet_v1, InceptionNet_v3, Vanilla3DCNN_large,Resnet_small
 
 def suggest_hyperparameters(trial):
