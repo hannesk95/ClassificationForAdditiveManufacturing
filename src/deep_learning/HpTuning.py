@@ -34,14 +34,14 @@ def suggest_hyperparameters(trial):
     # Optimizer to use as categorical value
     optimizer_name = trial.suggest_categorical("optimizer_name", ["Adam", "Adadelta"])
 
-    return lr, dropout, optimizer_name
+    return lr, optimizer_name
 
 
 def objective(trial):
 
     with mlflow.start_run():
         config = ParamConfigurator()
-        lr, dropout, optimizer_name = suggest_hyperparameters(trial)
+        lr, optimizer_name = suggest_hyperparameters(trial)
         config.learning_rate = lr
         config.optimizer = optimizer_name
         mlflow.log_params(trial.params)
