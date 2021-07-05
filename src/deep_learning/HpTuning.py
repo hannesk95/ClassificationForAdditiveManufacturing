@@ -81,7 +81,7 @@ def objective(trial):
 
 
 def main():
-    study = optuna.create_study(direction="maximize", pruner=pruner)
+    study = optuna.create_study(study_name="pytorch-mlflow-optuna", direction="maximize")
     study.optimize(objective, n_trials=100, timeout=600)
 
     print("Number of finished trials: {}".format(len(study.trials)))
