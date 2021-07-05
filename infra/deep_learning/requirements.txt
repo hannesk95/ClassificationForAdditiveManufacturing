@@ -7,3 +7,4 @@ pandas
 pillow
 torchsummary
 pytorch-lightning==1.3.0
+optuna
