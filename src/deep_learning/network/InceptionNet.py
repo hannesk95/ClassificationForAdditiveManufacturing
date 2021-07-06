@@ -118,7 +118,7 @@ class InceptionNet_v3(nn.Module):
        x = self.maxpool(x)
        x = self.inception6(x)
        x = self.avgpool(x)
-       print(x.shape)
+       # print(x.shape)
        x = x.view(x.size(0),-1)
        
        x = self.dropout(x)
