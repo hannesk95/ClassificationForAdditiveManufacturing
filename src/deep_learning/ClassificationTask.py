@@ -48,8 +48,8 @@ class ClassificationTask(pl.LightningModule):
 
     def training_epoch_end(self, training_step_outputs) -> None:
         """#TODO: Docstring"""
-        mlflow.log_metric("train_loss_epoch", self.tensor2float(self.train_loss))
-        mlflow.log_metric("train_acc_epoch", self.tensor2float(self.train_acc))
+        # mlflow.log_metric("train_loss_epoch", self.tensor2float(self.train_loss))
+        # mlflow.log_metric("train_acc_epoch", self.tensor2float(self.train_acc))
 
     def validation_step(self, batch, batch_idx) -> dict:
         """#TODO: Docstring"""
@@ -72,8 +72,8 @@ class ClassificationTask(pl.LightningModule):
 
     def validation_epoch_end(self, validation_step_outputs) -> None:
         """#TODO: Docstring"""
-        mlflow.log_metric("val_loss_epoch", self.tensor2float(self.val_loss))
-        mlflow.log_metric("val_acc_epoch", self.tensor2float(self.val_acc))
+        # mlflow.log_metric("val_loss_epoch", self.tensor2float(self.val_loss))
+        # mlflow.log_metric("val_acc_epoch", self.tensor2float(self.val_acc))
 
         # if self.val_acc > self.best_accuracy:
         #     torch.save(self.nn_model.state_dict(), 'model_parameters.pt')
