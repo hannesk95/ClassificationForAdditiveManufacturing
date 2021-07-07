@@ -32,7 +32,6 @@ class BasicBlock(nn.Module):
         self.relu = nn.ReLU(inplace=True)
         self.conv2 = conv3x3x3(planes, planes)
         self.bn2 = nn.BatchNorm3d(planes)
-        #self.dropout2 = nn.Dropout3d(0.3)
         self.downsample = downsample
         self.stride = stride
 
@@ -46,8 +45,6 @@ class BasicBlock(nn.Module):
 
         out = self.conv2(out)
         out = self.bn2(out)
-        #out = self.dropout2(out)
-
 
         if self.downsample is not None:
             residual = self.downsample(x)
@@ -64,7 +61,7 @@ class Resnet_small(nn.Module):
         super().__init__()
 
         block_inplanes = [int(x * widen_factor) for x in block_inplanes]
-        #print(block_inplanes[1])
+        
         self.in_planes = block_inplanes[0]
         self.no_max_pool = no_max_pool
 
@@ -75,15 +72,16 @@ class Resnet_small(nn.Module):
         self.layer1 = self._make_layer(block, block_inplanes[0], layer[0],shortcut_type)
         self.layer2 = self._make_layer(block,block_inplanes[1],layer[1],shortcut_type,stride=2)
         self.layer3 = self._make_layer(block,block_inplanes[2],layer[2],shortcut_type,stride=2)
-        #self.layer4 = self._make_layer(block,block_inplanes[3],layer[3],shortcut_type,stride=2)
+        
         self.maxpool1 = nn.MaxPool3d(kernel_size=5, stride=1)
         self.avgpool = nn.AvgPool3d(kernel_size=4,stride=1)
         self.fc1 = nn.Linear(1024, n_classes)
         self.fc2 = nn.Linear(n_classes, 128)
         self.fc3 = nn.Linear(128, 64)
         self.fc4 = nn.Linear(64, 1)
-        self.sigmoid = nn.Sigmoid()
         self.convf1 = conv1x1x1(256,1024)
+        self.sigmoid = nn.Sigmoid()
+        
         
         for m in self.modules():
             if isinstance(m, nn.Conv3d):
@@ -119,9 +117,6 @@ class Resnet_small(nn.Module):
 
         return nn.Sequential(*layers)
 
-    def normalize(self,x):
-        n = torch.sqrt(torch.sum(x*x,dim=-1,keepdim=True))
-        return x/n
 
     def forward(self, x):
         x = self.conv1(x)
@@ -132,10 +127,9 @@ class Resnet_small(nn.Module):
 
         x = self.layer1(x)
         x = self.layer2(x)
-        #print(x.shape)
         x = self.layer3(x)
         
-        #x = self.layer4(x)
+        
         x = self.maxpool1(x)
         x = self.avgpool(x)
         x = self.convf1(x)
@@ -148,7 +142,7 @@ class Resnet_small(nn.Module):
         x = self.relu(self.fc3(x))
         x = self.sigmoid(self.fc4(x))   
         
-        #x = self.normalize(x)
+        
         return x
 
 
