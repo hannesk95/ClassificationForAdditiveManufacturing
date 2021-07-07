@@ -13,9 +13,13 @@ class Vanilla3DCNN_large(pl.LightningModule):
         super(Vanilla3DCNN_large, self).__init__()
 
         self.conv1 = nn.Conv3d(in_channels=1, out_channels=32, kernel_size=(9, 9, 9))
+        self.bn1 = nn.BatchNorm3d(32)
         self.conv2 = nn.Conv3d(in_channels=32, out_channels=64, kernel_size=(7, 7, 7))
+        self.bn2 = nn.BatchNorm3d(64)
         self.conv3 = nn.Conv3d(in_channels=64, out_channels=96, kernel_size=(5, 5, 5))
+        self.bn3 = nn.BatchNorm3d(96)
         self.conv4 = nn.Conv3d(in_channels=96, out_channels=128, kernel_size=(3, 3, 3))
+        self.bn4 = nn.BatchNorm3d(128)
 
         self.fc1 = nn.Linear(in_features=128, out_features=32)
         self.fc2 = nn.Linear(in_features=32, out_features=1)
@@ -37,21 +41,21 @@ class Vanilla3DCNN_large(pl.LightningModule):
         """#TODO: Add docstring."""
 
         # Convolution block 1
-        x = self.conv1(x)
+        x = self.bn1(self.conv1(x))
         x = self.relu(x)
 
         # Convolution block 2
-        x = self.conv2(x)
+        x = self.bn2(self.conv2(x))
         x = self.relu(x)
         x = self.max_pool3d(x)
 
         # Convolution block 3
-        x = self.conv3(x)
+        x = self.bn3(self.conv3(x))
         x = self.relu(x)
         x = self.max_pool3d(x)
 
         # Convolution block 4
-        x = self.conv4(x)
+        x = self.bn4(self.conv4(x))
         x = self.relu(x)
         x = self.max_pool3d(x)
 
