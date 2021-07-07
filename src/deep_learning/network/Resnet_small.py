@@ -64,11 +64,11 @@ class Resnet_small(nn.Module):
         super().__init__()
 
         block_inplanes = [int(x * widen_factor) for x in block_inplanes]
-        print(block_inplanes[1])
+        #print(block_inplanes[1])
         self.in_planes = block_inplanes[0]
         self.no_max_pool = no_max_pool
 
-        self.conv1 = nn.Conv3d(n_input_channels,self.in_planes,kernel_size=(7, 7, 7),stride=(2, 2, 2),padding=(3, 3, 3),bias=False)
+        self.conv1 = nn.Conv3d(n_input_channels,self.in_planes,kernel_size=(5, 5, 5),stride=(2, 2, 2),padding=(2, 2, 2),bias=False)
         self.bn1 = nn.BatchNorm3d(self.in_planes)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool3d(kernel_size=3, stride=2, padding=1)
