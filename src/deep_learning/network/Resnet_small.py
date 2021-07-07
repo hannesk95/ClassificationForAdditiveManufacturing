@@ -148,7 +148,7 @@ class Resnet_small(nn.Module):
 
 
 def generate_model(**kwargs):
-    model = Resnet_small(BasicBlock, [], get_inplanes(), **kwargs)
+    model = Resnet_small(BasicBlock, [2,2,2], get_inplanes(), **kwargs)
     return model
 
 
