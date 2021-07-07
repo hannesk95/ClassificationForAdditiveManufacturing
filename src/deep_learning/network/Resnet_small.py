@@ -60,7 +60,7 @@ class BasicBlock(nn.Module):
 
 class Resnet_small(nn.Module):
 
-    def __init__(self,block,layer,block_inplanes,n_input_channels=1,conv1_t_size=7,conv1_t_stride=1,no_max_pool=False,shortcut_type='B',widen_factor=1.0,n_classes=512):
+    def __init__(self,block,layer,block_inplanes,n_input_channels=1,conv1_t_size=7,conv1_t_stride=1,no_max_pool=False,shortcut_type='B',widen_factor=1.0,n_classes=256):
         super().__init__()
 
         block_inplanes = [int(x * widen_factor) for x in block_inplanes]
@@ -84,14 +84,14 @@ class Resnet_small(nn.Module):
         self.fc4 = nn.Linear(64, 1)
         self.sigmoid = nn.Sigmoid()
         
-        """
+        
         for m in self.modules():
             if isinstance(m, nn.Conv3d):
                 nn.init.kaiming_normal_(m.weight,mode='fan_out',nonlinearity='relu')
             elif isinstance(m, nn.BatchNorm3d):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
-        """
+        
     def _downsample_basic_block(self, x, planes, stride):
         out = F.avg_pool3d(x, kernel_size=1, stride=stride)
         zero_pads = torch.zeros(out.size(0), planes - out.size(1), out.size(2),out.size(3), out.size(4))
@@ -143,7 +143,7 @@ class Resnet_small(nn.Module):
         x = self.relu(self.fc3(x))
         x = self.sigmoid(self.fc4(x))   
         
-        x = self.normalize(x)
+        #x = self.normalize(x)
         return x
 
 
