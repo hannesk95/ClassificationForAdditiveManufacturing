@@ -31,7 +31,7 @@ class ParamConfigurator:
             self.kwargs = {'num_workers': self.num_workers}
 
         self.optimizer = config['training']['optimizer']
-        if self.optimizer not in ['Adam', 'SGD']:
+        if self.optimizer not in ['Adam', 'SGD','Adagrad']:
             raise ValueError(f"[ERROR] Chosen optimizer is not valid! Please choose out of ['Adam, 'SGD].")
 
         self.loss_function = config['training']['loss_function']
