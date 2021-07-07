@@ -7,7 +7,7 @@ from torchsummary import summary
 
 
 def get_inplanes():
-    return [64,128,256]
+    return [64,128,256,512]
 
 
 def conv3x3x3(in_planes, out_planes, stride=1):
@@ -75,10 +75,10 @@ class Resnet_small(nn.Module):
         self.layer1 = self._make_layer(block, block_inplanes[0], layer[0],shortcut_type)
         self.layer2 = self._make_layer(block,block_inplanes[1],layer[1],shortcut_type,stride=2)
         self.layer3 = self._make_layer(block,block_inplanes[2],layer[2],shortcut_type,stride=2)
-        
+        self.layer4 = self._make_layer(block,block_inplanes[3],layer[3],shortcut_type,stride=2)
 
-        self.avgpool = nn.AdaptiveAvgPool3d((1, 1, 1))
-        self.fc1 = nn.Linear(block_inplanes[2] * block.expansion, n_classes)
+        self.avgpool = nn.AvgPool3d(kernel_size=4,stride=1)
+        self.fc1 = nn.Linear(512, n_classes)
         self.fc2 = nn.Linear(n_classes, 128)
         self.fc3 = nn.Linear(128, 64)
         self.fc4 = nn.Linear(64, 1)
@@ -132,12 +132,16 @@ class Resnet_small(nn.Module):
 
         x = self.layer1(x)
         x = self.layer2(x)
+        #print(x.shape)
         x = self.layer3(x)
         
-
+        x = self.layer4(x)
+       
         x = self.avgpool(x)
-
+        
         x = x.view(x.size(0), -1)
+        
+        #print(x.shape)
         x = self.fc1(x)
         x = self.relu(self.fc2(x))
         x = self.relu(self.fc3(x))
@@ -148,11 +152,11 @@ class Resnet_small(nn.Module):
 
 
 def generate_model(**kwargs):
-    model = Resnet_small(BasicBlock, [2,2,2], get_inplanes(), **kwargs)
+    model = Resnet_small(BasicBlock, [1,1,1,1], get_inplanes(), **kwargs)
     return model
 
 
 #For test
 if __name__ == '__main__':
     net = generate_model()
-    summary(net,(1,15,15,15))
+    summary(net,(1,128,128,128))
