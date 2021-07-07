@@ -85,9 +85,9 @@ class ClassificationTask(pl.LightningModule):
     def configure_optimizers(self) -> object:
         """#TODO: Docstring"""
         optim = self.config.optimizer
-        lr_scheduler = {'scheduler':torch.optim.lr_scheduler.CyclicLR(optim,base_lr=0.0003,max_lr=0.001),'name':'learning_rate'}
+        lr_scheduler = {'scheduler':torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer=optim,mode='min',patience=3)}
 
-        return [optimizer],[lr_scheduler]
+        return [optim],[lr_scheduler]
 
     def get_progress_bar_dict(self) -> dict:
         """#TODO: Docstring"""
