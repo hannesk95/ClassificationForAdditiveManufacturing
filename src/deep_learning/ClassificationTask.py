@@ -2,6 +2,7 @@ import numpy as np
 import pytorch_lightning as pl
 import torch.nn.functional as F
 import torch
+from torch.optim import optimizer
 from torchmetrics import Accuracy
 import mlflow
 from torchsummary import summary
@@ -24,6 +25,7 @@ class ClassificationTask(pl.LightningModule):
         self.train_loss = None
         self.val_loss = None
         self.epoch_count = 0
+
         self.save_mlflow_params()
         self.best_accuracy = 0
 
@@ -82,7 +84,10 @@ class ClassificationTask(pl.LightningModule):
 
     def configure_optimizers(self) -> object:
         """#TODO: Docstring"""
-        return self.config.optimizer
+        optim = self.config.optimizer
+        lr_scheduler = {'scheduler':torch.optim.lr_scheduler.CyclicLR(optim,base_lr=0.0003,max_lr=0.001),'name':'learning_rate'}
+
+        return [optimizer],[lr_scheduler]
 
     def get_progress_bar_dict(self) -> dict:
         """#TODO: Docstring"""
