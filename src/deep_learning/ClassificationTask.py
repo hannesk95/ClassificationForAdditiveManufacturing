@@ -85,7 +85,7 @@ class ClassificationTask(pl.LightningModule):
     def configure_optimizers(self) -> object:
         """#TODO: Docstring"""
         optim = self.config.optimizer
-        lr_scheduler = {'scheduler':torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer=optim,mode='min',patience=3),'name':'learning_rate'}
+        lr_scheduler = {'scheduler':torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer=optim,mode='min',patience=3),'monitor':'learning_rate'}
 
         return [optim],[lr_scheduler]
 
