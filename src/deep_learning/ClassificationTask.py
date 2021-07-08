@@ -1,8 +1,8 @@
 import numpy as np
 import pytorch_lightning as pl
 import torch.nn.functional as F
-import torch
-from torch.optim import optimizer
+# import torch
+# from torch.optim import optimizer
 from torchmetrics import Accuracy
 import mlflow
 from torchsummary import summary
@@ -139,9 +139,3 @@ class ClassificationTask(pl.LightningModule):
             summary(self.nn_model, (1, 128, 128, 128))
         sys.stdout = orig_stdout
         f.close()
-
-    # def save_model(self):
-    #     """#TODO: Docstring"""
-    #     PATH = "/workspace/mount_dir/model/model.pt"
-    #     torch.save({'epoch': self.epoch_count, 'model_state_dict': self.nn_model.state_dict(),
-    #                 'optimizer_state_dict': self.config.optimizer.state_dict()})
