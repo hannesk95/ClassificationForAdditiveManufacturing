@@ -113,7 +113,7 @@ def main():
     trainer.fit(classifier, train_data_loader, validation_data_loader)
 
     mlflow.log_artifact(checkpoint_callback.best_model_path, artifact_path="best_model_params")
-    classifier = classifier.load_from_checkpoint(checkpoint_path=checkpoint_callback.best_model_path, nn_model=nn_model, config=config)
+    classifier = classifier.load_from_checkpoint(checkpoint_path=checkpoint_callback.best_model_path, nn_model=nn_model, config=config, trained=True)
 
     # 10. Perform failure analysis
     analyst = PerformanceAnalyst(config=config, val_data=val_data, nn_model=classifier, trainer=trainer,
