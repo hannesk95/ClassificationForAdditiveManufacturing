@@ -14,7 +14,7 @@ import horovod.torch as hvd
 class ClassificationTask(pl.LightningModule):
     """#TODO: Docstring"""
 
-    def __init__(self, nn_model: object, config: object):
+    def __init__(self, nn_model: object, config: object, trained=False):
         """#TODO: Docstring"""
         super().__init__()
         self.nn_model = nn_model
@@ -25,9 +25,9 @@ class ClassificationTask(pl.LightningModule):
         self.train_loss = None
         self.val_loss = None
         self.epoch_count = 0
-
-        self.save_mlflow_params()
-        self.best_accuracy = 0
+        if not trained:
+            self.save_mlflow_params()
+        #self.best_accuracy = 0
 
     def training_step(self, batch, batch_idx) -> dict:
         """#TODO: Docstring"""
