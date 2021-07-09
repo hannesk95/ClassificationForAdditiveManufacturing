@@ -36,15 +36,15 @@ class ClassificationTask(pl.LightningModule):
         self.train_loss = F.binary_cross_entropy_with_logits(pred, label)
         self.train_acc = self.accuracy(pred.round().int(), label.int())
 
-        # train_loss_red = self.metric_average(self.train_loss, 'avg_loss')
-        # train_acc_red = self.metric_average(self.train_acc, 'avg_acc')
-        #
-        # if hvd.rank() == 0:
-        #     mlflow.log_metric("train_loss_step", train_loss_red)
-        #     mlflow.log_metric("train_acc_step", train_acc_red)
+        train_loss_red = self.metric_average(self.train_loss, 'avg_loss')
+        train_acc_red = self.metric_average(self.train_acc, 'avg_acc')
+        
+        if hvd.rank() == 0:
+             mlflow.log_metric("train_loss_step", train_loss_red)
+             mlflow.log_metric("train_acc_step", train_acc_red)
 
-        self.log('train_loss', self.train_loss, on_step=False, on_epoch=True, prog_bar=True, logger=False)
-        self.log('train_acc', self.train_acc, on_step=False, on_epoch=True, prog_bar=True, logger=False)
+#         self.log('train_loss', self.train_loss, on_step=False, on_epoch=True, prog_bar=True, logger=False)
+#         self.log('train_acc', self.train_acc, on_step=False, on_epoch=True, prog_bar=True, logger=False)
         
         return self.train_loss
 
@@ -60,15 +60,15 @@ class ClassificationTask(pl.LightningModule):
         self.val_loss = F.binary_cross_entropy_with_logits(pred, label)
         self.val_acc = self.accuracy(pred.round().int(), label.int())
 
-        # val_loss_red = self.metric_average(self.val_loss, 'avg_val_loss')
-        # val_acc_red = self.metric_average(self.val_acc, 'avg_val_acc')
-        #
-        # if hvd.rank() == 0:
-        #     mlflow.log_metric("val_loss_step", val_loss_red)
-        #     mlflow.log_metric("val_acc_step", val_acc_red)
+        val_loss_red = self.metric_average(self.val_loss, 'avg_val_loss')
+        val_acc_red = self.metric_average(self.val_acc, 'avg_val_acc')
+        
+        if hvd.rank() == 0:
+            mlflow.log_metric("val_loss_step", val_loss_red)
+            mlflow.log_metric("val_acc_step", val_acc_red)
 
-        self.log('val_loss', self.val_loss, on_step=False, on_epoch=True, prog_bar=True, logger=False)
-        self.log('val_acc', self.val_acc, on_step=False, on_epoch=True, prog_bar=True, logger=False)
+#         self.log('val_loss', self.val_loss, on_step=False, on_epoch=True, prog_bar=True, logger=False)
+#         self.log('val_acc', self.val_acc, on_step=False, on_epoch=True, prog_bar=True, logger=False)
 
         return self.val_loss
 
@@ -95,28 +95,29 @@ class ClassificationTask(pl.LightningModule):
 
     def save_mlflow_params(self):
         """#TODO: Docstring"""
-        # Save optimizer
-        mlflow.log_param("optimizer", self.config.optimizer)
+        if hvd.rank() == 0:
+            # Save optimizer
+            mlflow.log_param("optimizer", self.config.optimizer)
 
-        # Save learning rate
-        mlflow.log_param("learning_rate", self.config.learning_rate)
+            # Save learning rate
+            mlflow.log_param("learning_rate", self.config.learning_rate)
 
-        # Save number of epochs
-        mlflow.log_param("epochs", self.config.num_epochs)
+            # Save number of epochs
+            mlflow.log_param("epochs", self.config.num_epochs)
 
-        # Save dataset path
-        mlflow.log_param("dataset", self.config.data_dir)
+            # Save dataset path
+            mlflow.log_param("dataset", self.config.data_dir)
 
-        # Save num data samples of dataset
-        mlflow.log_param("dataset_total_samples", self.config.data_len)
+            # Save num data samples of dataset
+            mlflow.log_param("dataset_total_samples", self.config.data_len)
 
-        # Save train/val ratio
-        mlflow.log_param("dataset_train_val_ratio", self.config.train_val_ratio)
+            # Save train/val ratio
+            mlflow.log_param("dataset_train_val_ratio", self.config.train_val_ratio)
 
-        # Save model summary
-        self.save_model_summary()
-        mlflow.log_artifact("model_summary.txt", artifact_path="model_summary")
-        os.remove("model_summary.txt")
+            # Save model summary
+            self.save_model_summary()
+            mlflow.log_artifact("model_summary.txt", artifact_path="model_summary")
+            os.remove("model_summary.txt")
 
     def tensor2float(self, tensor) -> float:
         """Convert PyTorch tensor to float"""
