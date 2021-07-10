@@ -94,7 +94,7 @@ def main():
     # 7. Start MLflow logging
     mlflow.set_tracking_uri(config.mlflow_log_dir)
     mlflow.set_experiment(config.experiment_name)
-    mlflow.pytorch.autolog()
+    # mlflow.pytorch.autolog()
 
     # 8. Create classifier
     classifier = ClassificationTask(nn_model=nn_model, config=config)
@@ -104,7 +104,7 @@ def main():
         monitor='val_loss',
         dirpath='',
         filename='model_parameters-{epoch:02d}-{val_loss:.2f}',
-        save_top_k=3,
+        save_top_k=1,
         mode='min',
     )
 
@@ -112,7 +112,8 @@ def main():
     # trainer = pl.Trainer(max_epochs=config.num_epochs, deterministic=True)
     trainer.fit(classifier, train_data_loader, validation_data_loader)
 
-    mlflow.log_artifact(checkpoint_callback.best_model_path, artifact_path="best_model_params")
+    if hvd.rank() == 0:
+        mlflow.log_artifact(checkpoint_callback.best_model_path, artifact_path="best_model_params")
     classifier = classifier.load_from_checkpoint(checkpoint_path=checkpoint_callback.best_model_path, nn_model=nn_model, config=config, trained=True)
 
     # 10. Perform failure analysis

@@ -53,27 +53,31 @@ class PerformanceAnalyst:
                 # pred_labels.append(torch.round(self.nn_model(torch.unsqueeze(self.val_data[i][0], 0))))
 
             # Compute accuracy score and store result using MLflow
-            mlflow.log_param("val_accuracy_score", accuracy_score(np.array(true_labels, dtype=int),
-                                                                  torch.Tensor(pred_labels).numpy()))
+            if hvd.rank() == 0:
+                mlflow.log_param("val_accuracy_score", accuracy_score(np.array(true_labels, dtype=int),
+                                                                    torch.Tensor(pred_labels).numpy()))
 
             # Compute F1 score and store result using MLflow
-            mlflow.log_param("val_f1_score", f1_score(np.array(true_labels, dtype=int),
-                                                      torch.Tensor(pred_labels).numpy()))
+            if hvd.rank() == 0:
+                mlflow.log_param("val_f1_score", f1_score(np.array(true_labels, dtype=int),
+                                                        torch.Tensor(pred_labels).numpy()))
 
             # Compute confusion matrix and store results using MLflow
             tn, fp, fn, tp = confusion_matrix(np.array(true_labels, dtype=int),
                                               torch.Tensor(pred_labels).numpy()).ravel()
-            mlflow.log_param("confusion_mat_true_negative", tn)
-            mlflow.log_param("confusion_mat_false_positive", fp)
-            mlflow.log_param("confusion_mat_false_negative", fn)
-            mlflow.log_param("confusion_mat_true_positive", tp)
+            if hvd.rank() == 0:                                              
+                mlflow.log_param("confusion_mat_true_negative", tn)
+                mlflow.log_param("confusion_mat_false_positive", fp)
+                mlflow.log_param("confusion_mat_false_negative", fn)
+                mlflow.log_param("confusion_mat_true_positive", tp)
 
             # Compute ROC/AUC and store results using MLflow
             fpr, tpr, _ = roc_curve(np.array(true_labels, dtype=int), torch.Tensor(prob_labels).numpy())
             roc_auc = auc(fpr, tpr)
-            mlflow.log_param("roc_false_positive_rate", str(fpr))
-            mlflow.log_param("roc_true_positive_rate", str(tpr))
-            mlflow.log_param("roc_area_under_curve", roc_auc)
+            if hvd.rank() == 0:
+                mlflow.log_param("roc_false_positive_rate", str(fpr))
+                mlflow.log_param("roc_true_positive_rate", str(tpr))
+                mlflow.log_param("roc_area_under_curve", roc_auc)
 
             # models = torch.stack(val_models, dim=0)
 
