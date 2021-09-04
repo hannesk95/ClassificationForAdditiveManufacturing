@@ -1,0 +1,12 @@
+numpy
+plotly
+matplotlib
+seaborn
+numpy-stl
+tqdm
+open3d
+mesh-to-sdf
+trimesh
+scikit-image
+pymeshlab
+torch

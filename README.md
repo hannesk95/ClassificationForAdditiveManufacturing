@@ -1,4 +1,4 @@
-# Geometrical Deep Learning on 3D Models: Classification for Additive Manufacturing
+# Geometrical Deep Learning on 3D Models: <br> Classification for Additive Manufacturing
 ### TUM Data Innovation Lab in cooperation with VW Data:Lab | Summer 2021
 
 ---
@@ -27,6 +27,7 @@
     - [`5.5 Containerized Software Stack`](#55-containerized-software-stack)
     - [`5.6 Data Storage Limitations`](#56-data-storage-limitations)
     - [`5.7 Submitting Jobs into SLURM`](#57-submitting-jobs-into-slurm)
+    - [`5.8 MLflow UI on local browser`](#58-mlflow-ui-on-local-browser)
 - [`6. Model`](#6-model)
     - [`6.1 Model Selection`](#61-model-selection)
     - [`6.2 Modelling`](#62-modelling)
@@ -47,9 +48,11 @@
 
 ## 1. Repository Structure
 - [`data`](/data): Contains some sample data
+- [`dev_notebooks`](/dev_notebooks): Contains all Jupyter notebook files which are used for rapid prototyping
 - [`doc`](/doc): Contains diverse documentation files
 - [`infra`](/infra): Contains all files which are used in order to create the environment for training deep learning models on the LRZ AI System
 - [`src`](/src): Contains all python source files of the project
+- [`tests`](/tests): Contains all test files in order to perform unit testing
 
 ---
 
@@ -127,7 +130,7 @@ For elaborate information about the infrastruture and how to use it, please cons
 
 ### 5.1 General User Instructions
 
-- Request only the number of GPUs you are using (e.g., do not allocate more than 1 GPU if you are not performing parallel training using horovod) 
+- Request only the number of GPUs you are using (i.e. do not allocate more than 1 GPU if you are not performing parallel training using horovod) 
 
 - If your training has not mix precision enabled, please select only these resources with P100 cards 
 
@@ -135,7 +138,7 @@ For elaborate information about the infrastruture and how to use it, please cons
 
 ### 5.2 Login
 
-First, make sure that you've established a VPN tunnel to the LRZ. This can be done using any VPN client (e.g. Cisco AnyConnect) and providing the domain `https://asa-cluster.lrz.de/` if you're ask for that. Afterwards, use your TUM credentials to login. <br>
+First, make sure that you've established a VPN tunnel to the LRZ. This can be done using any VPN client (e.g. Cisco AnyConnect) and providing the domain `https://asa-cluster.lrz.de/` once you're asked for that. Afterwards, use your TUM credentials to login. <br>
 
 Once the VPN connection is established successfully, use SSH in order to login to the AI-System. 
 
@@ -239,6 +242,48 @@ Using this option does not provide a console output. However, within the .sbatch
 srun --container-mounts=./data-test:/mnt/data-test --container-image='horovod/horovod+0.16.4-tf1.12.0-torch1.1.0-mxnet1.4.1-py3.5' \
 python script.py --epochs 55 --batch-size 512
 ```
+
+### 5.8 MLflow UI on local Browser
+
+Once the deep learning container has been started on the LRZ AI system, you'll get a similar output to the one which is presented right below (please be patient, this might take some seconds):
+
+```console
+Cloning into 'TUM-DI-LAB'...
+remote: Enumerating objects: 3151, done.
+remote: Counting objects: 100% (233/233), done.
+remote: Compressing objects: 100% (172/172), done.
+remote: Total 3151 (delta 122), reused 135 (delta 61), pack-reused 2918
+Receiving objects: 100% (3151/3151), 108.13 MiB | 6.50 MiB/s, done.
+Resolving deltas: 100% (2100/2100), done.
+Updating files: 100% (145/145), done.
+Branch 'dev' set up to track remote branch 'dev' from 'origin'.
+Switched to a new branch 'dev'
+entrypoint.sh: line 9: cd: /workspace/mount_dir/: No such file or directory
+root@9fdaa7f9b957:/workspace# [2021-06-23 09:06:13 +0000] [339] [INFO] Starting gunicorn 20.1.0
+[2021-06-23 09:06:13 +0000] [339] [INFO] Listening at: http://0.0.0.0:5000 (339)
+[2021-06-23 09:06:13 +0000] [339] [INFO] Using worker: sync
+[2021-06-23 09:06:13 +0000] [341] [INFO] Booting worker with pid: 341
+```
+
+Things which are happening here are:
+- The latest version of the TUM-DI-LAB github repository gets cloned into the container
+- The working branch is changed to dev
+- The MLflow UI gets started as a background process (please do not kill this job, otherwise UI is not accessible anymore)
+
+`After you are facing a similar output as shown above, please hit ENTER, in ordert to get to the well known bash CLI.`
+
+From there on, please follow the corresponding steps in order to open the MLflow UI on your local web browser:
+1. Get to know the ip-address of the machine you are working on. Therefore execute the follwoing command:
+```console
+$ ifconfig
+```
+`Please look for the ip-adress which starts with 10.XXX.XXX.XXX`
+
+2. Start a web browser on your local machine and open the socket comprised of the ip-adress and the port 5000. A respective example can be found below:
+```
+http://10.195.15.242:5000/
+```
+
 
 ---
 
